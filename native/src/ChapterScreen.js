@@ -9,6 +9,7 @@ import {
   Text,
   ScrollView,
   Dimensions,
+  Platform,
   TouchableWithoutFeedback
 } from "react-native";
 import { TabRouter, NavigationActions } from "react-navigation";
@@ -24,6 +25,14 @@ const DefaultChapterRouter = TabRouter({
   ChapterEditPane: { screen: ChapterEditPane },
   ChapterResultsPane: { screen: ChapterResultsPane }
 });
+
+function timeoutOnAndroidHack(deferCbOnAndroid) {
+  if (Platform.OS === 'android') {
+    setTimeout(deferCbOnAndroid, 1);
+  } else {
+    deferCbOnAndroid();
+  }
+}
 
 const ChapterRouter = {
   ...DefaultChapterRouter,
@@ -45,7 +54,10 @@ class ChapterScreen extends Component {
   componentDidMount() {
     const newIndex = this.props.navigation.state.index;
     const scrollView = this._scroller.getNode();
-    scrollView.scrollTo({ x: newIndex * SCREEN_WIDTH, animated: false });
+    timeoutOnAndroidHack(() => {
+      // scroll to on mount does not work on Android unless we set this timeout :-(
+      scrollView.scrollTo({ x: newIndex * SCREEN_WIDTH, animated: false });
+    });
   }
   static navigationOptions = ({ navigation }) => ({
     headerBackTitle: "Cancel",

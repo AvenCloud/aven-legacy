@@ -49,18 +49,22 @@ class App extends Component {
       });
     }
   }
+  async componentDidUpdate() {
+    await AsyncStorage.setItem(NAV_STORE_KEY, JSON.stringify(this.state.nav));
+    console.log(this.state.nav);
+  }
   render() {
     if (!this.state.nav) {
       return null;
     }
     return (
-      <View style={{paddingTop: APP_TOP_PADDING, flex: 1}}>
-      <AppNavigator
-        navigation={addNavigationHelpers({
-          state: this.state.nav,
-          dispatch: this.dispatch
-        })}
-      />
+      <View style={{ paddingTop: APP_TOP_PADDING, flex: 1 }}>
+        <AppNavigator
+          navigation={addNavigationHelpers({
+            state: this.state.nav,
+            dispatch: this.dispatch
+          })}
+        />
       </View>
     );
   }

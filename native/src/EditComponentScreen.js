@@ -7,7 +7,21 @@ import { Text, View } from "react-native";
 import { List, ListItem, ButtonGroup } from "react-native-elements";
 import { GameComponents } from "./Game";
 import { WithChapterState, setChapterState } from "./ChapterStore";
-import { isTypeOrOfLiterals } from "./ZUtil";
+
+function isTypeOrOfLiterals(typeDef) {
+  if (!typeDef instanceof Array) {
+    return false;
+  }
+  let hasOnlyLiterals = true;
+  typeDef.forEach(t => {
+    if (!(typeof t === "string" ||
+      typeof t === "boolean" ||
+      typeof t === "number")) {
+      hasOnlyLiterals = false;
+    }
+  });
+  return hasOnlyLiterals;
+}
 
 class PropEditor extends Component {
   render() {

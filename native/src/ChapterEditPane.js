@@ -4,7 +4,8 @@
 
 import React, { Component } from "react";
 import Icon from "react-native-vector-icons/Ionicons";
-import { Alert, Text, View, TouchableOpacity } from "react-native";
+import { Alert, Text, View } from "react-native";
+import PlusButton from './PlusButton';
 import ChapterPane from "./ChapterPane";
 import { ListItem } from "react-native-elements";
 import { WithChapterState, setChapterState } from "./ChapterStore";
@@ -59,32 +60,11 @@ class ChapterEditPaneWithState extends Component {
     return (
       <ChapterPane
         absolutely={
-          <TouchableOpacity
+          <PlusButton
             onPress={() => {
               navigation.navigate("NewComponent", { chapterIndex });
             }}
-          >
-            <View
-              style={{
-                height: 50,
-                width: 50,
-                borderRadius: 25,
-                backgroundColor: "#ccc",
-                overflow: "hidden",
-                padding: 0,
-                position: "absolute",
-                right: 15,
-                bottom: 15
-              }}
-            >
-              <Icon
-                name="ios-add"
-                size={40}
-                style={{ marginHorizontal: 15, marginVertical: 5 }}
-                color="black"
-              />
-            </View>
-          </TouchableOpacity>
+          />
         }
       >
         <EditorContent {...this.props} />

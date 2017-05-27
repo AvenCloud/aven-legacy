@@ -12,8 +12,8 @@ const SCREEN_HEIGHT = Dimensions.get("window").height;
 class ChapterPane extends Component {
   render() {
     return (
-      <View style={{ flex: 1 }}>
-        <ScrollView style={{ flex: 1, width: SCREEN_WIDTH, borderWidth: 2 }}>
+      <View style={{ flex: 1, }}>
+        <ScrollView style={{ flex: 1, width: SCREEN_WIDTH, }}>
           {this.props.children}
         </ScrollView>
         {this.props.absolutely}
