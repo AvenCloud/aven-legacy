@@ -1,0 +1,16 @@
+{
+  "name": "zed",
+  "version": "0.0.0",
+  "main": "lib/Zed.js",
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-react-native-stage-0": "^1.0.1",
+    "jest": "^20.0.4",
+    "jest-cli": "^20.0.4"
+  },
+  "scripts": {
+    "test": "node node_modules/jest/bin/jest.js --watch",
+    "start": "babel src/ --source-maps --out-dir lib/ --watch",
+    "build": "babel src/ --source-maps --out-dir lib/"
+  }
+}

@@ -15,7 +15,7 @@ class AlienGameComponent extends Component {
     name = name || "Unnamed Alien";
     color = color || "red";
     return (
-      <View style={{ width: 187, alignSelf: 'center'}}>
+      <View style={{ width: 187, alignSelf: 'center' }}>
         <Image
           style={{
             tintColor: color || "red",
@@ -25,7 +25,7 @@ class AlienGameComponent extends Component {
           }}
           source={require("../assets/alien-head.png")}
         />
-        <Text style={{textAlign: 'center', color }}>{name}</Text>
+        <Text style={{ textAlign: 'center', color }}>{name}</Text>
       </View>
     );
   }
@@ -37,9 +37,9 @@ class KitchenSinkTypeComponent extends Component {
   static ZTypes: ZTypeMap = {
     name: { type: "string" },
     chooseLiterals: ["red", "blue", "green", true, 0.5],
-    width: { type: 'number'},
-    isThisThingOn: { type: 'boolean'},
-    strOrFifteen: [ {type: 'string'}, 15 ]
+    width: { type: 'number' },
+    isThisThingOn: { type: 'boolean' },
+    strOrFifteen: [{ type: 'string' }, 15]
   };
   render() {
     return <Text>{JSON.stringify(this.props)}</Text>;
@@ -73,9 +73,9 @@ const GameChapters = [
   {
     title: "Advanced game",
     description: "This is how you get started",
-    components: ["Alien", 'KitchenSink'],
+    components: Object.keys(GameComponents),
     getError: chapter => {
-      return "This chapter is literally impossible"
+      return "This chapter is literally impossible. Have fun!"
     }
   }
 ];
