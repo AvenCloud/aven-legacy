@@ -6,7 +6,7 @@ import React, { Component } from "react";
 import { Text, View } from "react-native";
 import { List, ListItem, ButtonGroup } from "react-native-elements";
 import { GameComponents } from "./Game";
-import { WithChapterState, setChapterState } from "./ChapterStore";
+import { WithZed } from "./ChapterStore";
 
 function isTypeOrOfLiterals(typeDef) {
   if (!typeDef instanceof Array) {
@@ -14,9 +14,11 @@ function isTypeOrOfLiterals(typeDef) {
   }
   let hasOnlyLiterals = true;
   typeDef.forEach(t => {
-    if (!(typeof t === "string" ||
-      typeof t === "boolean" ||
-      typeof t === "number")) {
+    if (
+      !(typeof t === "string" ||
+        typeof t === "boolean" ||
+        typeof t === "number")
+    ) {
       hasOnlyLiterals = false;
     }
   });
@@ -96,7 +98,7 @@ class PropEditor extends Component {
             <View style={{ flex: 1 }}>
               <ButtonGroup
                 selectedIndex={selectedIndex}
-                onPress={(index) => onValue(propTypeDef[index])}
+                onPress={index => onValue(propTypeDef[index])}
                 buttons={propTypeDef.map(tt => <Text>{"" + tt}</Text>)}
               />
             </View>
@@ -120,7 +122,7 @@ class EditComponentScreenWithState extends Component {
     title: "Edit Component"
   };
   render() {
-    const { chapterState, navigation, chapter } = this.props;
+    const { chapterState, navigation, chapter, setChapterState } = this.props;
     const { state, goBack } = navigation;
     const { chapterIndex, context } = state.params;
     const { components } = chapterState;
@@ -165,6 +167,6 @@ class EditComponentScreenWithState extends Component {
     );
   }
 }
-const EditComponentScreen = WithChapterState(EditComponentScreenWithState);
+const EditComponentScreen = WithZed(EditComponentScreenWithState);
 
 export default EditComponentScreen;

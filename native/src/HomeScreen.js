@@ -5,7 +5,7 @@
 import React, { Component } from "react";
 import { List, ListItem } from "react-native-elements";
 import { GameChapters } from "./Game";
-import { resetGame } from './ChapterStore';
+import { Alert } from "react-native";
 
 class HomeScreen extends Component {
   static navigationOptions = () => ({
@@ -23,15 +23,15 @@ class HomeScreen extends Component {
           />
         ))}
         <ListItem
-          containerStyle={{marginTop: 20}}
+          containerStyle={{ marginTop: 20 }}
           title="TESTING ONLY: Reset Game"
-          onPress={resetGame}
+          onPress={() => {
+            Alert.alert("not yet built");
+          }}
         />
       </List>
     );
   }
 }
-
-
 
 export default HomeScreen;

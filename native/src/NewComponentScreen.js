@@ -5,14 +5,14 @@
 import React, { Component } from "react";
 import { List, ListItem } from "react-native-elements";
 import { GameChapters } from "./Game";
-import { WithChapterState, setChapterState } from "./ChapterStore";
+import { WithZed } from "./ChapterStore";
 
 class NewComponentScreenWithState extends Component {
   static navigationOptions = {
     title: "Add Component.."
   };
   render() {
-    const { chapterState, navigation } = this.props;
+    const { chapterState, navigation, setChapterState } = this.props;
     const { state, goBack } = navigation;
     const { chapterIndex } = state.params;
     const validComponents = GameChapters[chapterIndex].components;
@@ -27,7 +27,7 @@ class NewComponentScreenWithState extends Component {
                 ...chapterState,
                 components: [
                   ...(chapterState.components || []),
-                  { type: componentName, key: ''+Date.now() }
+                  { type: componentName, key: "" + Date.now() }
                 ]
               });
               goBack();
@@ -38,6 +38,6 @@ class NewComponentScreenWithState extends Component {
     );
   }
 }
-const NewComponentScreen = WithChapterState(NewComponentScreenWithState);
+const NewComponentScreen = WithZed(NewComponentScreenWithState);
 
 export default NewComponentScreen;

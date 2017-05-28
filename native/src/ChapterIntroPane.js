@@ -5,7 +5,7 @@
 import React, { Component } from "react";
 import { Text } from "react-native";
 import ChapterPane from "./ChapterPane";
-import { WithChapterState } from "./ChapterStore";
+import { WithZed } from "./ChapterStore";
 
 class ChapterIntroPaneWithState extends Component {
   render() {
@@ -13,6 +13,6 @@ class ChapterIntroPaneWithState extends Component {
     return <ChapterPane><Text>{chapter.description}</Text></ChapterPane>;
   }
 }
-const ChapterIntroPane = WithChapterState(ChapterIntroPaneWithState);
+const ChapterIntroPane = WithZed(ChapterIntroPaneWithState);
 
 export default ChapterIntroPane;

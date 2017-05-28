@@ -5,7 +5,7 @@
 import React, { Component } from "react";
 import { Text, View } from "react-native";
 import ChapterPane from "./ChapterPane";
-import { WithChapterState } from "./ChapterStore";
+import { WithZed } from "./ChapterStore";
 import { GameComponents } from "./Game";
 
 class ChapterMessage extends Component {
@@ -47,6 +47,6 @@ class ChapterResultsPaneWithState extends Component {
     );
   }
 }
-const ChapterResultsPane = WithChapterState(ChapterResultsPaneWithState);
+const ChapterResultsPane = WithZed(ChapterResultsPaneWithState);
 
 export default ChapterResultsPane;

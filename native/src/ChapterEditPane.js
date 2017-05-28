@@ -5,14 +5,19 @@
 import React, { Component } from "react";
 import Icon from "react-native-vector-icons/Ionicons";
 import { Alert, Text, View } from "react-native";
-import PlusButton from './PlusButton';
+import PlusButton from "./PlusButton";
 import ChapterPane from "./ChapterPane";
 import { ListItem } from "react-native-elements";
-import { WithChapterState, setChapterState } from "./ChapterStore";
+import { WithZed } from "./ChapterStore";
 
 class EditorContent extends Component {
   render() {
-    const { chapterState, chapterIndex, navigation } = this.props;
+    const {
+      chapterState,
+      chapterIndex,
+      navigation,
+      setChapterState
+    } = this.props;
     if (!chapterState || !chapterState.components) {
       return <Text>Add something!</Text>;
     }
@@ -72,6 +77,6 @@ class ChapterEditPaneWithState extends Component {
     );
   }
 }
-const ChapterEditPane = WithChapterState(ChapterEditPaneWithState);
+const ChapterEditPane = WithZed(ChapterEditPaneWithState);
 
 export default ChapterEditPane;
