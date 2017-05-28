@@ -4,14 +4,15 @@
 
 // Single types:
 type ZLiteral = string | number | boolean;
-type ZStringDef = { type: "ZStringSpec" };
-type ZNumberDef = { type: "ZNumberSpec" };
-type ZBooleanDef = { type: "ZBooleanSpec" };
+type ZStringDef = { type: "ZStringSpec", value: string };
+type ZNumberDef = { type: "ZNumberSpec", value: number };
+type ZBooleanDef = { type: "ZBooleanSpec", value: boolean };
 type ZSingleDef = ZStringDef | ZBooleanDef | ZNumberDef | ZLiteral;
 
 // Intermediate types (this is not actually a ZType by itself)
 type ZMap = { [key: string]: ZData };
 type ZSet = Array<ZData>;
+type ZAddressDef = { type: "ZAddress", address: Array<string | number> };
 
 // Composite Types
 type ZListDef = {
@@ -27,7 +28,6 @@ type ZOrDef = { type: "ZOrSpec", options: ZSet };
 // Main type
 type ZData = ZSingleDef | ZListDef | ZObjectDef | ZOrDef;
 
-type ZAddress = string | Array<string>;
 type ZAddressListener = ZAddress => void;
 
 const VALID_TYPES = [
@@ -38,6 +38,17 @@ const VALID_TYPES = [
   "ZBooleanSpec",
   "ZObjectSpec"
 ];
+
+export function ZObject(items: ZMap, typeMap: ZMap): ZObjectDef {
+  return { type: "ZObjectSpec", items, typeMap };
+}
+export function ZList(items: ZSet, allType: ZData, tupleType: ZSet): ZListDef {
+  return { type: "ZListSpec", items, allType, tupleType };
+}
+
+export function ZAddress(...address): ZAddress {
+  return { type: "ZAddress", address };
+}
 
 export function isLiteralType(typeDef: ZData): boolean {
   return (
@@ -57,8 +68,8 @@ export function isTypeMatch(value: ZData, type: ZData): boolean {
 export function ZToJSON(data: ZData): mixed {
   return { IS_SERIALIZED_ZED: true, data };
 }
-export function JSONToZ(json: mixed): ZData {
-  if (!json) {
+export function JSONToZ(json: mixed): ?ZData {
+  if (json == null) {
     return json;
   } else if (json instanceof Array) {
     const zDataSet = json.map(jsonChild => {
@@ -126,7 +137,7 @@ export function createStore() {
 }
 
 /*import {
-  ZAdd, ZConnect, ZRef, ZNumber, ZAction, ZSetDocAction
+  ZAdd, ZConnect, ZAddress, ZNumber, ZAction, ZSetDocAction
 } from 'ZUtil'
 
 class Foo extends Component {
@@ -137,7 +148,7 @@ class Foo extends Component {
   render() {
     return (
       <div onPress={() => {
-        this.props.dispatch(ZSetDocAction('pressCount', ZAdd(ZRef('pressCount'), 1));
+        this.props.dispatch(ZSetDocAction('pressCount', ZAdd(ZAddress('pressCount'), 1));
       }}>
         Qty: {this.props.docs.qty}
         {this.props.docs.pressCount}
