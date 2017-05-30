@@ -18,31 +18,65 @@ const DOC_INDEX_KEY = "DOCS-INDEX";
     chapterStates = JSON.parse(chapterData);
     chapterStateEventEmitter.emit("change");
   }
-
-  const docIndex = [];
-  const docIndexData = await AsyncStorage.getItem(DOC_INDEX_KEY);
 })();
+
+async function markDocAsTracked(docName: string) {
+  if (docIndex.indexOf(docName) === -1) {
+    docIndex.push(docName);
+    await AsyncStorage.setItem(DOC_INDEX_KEY, JSON.stringify(docIndex));
+  }
+}
 
 let chapterStates = [];
 const chapterStateEventEmitter = new EventEmitter();
 
-const docsEventEmitter = new EventEmitter();
-const docs = {};
+class ZedStore {
+  constructor(input) {
+    this.hyrdrateData();
+  }
+
+  async hyrdrateData() {
+    const docIndexData = await AsyncStorage.getItem(DOC_INDEX_KEY);
+    if (docIndexData) {
+      this.docIndex = [...docIndex, ...JSON.parse(docIndexData)];
+    }
+  }
+  docIndex: Array<string> = [];
+  docsEventEmitter = new EventEmitter();
+  docs = {}; // mutation only!
+}
+
+const theStore = new ZedStore();
+const docIndex = [];
 
 const WithZed = (ComponentNeedsChapter: Component<*, *, *>) => {
+  // $FlowFixMe lol
+  const getDocsForProps = ComponentNeedsChapter.getDocsForProps;
   class ChapterStateConnectorComponent extends Component {
+    // $FlowFixMe lol
     static navigationOptions = ComponentNeedsChapter.navigationOptions;
     listener: ?ZListener = null;
-    state = {
-      docs: {},
-      chapter: chapterStates[this.props.navigation.state.params.chapterIndex]
-    };
+    constructor(props) {
+      super(props);
+      const initialDocsState = {};
+      getDocsForProps &&
+        getDocsForProps(props).forEach(docName => {
+          initialDocsState[docName] = docs[docName];
+        });
+      this.state = {
+        docs: initialDocsState,
+        chapter: chapterStates[props.navigation.state.params.chapterIndex]
+      };
+    }
     componentDidMount() {
       this.listener = chapterStateEventEmitter.addListener(
         "change",
         this.chapterChange
       );
-      this.listener = docsEventEmitter.addListener("change", this.docChange);
+      this.listener = theStore.docsEventEmitter.addListener(
+        "change",
+        this.docChange
+      );
     }
     chapterChange = () => {
       const { chapterIndex } = this.props.navigation.state.params;
@@ -50,16 +84,17 @@ const WithZed = (ComponentNeedsChapter: Component<*, *, *>) => {
         this.setState({ chapter: chapterStates[chapterIndex] });
       }
     };
-    docChange = (docName: string) => {
+    docChange = async (docName: string) => {
       if (Object.keys(this.state.docs).indexOf(docName) !== -1) {
         this.setState(state => ({
-          docs: { ...state.docs, [docName]: docs[docName] }
+          docs: { ...state.docs, [docName]: theStore.docs[docName] }
         }));
       }
     };
     setDoc = async (docName: string, docValue: ZData) => {
       docs[docName] = docValue;
       docsEventEmitter.emit("change", docName);
+      await markDocAsTracked(docName);
       const chapterData = await AsyncStorage.setItem(
         `DOCS-${docName}`,
         JSON.stringify(docValue)
@@ -69,15 +104,11 @@ const WithZed = (ComponentNeedsChapter: Component<*, *, *>) => {
       this.listener && this.listener.remove();
     }
     render() {
-      const { chapterIndex } = this.props.navigation.state.params;
-      const chapter = GameChapters[chapterIndex];
       const chapterState = this.state.chapter || {};
       return (
         <ComponentNeedsChapter
           {...this.props}
           docs={this.state.docs}
-          chapter={chapter}
-          chapterIndex={chapterIndex}
           chapterState={chapterState}
           setDoc={this.setDoc}
           setChapterState={async (index, newState) => {

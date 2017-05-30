@@ -5,8 +5,8 @@
 import React, { Component } from "react";
 import { Text, View } from "react-native";
 import { List, ListItem, ButtonGroup } from "react-native-elements";
-import { GameComponents } from "./Game";
-import { WithZed } from "./ChapterStore";
+import { GameComponents, GameChapters } from "./Game";
+import { WithZed } from "./ZedStore";
 
 function isTypeOrOfLiterals(typeDef) {
   if (!typeDef instanceof Array) {
@@ -28,8 +28,6 @@ function isTypeOrOfLiterals(typeDef) {
 class PropEditor extends Component {
   render() {
     const {
-      chapter,
-      chapterIndex,
       chapterState,
       navigation,
       context,
@@ -122,9 +120,10 @@ class EditComponentScreenWithState extends Component {
     title: "Edit Component"
   };
   render() {
-    const { chapterState, navigation, chapter, setChapterState } = this.props;
+    const { chapterState, navigation, setChapterState } = this.props;
     const { state, goBack } = navigation;
     const { chapterIndex, context } = state.params;
+    const chapter = GameChapters[chapterIndex];
     const { components } = chapterState;
     let thisComponent = chapterState;
     context.forEach(contextName => {

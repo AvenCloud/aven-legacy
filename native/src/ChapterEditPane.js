@@ -8,21 +8,17 @@ import { Alert, Text, View } from "react-native";
 import PlusButton from "./PlusButton";
 import ChapterPane from "./ChapterPane";
 import { ListItem } from "react-native-elements";
-import { WithZed } from "./ChapterStore";
+import { WithZed } from "./ZedStore";
 
 class EditorContent extends Component {
   render() {
-    const {
-      chapterState,
-      chapterIndex,
-      navigation,
-      setChapterState
-    } = this.props;
+    const { chapterState, navigation, setChapterState } = this.props;
     if (!chapterState || !chapterState.components) {
       return <Text>Add something!</Text>;
     }
     const { components } = chapterState;
-    const { navigate } = navigation;
+    const { navigate, state } = navigation;
+    const { chapterIndex } = state.params;
     return (
       <View>
         {components.map((c, index) => (
@@ -61,7 +57,8 @@ class EditorContent extends Component {
 
 class ChapterEditPaneWithState extends Component {
   render() {
-    const { chapter, chapterState, chapterIndex, navigation } = this.props;
+    const { chapterState, navigation } = this.props;
+    const { chapterIndex } = navigation.state.params;
     return (
       <ChapterPane
         absolutely={

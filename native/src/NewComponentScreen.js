@@ -5,7 +5,7 @@
 import React, { Component } from "react";
 import { List, ListItem } from "react-native-elements";
 import { GameChapters } from "./Game";
-import { WithZed } from "./ChapterStore";
+import { WithZed } from "./ZedStore";
 
 class NewComponentScreenWithState extends Component {
   static navigationOptions = {
@@ -15,10 +15,10 @@ class NewComponentScreenWithState extends Component {
     const { chapterState, navigation, setChapterState } = this.props;
     const { state, goBack } = navigation;
     const { chapterIndex } = state.params;
-    const validComponents = GameChapters[chapterIndex].components;
+    const chapter = GameChapters[chapterIndex];
     return (
       <List>
-        {validComponents.map((componentName, i) => (
+        {chapter.components.map((componentName, i) => (
           <ListItem
             key={i}
             title={componentName}
