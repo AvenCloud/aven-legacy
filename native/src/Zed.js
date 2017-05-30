@@ -46,7 +46,7 @@ export function ZList(items: ZSet, allType: ZData, tupleType: ZSet): ZListDef {
   return { type: "ZList", items, allType, tupleType };
 }
 
-export function ZAddress(...address): ZAddress {
+export function ZAddress(address): ZAddress {
   return { type: "ZAddress", address };
 }
 
@@ -66,161 +66,66 @@ export function ZEquals(a, b): ZEquals {
   return { type: "ZEquals", a, b };
 }
 
-// export function isLiteralType(typeDef: ZData): boolean {
-//   return (
-//     typeof typeDef === "string" ||
-//     typeof typeDef === "boolean" ||
-//     typeof typeDef === "number"
-//   );
-// }
+export function ZSum(a, b): ZSum {
+  return { type: "ZSum", a, b };
+}
 
-// export function isTypeMatch(value: ZData, type: ZData): boolean {
-//   if (isLiteralType(type) && value === type) {
-//     return true;
-//   }
-//   return false;
-// }
-
-// export function ZToJSON(data: ZData): mixed {
-//   return { IS_SERIALIZED_ZED: true, data };
-// }
-// export function JSONToZ(json: mixed): ?ZData {
-//   if (json == null) {
-//     return json;
-//   } else if (json instanceof Array) {
-//     const zDataSet = json.map(jsonChild => {
-//       return JSONToZ(jsonChild);
-//     });
-//     return { type: "list", items: zDataSet };
-//   }
-//   if (json.IS_SERIALIZED_ZED) {
-//     return json.data;
-//   }
-//   const zDataMap = {};
-//   Object.keys(json).map(name => {
-//     zDataMap[name] = JSONToZ(json[name]);
-//   });
-//   return { type: "object", items: zDataMap };
-// }
-
-// function getMutationValidationErrorMessage(state, address, newValue) {
-//   // todo
-// }
-
-// export function createStore() {
-//   const state = {};
-//   const listeners = [];
-
-//   function mutate(address: ZAddress, value: ZData) {
-//     const validationErrorMessage = getMutationValidationErrorMessage(
-//       state,
-//       address,
-//       value
-//     );
-//     if (validationErrorMessage) {
-//       throw new Error("Invalid data. " + validationErrorMessage);
-//     }
-//     if (typeof address === "string") {
-//       address = [address];
-//     }
-//     if (!address instanceof Array) {
-//       throw new Error("Unknown address type!");
-//     }
-
-//     emitChange(address);
-//   }
-
-//   function addListener(stateAddressListener: ZAddressListener) {
-//     listeners.push(stateAddressListener);
-//     return {
-//       remove: () => listeners.splice(listeners.indexOf(stateAddressListener), 1)
-//     };
-//   }
-
-//   function emitChange(address) {
-//     listeners.forEach(listener => {
-//       listener(address);
-//     });
-//   }
-
-//   const store = {
-//     state,
-//     mutate,
-//     addListener
-//   };
-
-//   return store;
-// }
-
-/*import {
-  ZAdd, ZConnect, ZAddress, ZNumber, ZAction, ZSetDocAction
-} from 'ZUtil'
-
-class Foo extends Component {
-  static docs = {
-    pressCount: ZNumber(0),
-    qty: ZNumber(0),
+function genPrimitiveType(typeName, jsPrimitive) {
+  return {
+    match: input => {
+      return input.type === typeName && typeof input.value === jsPrimitive;
+    },
+    compute: (store, input) => {
+      return input;
+    }
   };
-  render() {
-    return (
-      <div onPress={() => {
-        this.props.dispatch(ZSetDocAction('pressCount', ZAdd(ZAddress('pressCount'), 1));
-      }}>
-        Qty: {this.props.docs.qty}
-        {this.props.docs.pressCount}
-      </div>
-    );
-  }
 }
 
-ZConnect(Foo);
-*/
+const BUILT_IN_STUFF = {
+  ZString: genPrimitiveType("ZString", "string"),
+  ZBoolean: genPrimitiveType("ZBoolean", "boolean"),
+  ZNumber: genPrimitiveType("ZNumber", "number"),
 
-import ZedTypes from "./ZedTypes";
-
-export function getBuiltInType(input) {
-  const matchBuiltInZedType = Object.keys(ZedTypes).find(
-    typeName => input.type === typeName
-  );
-  if (matchBuiltInZedType) {
-    return ZedTypes[matchBuiltInZedType];
+  ZAddress: {
+    compute: (store, input) => {
+      return store.compute(store.data[input.address]);
+    }
+  },
+  ZEquals: {
+    compute: (store, input) => {
+      const a = store.compute(input.a);
+      const b = store.compute(input.b);
+      return ZBoolean(a.value === b.value);
+    }
+  },
+  ZSum: {
+    compute: (store, input) => {
+      const a = store.compute(input.a);
+      const b = store.compute(input.b);
+      return ZNumber(a.value + b.value);
+    }
   }
-  return null;
-}
+};
 
-export function validate(input, type) {
-  const definedType = type && getBuiltInType(type);
-  if (definedType) {
-    return definedType.validate(input, type);
+export class Store {
+  data: ZMap = {};
+  constructor(initialData: ZMap) {
+    this.data = initialData;
   }
-  const impliedType = getBuiltInType(input);
-  if (impliedType) {
-    return impliedType.validate(input);
-  }
+  compute(doc: ZData) {
+    const docType = doc.type;
 
-  if (type == null) {
-    // I suppose type is not meant to match anything, and there is no error..
-    return false;
+    const builtIn = BUILT_IN_STUFF[docType];
+    if (builtIn) {
+      return builtIn.compute(this, doc);
+    }
+    throw new Error("Unrecognized type");
   }
-  return "is of an unknown type";
-}
-
-export function compute(docs, address) {
-  const doc = docs[address];
-  const validationError = validate(doc);
-  if (validationError) {
-    return { validationError, doc };
+  match(input, expectedType) {
+    const builtIn = BUILT_IN_STUFF[expectedType];
+    if (builtIn) {
+      return builtIn.match(input);
+    }
+    throw new Error("Unrecognized type");
   }
-  const t = getBuiltInType(doc);
-  if (t) {
-    return t.compute(doc, docs);
-  }
-  return null;
-}
-
-export function get(docs, address) {
-  const computed = compute(docs, address);
-
-  // now convert it to json mmkay
-  return false;
 }

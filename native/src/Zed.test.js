@@ -7,7 +7,9 @@ import {
   ZNumber,
   ZBoolean,
   ZEquals,
-  ZAddress
+  ZAddress,
+  ZSum,
+  Store
 } from "./Zed";
 
 // test("Zed Store Has initial state", () => {
@@ -47,51 +49,95 @@ import {
 //   // expect(someMockFunction.mock.calls[0][0]).toBe('first arg');
 // });
 
-test("Validates Primitive Strings", () => {
-  expect(validate(ZString("asdf"), ZString())).toBeFalsy();
-  expect(validate(ZString("foo"), ZString("bar"))).toEqual(
-    'does not match "bar"'
-  );
-  expect(validate(ZNumber(42), ZString())).toEqual("is not a string");
-  expect(validate(ZString("bar"), ZString("bar"))).toBeFalsy();
-});
+// test("Validates Primitive Strings", () => {
+//   expect(validate(ZString("asdf"), ZString())).toBeFalsy();
+//   expect(validate(ZString("foo"), ZString("bar"))).toEqual(
+//     'does not match "bar"'
+//   );
+//   expect(validate(ZNumber(42), ZString())).toEqual("is not a string");
+//   expect(validate(ZString("bar"), ZString("bar"))).toBeFalsy();
+// });
 
-test("Validates Primitive Numbers", () => {
-  expect(validate(ZNumber(12), ZNumber())).toBeFalsy();
-  expect(validate(ZNumber(91), ZNumber(73))).toEqual("does not equal 73");
-  expect(validate(ZString("foo"), ZNumber())).toEqual("is not a number");
-  expect(validate(ZNumber(73), ZNumber(73))).toBeFalsy();
-});
+// test("Validates Primitive Numbers", () => {
+//   expect(validate(ZNumber(12), ZNumber())).toBeFalsy();
+//   expect(validate(ZNumber(91), ZNumber(73))).toEqual("does not equal 73");
+//   expect(validate(ZString("foo"), ZNumber())).toEqual("is not a number");
+//   expect(validate(ZNumber(73), ZNumber(73))).toBeFalsy();
+// });
 
 test("compute basics", () => {
-  const simpleDocs = {
+  const store = new Store({
     a: ZNumber(12),
     b: ZString("foo"),
     c: ZBoolean(true),
     d: ZBoolean(false)
-  };
-  expect(compute(simpleDocs, "a").type).toEqual("ZNumber");
-  expect(compute(simpleDocs, "a").value).toEqual(12);
-  expect(compute(simpleDocs, "b").type).toEqual("ZString");
-  expect(compute(simpleDocs, "b").value).toEqual("foo");
-  expect(compute(simpleDocs, "c").type).toEqual("ZBoolean");
-  expect(compute(simpleDocs, "c").value).toEqual(false);
-  expect(compute(simpleDocs, "d").value).toEqual(true);
+  });
+  expect(store.compute(ZAddress("a")).type).toEqual("ZNumber");
+  expect(store.compute(ZAddress("a")).value).toEqual(12);
+  expect(store.compute(ZAddress("b")).type).toEqual("ZString");
+  expect(store.compute(ZAddress("b")).value).toEqual("foo");
+  expect(store.compute(ZAddress("c")).type).toEqual("ZBoolean");
+  expect(store.compute(ZAddress("c")).value).toEqual(true);
+  expect(store.compute(ZAddress("d")).value).toEqual(false);
+});
+
+test("addressing", () => {
+  const store = new Store({
+    x: ZNumber(12),
+    y: ZAddress("x")
+  });
+  expect(store.compute(ZAddress("y")).type).toEqual("ZNumber");
+  expect(store.compute(ZAddress("y")).value).toEqual(12);
 });
 
 test("Equality primitives", () => {
-  const docs = {
-    x: 42,
-    y: "abc",
+  const store = new Store({
+    x: ZNumber(42),
+    y: ZString("abc"),
     a: ZEquals(ZAddress("x"), ZNumber(42)),
     b: ZEquals(ZAddress("x"), ZNumber(12)),
     c: ZEquals(ZAddress("y"), ZString("abc")),
     d: ZEquals(ZAddress("y"), ZString("foo")),
     e: ZEquals(ZAddress("y"), ZNumber(12))
-  };
-  expect(compute(docs, "a").value).toEqual(true);
-  expect(compute(docs, "b").value).toEqual(false);
-  expect(compute(docs, "c").value).toEqual(true);
-  expect(compute(docs, "d").value).toEqual(false);
-  expect(compute(docs, "e").value).toEqual(false);
+  });
+  expect(store.compute(ZAddress("a")).value).toEqual(true);
+  expect(store.compute(ZAddress("b")).value).toEqual(false);
+  expect(store.compute(ZAddress("c")).value).toEqual(true);
+  expect(store.compute(ZAddress("d")).value).toEqual(false);
+  expect(store.compute(ZAddress("e")).value).toEqual(false);
+});
+
+test("Sums", () => {
+  const store = new Store({
+    x: ZNumber(42),
+    y: ZNumber(5),
+    a: ZSum(ZAddress("x"), ZNumber(0)),
+    b: ZSum(ZAddress("x"), ZAddress("y"))
+  });
+  expect(store.compute(ZSum(ZNumber(2), ZNumber(0))).value).toEqual(2);
+  expect(store.compute(ZSum(ZNumber(0.2), ZAddress("x"))).value).toEqual(42.2);
+  expect(store.compute(ZAddress("a")).value).toEqual(42);
+  expect(store.compute(ZAddress("b")).value).toEqual(47);
+});
+
+test("Basic type errors", () => {
+  const store = new Store();
+  expect(store.match(ZString("a"), "ZString")).toBeTruthy();
+  expect(store.match(ZString("a"), "ZNumber")).toBeFalsy();
+  expect(store.match(ZNumber(12), "ZNumber")).toBeTruthy();
+  expect(store.match(ZNumber(12), "ZString")).toBeFalsy();
+});
+
+test("fancy type errors", () => {
+  const store = new Store({
+    x: ZNumber(42),
+    y: ZNumber(5),
+    a: ZSum(ZAddress("x"), ZAddress("y"))
+  });
+  expect(store.match(ZAddress("a"), "ZNumber")).toBeTruthy();
+
+  // expect(store.compute(ZSum(ZString("a"), ZString("a"))).value).toEqual(null);
+  // expect(
+  //   store.compute(ZSum(ZString("a"), ZString("a"))).validationError
+  // ).toEqual("Cannot add something that is not a number");
 });
