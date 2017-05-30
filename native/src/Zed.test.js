@@ -1,6 +1,14 @@
 const Zed = require("./Zed");
 
-import { validate, compute, ZString, ZNumber, ZEquals, ZAddress } from "./Zed";
+import {
+  validate,
+  compute,
+  ZString,
+  ZNumber,
+  ZBoolean,
+  ZEquals,
+  ZAddress
+} from "./Zed";
 
 // test("Zed Store Has initial state", () => {
 //   const store = createStore();
@@ -40,35 +48,27 @@ import { validate, compute, ZString, ZNumber, ZEquals, ZAddress } from "./Zed";
 // });
 
 test("Validates Primitive Strings", () => {
-  expect(validate("asdf", ZString())).toBeFalsy();
   expect(validate(ZString("asdf"), ZString())).toBeFalsy();
-  expect(validate("foo", ZString("bar"))).toEqual('does not match "bar"');
   expect(validate(ZString("foo"), ZString("bar"))).toEqual(
     'does not match "bar"'
   );
-  expect(validate("bar", ZString("bar"))).toBeFalsy();
-  expect(validate(42, ZString("bar"))).toEqual('does not match "bar"');
-  expect(validate(42, ZString())).toEqual("is not a string");
+  expect(validate(ZNumber(42), ZString())).toEqual("is not a string");
   expect(validate(ZString("bar"), ZString("bar"))).toBeFalsy();
 });
 
 test("Validates Primitive Numbers", () => {
-  expect(validate(12, ZNumber())).toBeFalsy();
   expect(validate(ZNumber(12), ZNumber())).toBeFalsy();
-  expect(validate(91, ZNumber(73))).toEqual("does not equal 73");
   expect(validate(ZNumber(91), ZNumber(73))).toEqual("does not equal 73");
-  expect(validate(73, ZNumber(73))).toBeFalsy();
-  expect(validate("foo", ZNumber(73))).toEqual("is not a number equal to 73");
-  expect(validate("foo", ZNumber())).toEqual("is not a number");
+  expect(validate(ZString("foo"), ZNumber())).toEqual("is not a number");
   expect(validate(ZNumber(73), ZNumber(73))).toBeFalsy();
 });
 
 test("compute basics", () => {
   const simpleDocs = {
-    a: 12,
-    b: "foo",
-    c: true,
-    d: false
+    a: ZNumber(12),
+    b: ZString("foo"),
+    c: ZBoolean(true),
+    d: ZBoolean(false)
   };
   expect(compute(simpleDocs, "a").type).toEqual("ZNumber");
   expect(compute(simpleDocs, "a").value).toEqual(12);
@@ -83,11 +83,11 @@ test("Equality primitives", () => {
   const docs = {
     x: 42,
     y: "abc",
-    a: ZEquals(ZAddress("x"), 42),
-    b: ZEquals(ZAddress("x"), 12),
-    c: ZEquals(ZAddress("y"), "abc"),
-    d: ZEquals(ZAddress("y"), "foo"),
-    e: ZEquals(ZAddress("y"), 12)
+    a: ZEquals(ZAddress("x"), ZNumber(42)),
+    b: ZEquals(ZAddress("x"), ZNumber(12)),
+    c: ZEquals(ZAddress("y"), ZString("abc")),
+    d: ZEquals(ZAddress("y"), ZString("foo")),
+    e: ZEquals(ZAddress("y"), ZNumber(12))
   };
   expect(compute(docs, "a").value).toEqual(true);
   expect(compute(docs, "b").value).toEqual(false);

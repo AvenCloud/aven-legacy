@@ -10,10 +10,10 @@ const ZBoolean = {
     }
   },
   validate: (input, type): boolean => {
-    const matchingString = ZBoolean.get(type);
-    const doesMatch = ZBoolean.get(input) === matchingString;
-    if (matchingString != null && !doesMatch) {
-      return `does not match "${matchingString}"`;
+    const matchingBool = ZBoolean.get(type);
+    const doesMatch = ZBoolean.get(input) === matchingBool;
+    if (matchingBool != null && !doesMatch) {
+      return `does not match "${matchingBool}"`;
     }
     if (!ZBoolean.is(input)) {
       return "is not a boolean";

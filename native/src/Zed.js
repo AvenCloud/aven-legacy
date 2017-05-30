@@ -58,6 +58,10 @@ export function ZNumber(value: number): ZNumberDef {
   return { type: "ZNumber", value };
 }
 
+export function ZBoolean(value: boolean): ZBooleanDef {
+  return { type: "ZBoolean", value };
+}
+
 export function ZEquals(a, b): ZEquals {
   return { type: "ZEquals", a, b };
 }
@@ -176,7 +180,7 @@ import ZedTypes from "./ZedTypes";
 
 export function getBuiltInType(input) {
   const matchBuiltInZedType = Object.keys(ZedTypes).find(
-    typeName => type.type === typeName
+    typeName => input.type === typeName
   );
   if (matchBuiltInZedType) {
     return ZedTypes[matchBuiltInZedType];
@@ -187,11 +191,11 @@ export function getBuiltInType(input) {
 export function validate(input, type) {
   const definedType = type && getBuiltInType(type);
   if (definedType) {
-    return t.validate(input, type);
+    return definedType.validate(input, type);
   }
   const impliedType = getBuiltInType(input);
   if (impliedType) {
-    return t.validate(input);
+    return impliedType.validate(input);
   }
 
   if (type == null) {
