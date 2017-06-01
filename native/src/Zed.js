@@ -3,32 +3,32 @@
  */
 
 // Single types:
-type ZLiteral = string | number | boolean;
-type ZStringDef = { type: "ZString", value: string };
-type ZNumberDef = { type: "ZNumber", value: number };
-type ZBooleanDef = { type: "ZBoolean", value: boolean };
-type ZSingleDef = ZStringDef | ZBooleanDef | ZNumberDef | ZLiteral;
+type ZStringDef = { __zType: "ZString", value: string };
+type ZNumberDef = { __zType: "ZNumber", value: number };
+type ZBooleanDef = { __zType: "ZBoolean", value: boolean };
+type ZSingleDef = ZStringDef | ZBooleanDef | ZNumberDef;
 
 // Intermediate types (this is not actually a ZType by itself)
 type ZMap = { [key: string]: ZData };
 type ZSet = Array<ZData>;
-type ZAddressDef = { type: "ZAddress", address: Array<string | number> };
+type ZAddressDef = { __zType: "ZAddress", address: string };
 
 // Composite Types
 type ZListDef = {
-  type: "ZList",
+  __zType: "ZList",
   items: ZSet,
   allType: ?ZData,
   tupleType: ?ZSet
 };
-// type ZTupleDef = {type: 'ZTupleSpec', subtypes: ZSet} // lets ignore this for now because the UI is inconvenient
-type ZObjectDef = { type: "ZObject", typeMap: ?ZMap, items: ZMap };
-type ZOrDef = { type: "ZOr", options: ZSet };
+// type ZTupleDef = { __zType: 'ZTupleSpec', subtypes: ZSet} // lets ignore this for now because the UI is inconvenient
+type ZObjectDef = { __zType: "ZObject", typeMap: ?ZMap, items: ZMap };
+type ZOrDef = { __zType: "ZOr", options: ZSet };
 
 // Main type
 type ZData = ZSingleDef | ZListDef | ZObjectDef | ZOrDef;
 
 type ZAddressListener = ZAddress => void;
+type ZDataListener = ZData => void;
 
 const VALID_TYPES = [
   "ZOr",
@@ -40,40 +40,46 @@ const VALID_TYPES = [
 ];
 
 export function ZObject(items: ZMap, typeMap: ZMap): ZObjectDef {
-  return { type: "ZObject", items, typeMap };
+  return { __zType: "ZObject", items, typeMap };
 }
 export function ZList(items: ZSet, allType: ZData, tupleType: ZSet): ZListDef {
-  return { type: "ZList", items, allType, tupleType };
+  return { __zType: "ZList", items, allType, tupleType };
 }
 
-export function ZAddress(address): ZAddress {
-  return { type: "ZAddress", address };
+export function ZAddress(address: string): ZAddress {
+  return { __zType: "ZAddress", address };
 }
 
 export function ZString(value: string): ZStringDef {
-  return { type: "ZString", value };
+  return { __zType: "ZString", value };
 }
 
 export function ZNumber(value: number): ZNumberDef {
-  return { type: "ZNumber", value };
+  return { __zType: "ZNumber", value };
 }
 
 export function ZBoolean(value: boolean): ZBooleanDef {
-  return { type: "ZBoolean", value };
+  return { __zType: "ZBoolean", value };
 }
 
 export function ZEquals(a, b): ZEquals {
-  return { type: "ZEquals", a, b };
+  return { __zType: "ZEquals", a, b };
 }
 
 export function ZSum(a, b): ZSum {
-  return { type: "ZSum", a, b };
+  return { __zType: "ZSum", a, b };
 }
 
 function genPrimitiveType(typeName, jsPrimitive) {
   return {
-    match: input => {
-      return input.type === typeName && typeof input.value === jsPrimitive;
+    validate: (store, input, expectedType) => {
+      if (typeName !== expectedType.__zType) {
+        return `value is not a ${expectedType.__zType}`;
+      }
+      if (typeof input.value !== jsPrimitive) {
+        return `value is not a ${jsPrimitive}`;
+      }
+      return null;
     },
     compute: (store, input) => {
       return input;
@@ -81,7 +87,7 @@ function genPrimitiveType(typeName, jsPrimitive) {
   };
 }
 
-const BUILT_IN_STUFF = {
+const NativeTypes = {
   ZString: genPrimitiveType("ZString", "string"),
   ZBoolean: genPrimitiveType("ZBoolean", "boolean"),
   ZNumber: genPrimitiveType("ZNumber", "number"),
@@ -89,6 +95,9 @@ const BUILT_IN_STUFF = {
   ZAddress: {
     compute: (store, input) => {
       return store.compute(store.data[input.address]);
+    },
+    validate: (store, input, expectedType) => {
+      return store.validate(store.data[input.address], expectedType);
     }
   },
   ZEquals: {
@@ -96,6 +105,9 @@ const BUILT_IN_STUFF = {
       const a = store.compute(input.a);
       const b = store.compute(input.b);
       return ZBoolean(a.value === b.value);
+    },
+    validate: (store, input, expectedType) => {
+      return null;
     }
   },
   ZSum: {
@@ -104,28 +116,51 @@ const BUILT_IN_STUFF = {
       const b = store.compute(input.b);
       return ZNumber(a.value + b.value);
     }
-  }
+  },
+  ZObject: {},
+  ZOr: {},
+  ZList: {}
+  //ZSwitch: {}, // ?
 };
 
 export class Store {
   data: ZMap = {};
+  listeners: { [key: string]: ZDataListener } = {};
   constructor(initialData: ZMap) {
     this.data = initialData;
   }
-  compute(doc: ZData) {
-    const docType = doc.type;
-
-    const builtIn = BUILT_IN_STUFF[docType];
-    if (builtIn) {
-      return builtIn.compute(this, doc);
-    }
-    throw new Error("Unrecognized type");
+  watch(address: ZAddress, handler: ZDataListener) {
+    const addy = address.address;
+    const listeners = this.listeners[addy] || (this.listeners[addy] = []);
+    listeners.push(handler);
+    handler(this.data[addy]);
+    return {
+      remove: () => {
+        const listeners = this.listeners[addy] || (this.listeners[addy] = []);
+        const handlerIndex = listeners.indexOf(handler);
+        handlerIndex !== -1 && listeners.splice(handlerIndex, 1);
+      }
+    };
   }
-  match(input, expectedType) {
-    const builtIn = BUILT_IN_STUFF[expectedType];
-    if (builtIn) {
-      return builtIn.match(input);
+  mutate(address: ZAddress, newDoc: ZData) {
+    this.data[address.address] = newDoc;
+    if (this.listeners[address.address]) {
+      this.listeners[address.address].forEach(listener => listener(newDoc));
     }
-    throw new Error("Unrecognized type");
+  }
+  compute(doc: ZData) {
+    const type = NativeTypes[doc.__zType];
+    if (type) {
+      return type.compute(this, doc);
+    }
+    throw new Error("Unrecognized __zType");
+  }
+  validate(doc: ZData, expectedType: ZData): ?string {
+    const computedExpectedType = this.compute(expectedType);
+    const type = NativeTypes[doc.__zType];
+    if (type) {
+      return type.validate(this, doc, computedExpectedType);
+    }
+    return "__zType is not recognized";
   }
 }
