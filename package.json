@@ -2,7 +2,8 @@
   "name": "foo",
   "version": "0.0.0",
   "scripts": {
-    "start": "node server/main.js"
+    "start": "node server/main.js",
+    "upload-secrets": "node server/upload_secrets.js"
   },
   "engines": {
     "node": "6.10.2"
