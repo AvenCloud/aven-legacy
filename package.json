@@ -9,6 +9,7 @@
     "node": "6.10.2"
   },
   "dependencies": {
-    "express": "^4.15.3"
+    "express": "^4.15.3",
+    "pg": "^6.2.3"
   }
 }
