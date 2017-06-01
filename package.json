@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "express": "^4.15.3",
+    "node-fetch": "^1.7.0",
     "pg": "^6.2.3"
   }
 }
