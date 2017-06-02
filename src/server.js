@@ -24,7 +24,7 @@ const CONFIG = {
 };
 
 app.get("/", function(req, res) {
-  res.send("Coming Soon!");
+  res.send("Greatness Coming Eventually!");
 });
 
 app.get("/users", function(req, res) {

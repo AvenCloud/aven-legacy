@@ -1,0 +1,8 @@
+{
+  "uid": "main",
+  "append": true,
+  "script": "src/server.js",
+  "watch": true,
+  "watchDirectory": "src",
+  "sourceDir": "."
+}
