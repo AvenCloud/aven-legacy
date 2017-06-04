@@ -11,9 +11,13 @@
     "node": "6.10.2"
   },
   "dependencies": {
+    "babel-polyfill": "^6.23.0",
+    "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "node-fetch": "^1.7.0",
-    "pg": "^6.2.3"
+    "pg": "^6.2.3",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
