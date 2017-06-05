@@ -13,7 +13,7 @@ import ReactComponentHandleGet from "./ReactComponentHandleGet";
 import NotFoundPage from "./NotFoundPage";
 
 app.use((req, res, next) => {
-  console.log("req", req.host);
+  console.log("req", req.hostname, req.protocol);
   next();
 });
 
