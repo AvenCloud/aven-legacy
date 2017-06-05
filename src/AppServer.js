@@ -27,7 +27,7 @@ app.use((req, res, next) => {
   }
   if (req.protocol !== "https") {
     // res.redirect("https://" + req.hostname + req.path);
-    console.log(req.protocol);
+    console.log(req.headers);
     return;
   }
 
