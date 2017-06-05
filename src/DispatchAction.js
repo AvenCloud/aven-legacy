@@ -1,7 +1,9 @@
 import AuthRegisterAction from "./AuthRegisterAction";
 import AuthVerifyAction from "./AuthVerifyAction";
+import EmailRecieveAction from "./EmailRecieveAction";
 
 const DataActions = {
+  EmailRecieveAction,
   AuthRegisterAction,
   AuthVerifyAction
 };
