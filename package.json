@@ -11,6 +11,7 @@
     "node": "6.10.2"
   },
   "dependencies": {
+    "babel-core": "^6.24.1",
     "babel-polyfill": "^6.23.0",
     "bcrypt-nodejs": "^0.0.3",
     "body-parser": "^1.17.2",
