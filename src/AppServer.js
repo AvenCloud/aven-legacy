@@ -13,8 +13,30 @@ import ReactComponentHandleGet from "./ReactComponentHandleGet";
 import NotFoundPage from "./NotFoundPage";
 
 app.use((req, res, next) => {
-  console.log("req", req.hostname, req.protocol);
-  next();
+  if (Configuration.env === "development" || req.hostname === "localhost") {
+    next();
+    return;
+  }
+  if (req.hostname === "aven.io" && req.protocol === "https") {
+    next();
+    return;
+  }
+  if (req.hostname === "www.aven.io") {
+    res.redirect("https://aven.io" + req.path);
+    return;
+  }
+  if (req.protocol !== "https") {
+    res.redirect("https://" + req.hostname + req.path);
+    return;
+  }
+
+  const matchesSubdomain = req.hostname.match("(.*).aven.io$");
+  if (matchesSubdomain) {
+    res.send("Subdomains are not yet supported. Stay tuned!");
+    return;
+  }
+  // finally we handle random cases that are not subdomains, like aven-prod.herokuapp.com
+  res.redirect("https://aven.io" + req.path);
 });
 
 app.get("/debug", function(req, res) {
