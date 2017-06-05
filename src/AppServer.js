@@ -12,6 +12,11 @@ import NavigationActions from "./NavigationActions";
 import ReactComponentHandleGet from "./ReactComponentHandleGet";
 import NotFoundPage from "./NotFoundPage";
 
+app.use((req, res, next) => {
+  console.log("req", req.host);
+  next();
+});
+
 app.get("/debug", function(req, res) {
   res.send(JSON.stringify(Configuration.publicInfo));
 });
@@ -29,6 +34,13 @@ app.post("/_inbound_mail", multer.single(), async (req, res) => {
 });
 
 app.use("/assets", express.static(__dirname + "/static"));
+
+let faviconHandler = express.static(__dirname + "/static/favicon.prod.ico");
+if (Configuration.env === "development") {
+  faviconHandler = express.static(__dirname + "/static/favicon.dev.ico");
+}
+
+app.use("/favicon.ico", faviconHandler);
 
 Object.keys(NavigationActions).forEach(actionName => {
   const { path, handler, component } = NavigationActions[actionName];
