@@ -27,7 +27,9 @@ app.use((req, res, next) => {
   }
   const proto = req.headers["x-forwarded-proto"] || req.protocol;
   if (proto !== "https") {
-    res.redirect("https://" + req.hostname + req.path);
+    console.log("wtf", proto, req.headers, req.protocol);
+    // res.redirect("https://" + req.hostname + req.path);
+    next();
     return;
   }
 
