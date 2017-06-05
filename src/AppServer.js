@@ -19,17 +19,13 @@ app.post("/api/v1/dispatch", bodyParser.json(), async (req, res) => {
   const result = await DispatchAction(req.body);
 });
 
-app.post(
-  "/_inbound_mail",
-  bodyParser.urlencoded({ extended: false }),
-  async (req, res) => {
-    const result = await DispatchAction({
-      type: "EmailRecieveAction",
-      data: req.body
-    });
-    res.send("hello kind email service");
-  }
-);
+app.post("/_inbound_mail", bodyParser.json(), async (req, res) => {
+  const result = await DispatchAction({
+    type: "EmailRecieveAction",
+    data: req.body
+  });
+  res.send("hello kind email service");
+});
 
 app.use("/assets", express.static(__dirname + "/static"));
 
