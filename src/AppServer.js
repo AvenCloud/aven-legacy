@@ -25,9 +25,9 @@ app.use((req, res, next) => {
     res.redirect("https://aven.io" + req.path);
     return;
   }
-  if (req.protocol !== "https") {
-    // res.redirect("https://" + req.hostname + req.path);
-    console.log(req.headers);
+  const proto = req.headers["x-forwarded-proto"] || req.protocol;
+  if (proto !== "https") {
+    res.redirect("https://" + req.hostname + req.path);
     return;
   }
 
