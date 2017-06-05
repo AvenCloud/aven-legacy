@@ -2,7 +2,7 @@ require("babel-core/register");
 require("babel-polyfill");
 
 const bodyParser = require("body-parser");
-const multer = require("multer");
+const multer = require("multer")();
 const express = require("express");
 const app = express();
 
@@ -20,7 +20,7 @@ app.post("/api/v1/dispatch", bodyParser.json(), async (req, res) => {
   const result = await DispatchAction(req.body);
 });
 
-app.post("/_inbound_mail", multer(), async (req, res) => {
+app.post("/_inbound_mail", multer.single(), async (req, res) => {
   const result = await DispatchAction({
     type: "EmailRecieveAction",
     data: req.body
