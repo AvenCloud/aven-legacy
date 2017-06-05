@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512px" height="160px" viewBox="0 0 512 160" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="aven-logo" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="aven-logo-back" fill="#145361">
+            <path d="M0,0 L512,0 L512,160 L0,160 L0,0 Z M90,80 L70,120 L110,120 L90,80 Z M392,80 L372,120 L412,120 L392,80 Z M422,80 L442,40 L402,40 L422,80 Z M188,80 L208,40 L168,40 L188,80 Z M30,30 L30,130 L80,30 L30,30 Z M130,30 L100,30 L150,130 L180,130 L130,30 Z M248,30 L198,130 L228,130 L278,30 L248,30 Z M482,130 L482,30 L432,130 L482,130 Z M382,30 L352,30 L342,50 L303,50 L293,70 L332,70 L322.023901,89.9998905 L283,90 L273,110 L312,110 L302,130 L332,130 L382,30 Z" id="Combined-Shape"></path>
+        </g>
+    </g>
+</svg>
