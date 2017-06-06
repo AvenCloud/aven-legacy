@@ -14,28 +14,24 @@ import NotFoundPage from "./NotFoundPage";
 
 app.use((req, res, next) => {
   const proto = req.headers["x-forwarded-proto"] || req.protocol;
-  console.log("ok", {
-    env: Configuration.env,
-    hostname: req.hostname,
-    proto,
-    reqProto: req.protocol
-  });
+
   if (Configuration.env === "development" || req.hostname === "localhost") {
     next();
     return;
   }
-  if (req.hostname === "aven.io" && req.protocol === "https") {
+
+  if (req.hostname === "aven.io" && proto === "https") {
     next();
     return;
   }
+
   if (req.hostname === "www.aven.io") {
     res.redirect("https://aven.io" + req.path);
     return;
   }
+
   if (proto !== "https") {
-    // console.log("wtf", proto, req.headers, req.protocol);
-    // res.redirect("https://" + req.hostname + req.path);
-    next();
+    res.redirect("https://" + req.hostname + req.path);
     return;
   }
 
