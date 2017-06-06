@@ -21,7 +21,7 @@ class EmailPhoneThing extends React.Component {
   }
 }
 
-const SmallFormPage = ({ children }) =>
+const SmallFormPage = ({ children }) => (
   <div style={{}}>
     <div
       style={{
@@ -78,7 +78,8 @@ const SmallFormPage = ({ children }) =>
         </div>
       </div>
     </div>
-  </div>;
+  </div>
+);
 
 export default function CreateSmallFormPage(opts) {
   class FormPage extends React.Component {
@@ -110,9 +111,10 @@ export default function CreateSmallFormPage(opts) {
                     <span className="control-label-right">
                       {inputConfig.rightLabel(values)}
                     </span>}
-                  <label className="control-label" for={inputConfig.name}>
-                    {inputConfig.label}
-                  </label>
+                  {inputConfig.label &&
+                    <label className="control-label" for={inputConfig.name}>
+                      {inputConfig.label}
+                    </label>}
                   <input
                     className="form-control"
                     id={inputConfig.name}

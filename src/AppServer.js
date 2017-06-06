@@ -17,36 +17,30 @@ app.use((req, res, next) => {
 
   if (Configuration.env === "development" || req.hostname === "localhost") {
     next();
-    console.log("FFFO", req.hostname, proto);
     return;
   }
 
   if (req.hostname === "aven.io" && proto === "https") {
-    console.log("ASDF", req.hostname, proto);
     next();
     return;
   }
 
   if (req.hostname === "www.aven.io") {
     res.redirect("https://aven.io" + req.path);
-    console.log("AAAAAA", req.hostname, proto);
     return;
   }
 
   if (proto !== "https") {
     res.redirect("https://" + req.hostname + req.path);
-    console.log("GGMGGG", req.hostname, proto);
     return;
   }
 
   const matchesSubdomain = req.hostname.match("(.*).aven.io$");
   if (matchesSubdomain) {
     res.send("Subdomains are not yet supported. Stay tuned!");
-    console.log("SSSSS", req.hostname, proto);
     return;
   }
   // finally we handle random cases that are not subdomains, like aven-prod.herokuapp.com
-  console.log("RRRRRR", req.hostname, proto);
   res.redirect("https://aven.io" + req.path);
 });
 

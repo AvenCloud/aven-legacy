@@ -4,27 +4,25 @@ import React from "react";
 const RegisterFormPage = CreateSmallFormPage({
   submitButtonLabel: "Verify and Join Aven",
   title: "Register",
-  heading: "Great to meet you!",
-  subheadingText: "We're excited to build great things together",
+  heading: "Welcome to Aven!",
+  subheadingText: "How can we keep in touch?",
   // "Before we get started, we'll need to make sure we can stay in touch.",
   successNavigationAction: { uri: "/auth/verify" },
   inputs: [
     {
       type: "text",
       name: "username",
-      label: "Username",
       rightLabel: input => {
         if (input && input.length > 2) {
           return input + ".aven.io";
         }
         return <span style={{ color: "#777" }}>you.aven.io</span>;
       },
-      placeholder: "What is your personal shortname/url?"
+      placeholder: "Username"
     },
     {
       name: "email_or_phone",
-      placeholder: "How can we stay in touch?",
-      label: "Email or Phone Number",
+      placeholder: "Email or Phone Number",
       type: "email-phone-signup"
     }
   ],
