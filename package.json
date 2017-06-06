@@ -4,7 +4,7 @@
   "scripts": {
     "start": "NODE_ENV=development forever -c 'node -r babel-register' ./forever-config.json",
     "run-prod": "NODE_ENV=production node lib/AppServer.js",
-    "postinstall": "babel src/ --out-dir lib/ && rm -rf lib/static && cp -r src/static lib/static",
+    "build": "babel src/ --out-dir lib/ && rm -rf lib/static && cp -r src/static lib/static",
     "upload-secrets": "node lib/upload_secrets.js"
   },
   "engines": {
