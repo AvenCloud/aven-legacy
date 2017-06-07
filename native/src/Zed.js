@@ -70,19 +70,29 @@ export function ZSum(a, b): ZSum {
   return { __zType: "ZSum", a, b };
 }
 
+export function ZOr(...options): ZOrDef {
+  return { __zType: "ZOr", options };
+}
+
 function genPrimitiveType(typeName, jsPrimitive) {
   return {
+    compute: (store, input) => {
+      return { ...input, dependencies: [] };
+    },
     validate: (store, input, expectedType) => {
       if (typeName !== expectedType.__zType) {
-        return `value is not a ${expectedType.__zType}`;
+        return `is not a ${expectedType.__zType}`;
       }
-      if (typeof input.value !== jsPrimitive) {
-        return `value is not a ${jsPrimitive}`;
+      if (input.__zType !== expectedType.__zType) {
+        return `is not a ${expectedType.__zType}`;
+      }
+      if (expectedType.value != null && expectedType.value !== input.value) {
+        return `does not match '${expectedType.value}'`;
+      }
+      if (input.value != null && typeof input.value !== jsPrimitive) {
+        return `is not a ${jsPrimitive}`;
       }
       return null;
-    },
-    compute: (store, input) => {
-      return input;
     }
   };
 }
@@ -94,7 +104,12 @@ const NativeTypes = {
 
   ZAddress: {
     compute: (store, input) => {
-      return store.compute(store.data[input.address]);
+      const computedChild = store.compute(store.data[input.address]);
+      const dependencies = computedChild.dependencies
+        ? [...computedChild.dependencies]
+        : [];
+      dependencies.push(input);
+      return { ...computedChild, dependencies };
     },
     validate: (store, input, expectedType) => {
       return store.validate(store.data[input.address], expectedType);
@@ -104,7 +119,11 @@ const NativeTypes = {
     compute: (store, input) => {
       const a = store.compute(input.a);
       const b = store.compute(input.b);
-      return ZBoolean(a.value === b.value);
+      const computedEquality = ZBoolean(a.value === b.value);
+      return {
+        ...computedEquality,
+        dependencies: [...a.dependencies, ...b.dependencies]
+      };
     },
     validate: (store, input, expectedType) => {
       return null;
@@ -114,11 +133,36 @@ const NativeTypes = {
     compute: (store, input) => {
       const a = store.compute(input.a);
       const b = store.compute(input.b);
-      return ZNumber(a.value + b.value);
+      let computedNumber = null;
+      if (typeof a.value === "number" && typeof b.value === "number") {
+        computedNumber = ZNumber(a.value + b.value);
+      }
+      return {
+        value: null,
+        ...computedNumber,
+        dependencies: [...a.dependencies, ...b.dependencies]
+      };
+    },
+    validate: (store, input, expectedType) => {
+      const aValidationError = store.validate(input.a, ZNumber());
+      const bValidationError = store.validate(input.b, ZNumber());
+      if (aValidationError) {
+        return "cannot a non-number to something";
+      }
+      if (bValidationError) {
+        return "cannot add this to a non-number";
+      }
+      return null;
+    }
+  },
+  ZOr: {
+    compute: (store, input) => input,
+    validate: (store, input, expectedType) => {
+      // This should not happen and be handled directly by store.validate
+      return null;
     }
   },
   ZObject: {},
-  ZOr: {},
   ZList: {}
   //ZSwitch: {}, // ?
 };
@@ -129,7 +173,7 @@ export class Store {
   constructor(initialData: ZMap) {
     this.data = initialData;
   }
-  watch(address: ZAddress, handler: ZDataListener) {
+  watch(address: ZAddress, handler: ZDataListener, onRemove: ?Function) {
     const addy = address.address;
     const listeners = this.listeners[addy] || (this.listeners[addy] = []);
     listeners.push(handler);
@@ -139,8 +183,43 @@ export class Store {
         const listeners = this.listeners[addy] || (this.listeners[addy] = []);
         const handlerIndex = listeners.indexOf(handler);
         handlerIndex !== -1 && listeners.splice(handlerIndex, 1);
+        onRemove && onRemove();
       }
     };
+  }
+  watchComputed(
+    address: ZAddress,
+    handler: ZDataListener,
+    onRemove: ?Function
+  ) {
+    let childWatches = [];
+    return this.watch(
+      address,
+      watchedData => {
+        let handleChange = () => {};
+        const computedData = this.compute(watchedData);
+        let lastData = computedData;
+        computedData.dependencies &&
+          computedData.dependencies.forEach(dependency => {
+            childWatches.push(
+              this.watch(dependency, () => {
+                const computedData = this.compute(watchedData);
+                if (computedData.value !== lastData.value) {
+                  handleChange(computedData);
+                  lastData = computedData;
+                }
+              })
+            );
+          });
+        handler(computedData);
+        handleChange = handler;
+      },
+      () => {
+        childWatches.forEach(childWatch => childWatch.remove());
+        childWatches = [];
+        onRemove && onRemove();
+      }
+    );
   }
   mutate(address: ZAddress, newDoc: ZData) {
     this.data[address.address] = newDoc;
@@ -149,18 +228,30 @@ export class Store {
     }
   }
   compute(doc: ZData) {
-    const type = NativeTypes[doc.__zType];
-    if (type) {
-      return type.compute(this, doc);
+    if (doc == null) {
+      return {};
+    }
+    const nativeType = NativeTypes[doc.__zType];
+    if (nativeType) {
+      return nativeType.compute(this, doc);
     }
     throw new Error("Unrecognized __zType");
   }
   validate(doc: ZData, expectedType: ZData): ?string {
     const computedExpectedType = this.compute(expectedType);
-    const type = NativeTypes[doc.__zType];
-    if (type) {
-      return type.validate(this, doc, computedExpectedType);
+    if (computedExpectedType && computedExpectedType.__zType === "ZOr") {
+      const validations = computedExpectedType.options.map(optionType => {
+        return this.validate(doc, optionType);
+      });
+      if (validations.indexOf(null) !== -1) {
+        return null;
+      }
+      return validations.join(" and ");
     }
-    return "__zType is not recognized";
+    const nativeType = NativeTypes[doc.__zType];
+    if (nativeType) {
+      return nativeType.validate(this, doc, computedExpectedType);
+    }
+    return `cannot recognize type '${doc.__zType}'`;
   }
 }
