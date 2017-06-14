@@ -190,3 +190,23 @@ test("Or validation", () => {
     "is not a ZNumber and does not match 'Foo'"
   );
 });
+
+test.skip("Objects", () => {
+  const store = new Store({
+    lucy: ZObject({
+      name: ZString('Lucy'),
+    }),
+    lucyWithAge: ZObject(ZAddress('lucy'), {
+      age: ZNumber(25),
+    }),
+  });
+
+  expect(store.validate(ZString(), ZOr(ZNumber(42), ZString()))).toBeNull();
+
+  const computedResult = store.compute(ZAddress('lucyWithAge')));
+  expect(computedResult.value).toEqual(expect.objectContaining({
+    name: expect.objectContaining({ value: 'Lucy' }),
+    age: expect.objectContaining({ value: 25 })
+  }));
+
+});

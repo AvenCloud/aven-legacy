@@ -2,6 +2,9 @@
  * @flow
  */
 
+export ZConnect from "./ZConnect";
+export ZProvider from "./ZProvider";
+
 // Single types:
 type ZStringDef = { __zType: "ZString", value: string };
 type ZNumberDef = { __zType: "ZNumber", value: number };
@@ -167,7 +170,7 @@ const NativeTypes = {
   //ZSwitch: {}, // ?
 };
 
-export class Store {
+export class ZStore {
   data: ZMap = {};
   listeners: { [key: string]: ZDataListener } = {};
   constructor(initialData: ZMap) {
