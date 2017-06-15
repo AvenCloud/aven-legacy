@@ -15,11 +15,18 @@ import HomeScreen from "./HomeScreen";
 import ChapterScreen from "./ChapterScreen";
 import NewComponentScreen from "./NewComponentScreen";
 import EditComponentScreen from "./EditComponentScreen";
+import ZedScreen from "./ZedScreen";
+import { ZStore, ZProvider, ZString } from "./Zed";
 
-const APP_TOP_PADDING = Platform.OS === 'ios' ? 0 : 20;
+const store = new ZStore({
+  wat: ZString("Foo")
+});
+
+const APP_TOP_PADDING = Platform.OS === "ios" ? 0 : 20;
 
 const AppNavigator = StackNavigator(
   {
+    Zed: { screen: ZedScreen },
     Home: { screen: HomeScreen },
     Chapter: { screen: ChapterScreen },
     NewComponent: { screen: NewComponentScreen },
@@ -30,13 +37,13 @@ const AppNavigator = StackNavigator(
   }
 );
 
-const NAV_STORE_KEY = "NavStoreKey7";
+const NAV_STORE_KEY = "NavStoreKey8";
 class App extends Component {
   state = {
     nav: null
   };
   async componentDidMount() {
-    BackHandler.addEventListener('hardwareBackPress', () => {
+    BackHandler.addEventListener("hardwareBackPress", () => {
       return this.dispatch(NavigationActions.back(null));
     });
 
