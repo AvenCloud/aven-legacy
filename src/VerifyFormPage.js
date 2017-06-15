@@ -10,12 +10,19 @@ const LoginFormPage = CreateSmallFormPage({
     {
       type: "text",
       name: "username",
+      hidden: true,
       label: "Username"
     },
     {
       type: "text",
       name: "code",
+      hidden: true,
       label: ["Code that we sent you"]
+    },
+    {
+      type: "password",
+      name: "password",
+      label: "New Password"
     }
   ],
   getActionForInput: state => ({ type: "AuthVerifyAction", ...state }),

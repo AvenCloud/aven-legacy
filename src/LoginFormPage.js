@@ -4,19 +4,26 @@ import React from "react";
 const LoginFormPage = CreateSmallFormPage({
   submitButtonLabel: "Sign in",
   title: "Login",
-  heading: "Login to Aven",
+  heading: "Welcome back!",
   successNavigationAction: { uri: "/" },
   inputs: [
     {
       type: "text",
       name: "username",
-      label: "Username, Email, or Phone #"
+      placeholder: "Username, Email, or Phone #",
+      rightLabel: () => [
+        "Need an account? ",
+        <a href="/auth/register">Register here</a>
+      ]
     },
     {
       type: "password",
       name: "password",
-      label: ["Password"],
-      rightLabel: () => ["Forgot? ", <a href="#">Click here to reset</a>]
+      placeholder: "Password",
+      rightLabel: () => [
+        "Forgot? ",
+        <a href="/auth/reset">Reset password here</a>
+      ]
     }
   ],
   validate: state => {

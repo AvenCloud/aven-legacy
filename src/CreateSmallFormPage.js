@@ -21,7 +21,7 @@ class EmailPhoneThing extends React.Component {
   }
 }
 
-const SmallFormPage = ({ children }) => (
+const SmallFormPage = ({ children }) =>
   <div style={{}}>
     <div
       style={{
@@ -78,8 +78,7 @@ const SmallFormPage = ({ children }) => (
         </div>
       </div>
     </div>
-  </div>
-);
+  </div>;
 
 export default function CreateSmallFormPage(opts) {
   class FormPage extends React.Component {
@@ -88,7 +87,7 @@ export default function CreateSmallFormPage(opts) {
     static getTitle = () => opts.title;
     static validate = opts.validate;
     render() {
-      const { validationError, values } = this.props;
+      const { validationError, input } = this.props;
       return (
         <SmallFormPage>
           <form method="post">
@@ -105,12 +104,22 @@ export default function CreateSmallFormPage(opts) {
                   <EmailPhoneThing key="email-phone-signup" {...inputConfig} />
                 );
               }
+              if (inputConfig.hidden && input[inputConfig.name] != null) {
+                return (
+                  <input
+                    id={inputConfig.name}
+                    name={inputConfig.name}
+                    type="hidden"
+                    value={input[inputConfig.name]}
+                  />
+                );
+              }
               return (
-                <div className="form-group" key={inputConfig.name}>
-                  {inputConfig.rightLabel &&
-                    <span className="control-label-right">
-                      {inputConfig.rightLabel(values)}
-                    </span>}
+                <div
+                  className="form-group"
+                  key={inputConfig.name}
+                  style={{ marginBottom: 40 }}
+                >
                   {inputConfig.label &&
                     <label className="control-label" for={inputConfig.name}>
                       {inputConfig.label}
@@ -121,16 +130,24 @@ export default function CreateSmallFormPage(opts) {
                     name={inputConfig.name}
                     placeholder={inputConfig.placeholder}
                     type={inputConfig.type}
+                    value={input[inputConfig.name]}
                   />
+                  {inputConfig.rightLabel &&
+                    <span
+                      className="control-label-right"
+                      style={{ marginTop: 5 }}
+                    >
+                      {inputConfig.rightLabel(input)}
+                    </span>}
                 </div>
               );
             })}
 
             {validationError &&
               <div className="alert alert-dismissible alert-danger">
-                <button type="button" className="close" data-dismiss="alert">
+                <a type="button" className="close" data-dismiss="alert" href="">
                   ×
-                </button>
+                </a>
                 <strong>Whoops!</strong> {validationError}
               </div>}
 

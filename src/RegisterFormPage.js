@@ -4,9 +4,8 @@ import React from "react";
 const RegisterFormPage = CreateSmallFormPage({
   submitButtonLabel: "Verify and Join Aven",
   title: "Register",
-  heading: "Welcome to Aven!",
+  heading: "Welcome!",
   subheadingText: "How can we keep in touch?",
-  // "Before we get started, we'll need to make sure we can stay in touch.",
   successNavigationAction: { uri: "/auth/verify" },
   inputs: [
     {

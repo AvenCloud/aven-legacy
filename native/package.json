@@ -6,15 +6,10 @@
     "jest": "^20.0.4",
     "jest-cli": "^20.0.4",
     "jest-expo": "~1.0.1",
-    "react-native-scripts": "0.0.30",
     "react-test-renderer": "16.0.0-alpha.6"
   },
-  "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
+  "main": "index.js",
   "scripts": {
-    "start": "react-native-scripts start",
-    "eject": "react-native-scripts eject",
-    "android": "react-native-scripts android",
-    "ios": "react-native-scripts ios",
     "test": "node node_modules/jest/bin/jest.js --watch"
   },
   "jest": {
@@ -23,7 +18,7 @@
   "dependencies": {
     "expo": "^17.0.0",
     "react": "16.0.0-alpha.6",
-    "react-native": "^0.44.0",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-17.0.0.tar.gz",
     "react-native-elements": "^0.12.2",
     "react-native-vector-icons": "^4.1.1",
     "react-navigation": "^1.0.0-beta.11"

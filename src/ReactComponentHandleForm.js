@@ -8,7 +8,11 @@ export default function ReactComponentHandleForm(Component) {
   return (req, res) => {
     if (req.method === "GET") {
       const title = AppPage.getTitle(Component.getTitle());
-      res.send(renderToString(<AppPage title={title}><Component /></AppPage>));
+      res.send(
+        renderToString(
+          <AppPage title={title}><Component input={req.query} /></AppPage>
+        )
+      );
       return;
     }
     if (req.method === "POST") {
@@ -20,7 +24,7 @@ export default function ReactComponentHandleForm(Component) {
           res.send(
             renderToString(
               <AppPage title={title}>
-                <Component validationError={validationError} />
+                <Component validationError={validationError} input={input} />
               </AppPage>
             )
           );
@@ -41,10 +45,24 @@ export default function ReactComponentHandleForm(Component) {
               ) {
                 return res.redirect(Component.successNavigationAction.uri);
               }
+              if (data.state === "rejected") {
+                res.send(
+                  renderToString(
+                    <AppPage title={AppPage.getTitle(Component.getTitle())}>
+                      <Component
+                        input={input}
+                        validationError={JSON.stringify(data.result)}
+                      />
+                    </AppPage>
+                  )
+                );
+                return;
+              }
               res.send(
                 renderToString(
                   <AppPage title={AppPage.getTitle(Component.getTitle())}>
                     <Component
+                      input={input}
                       validationError={
                         "Success! But we don't know how to handle it"
                       }

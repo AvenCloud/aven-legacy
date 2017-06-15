@@ -6,8 +6,14 @@ import RegisterFormPage from "./RegisterFormPage";
 import ComingSoonPage from "./ComingSoonPage";
 import VerifyFormPage from "./VerifyFormPage";
 import HomePage from "./HomePage";
+import ResetPasswordPage from "./ResetPasswordPage";
 
 const NavigationActions = {
+  NavigateResetAction: {
+    path: "/auth/reset",
+    handler: ReactComponentHandleForm,
+    component: ResetPasswordPage
+  },
   NavigateHomeAction: {
     path: "/",
     component: HomePage

@@ -1,0 +1,28 @@
+{
+  "name": "aven",
+  "description": "An empty new project",
+  "slug": "aven",
+  "privacy": "public",
+  "sdkVersion": "17.0.0",
+  "version": "1.0.0",
+  "orientation": "portrait",
+  "primaryColor": "#cccccc",
+  "icon": "./icon.png",
+  "android": {
+    "package": "io.aven.mobile"
+  },
+  "loading": {
+    "icon": "./assets/icons/loading.png",
+    "hideExponentText": false
+  },
+  "packagerOpts": {
+    "assetExts": [
+      "ttf",
+      "mp4"
+    ]
+  },
+  "ios": {
+    "supportsTablet": true,
+    "bundleIdentifier": "io.aven.mobile"
+  }
+}

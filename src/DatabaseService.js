@@ -35,7 +35,24 @@ async function writeDoc(docName, value) {
   );
 }
 
+async function getDoc(docName) {
+  await pool.connect();
+  const res = await pool.query("SELECT value FROM documents WHERE name = $1;", [
+    docName
+  ]);
+  if (res.rows && res.rows[0]) {
+    const val = res.rows[0].value;
+    try {
+      return JSON.parse(val);
+    } catch (e) {
+      return val;
+    }
+  }
+  return null;
+}
+
 const DatabaseService = {
+  getDoc,
   writeDoc,
   createDoc
 };
