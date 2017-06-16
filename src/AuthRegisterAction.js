@@ -1,6 +1,7 @@
 import DatabaseService from "./DatabaseService";
 import { sendSMS } from "./PhoneService";
 import { sendEmail } from "./EmailService";
+import Utilities from "./Utilities";
 
 const validator = require("validator");
 
@@ -47,13 +48,13 @@ export default async function AuthRegisterAction(action) {
     user.emailVerification = {
       verificationTime: Date.now() / 1000,
       email,
-      code: Math.floor(Math.random() * 10000)
+      code: await Utilities.genAuthCode()
     };
   } else if (phone) {
     user.phoneVerification = {
       verificationTime: Date.now() / 1000,
       phone,
-      code: Math.floor(Math.random() * 10000)
+      code: await Utilities.genAuthCode()
     };
   } else {
     throw "No valid email address or phone number!";
@@ -72,14 +73,19 @@ export default async function AuthRegisterAction(action) {
   if (user.emailVerification) {
     await sendEmail(
       user.emailVerification.email,
-      `welcome and verification`,
-      `your code is ${user.emailVerification.code}`
+      `Welcome to Aven`,
+      `Hello, ${action.name}! Your auth code is ${user.emailVerification.code}
+Or, click here:
+
+https://aven.io/auth/verify?username=${action.name}&code=${user
+        .emailVerification.code}
+      `
     );
   }
   if (user.phoneVerification) {
     await sendSMS(
       user.phoneVerification.phone,
-      `your code is ${user.phoneVerification.code}`
+      `Your Aven authentication code is ${user.phoneVerification.code}`
     );
   }
   return { name: action.name };

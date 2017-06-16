@@ -5,7 +5,7 @@ const LoginFormPage = CreateSmallFormPage({
   submitButtonLabel: "Verify",
   title: "Verify",
   heading: "Verification",
-  successNavigationAction: { type: "NavigateHomeAction" },
+  successNavigationAction: { uri: "/" },
   inputs: [
     {
       type: "text",
@@ -17,7 +17,7 @@ const LoginFormPage = CreateSmallFormPage({
       type: "text",
       name: "code",
       hidden: true,
-      label: ["Code that we sent you"]
+      label: "Code that we sent you"
     },
     {
       type: "password",

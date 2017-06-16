@@ -6,11 +6,13 @@ const multer = require("multer")();
 const express = require("express");
 const http = require("http");
 const SocketServer = require("ws").Server;
+const cookieParser = require("cookie-parser");
 
 import Configuration from "./Configuration";
+import DatabaseService from "./DatabaseService";
 import DispatchAction from "./DispatchAction";
 import NavigationActions from "./NavigationActions";
-import ReactComponentHandleGet from "./ReactComponentHandleGet";
+import HandleReactComponentGet from "./HandleReactComponentGet";
 import NotFoundPage from "./NotFoundPage";
 
 const app = express();
@@ -69,11 +71,6 @@ app.get("/debug", function(req, res) {
   res.send(JSON.stringify(Configuration.publicInfo));
 });
 
-app.post("/api/v1/dispatch", bodyParser.json(), async (req, res) => {
-  const result = await DispatchAction(req.body);
-  res.send(result);
-});
-
 app.post("/_inbound_mail", multer.single(), async (req, res) => {
   if (req.query.key !== Configuration.secrets.inbound_mail_key) {
     res.setStatus(400).send("Wrong inbound mail key");
@@ -95,16 +92,39 @@ if (Configuration.env === "development") {
 
 app.use("/favicon.ico", faviconHandler);
 
+app.use(cookieParser());
+
+app.use(async (req, res, next) => {
+  req.authenticatedUser = null;
+  const { username, session } = req.cookies;
+  if (username && session) {
+    const userDoc = await DatabaseService.getDoc(username);
+    if (userDoc.sessions.indexOf(session) !== -1) {
+      req.authenticatedUser = username;
+      req.authenticatedSession = session;
+      req.authenticatedUserDoc = userDoc;
+    }
+  }
+  next();
+});
+
+app.post("/api/v1/dispatch", bodyParser.json(), async (req, res) => {
+  const result = await DispatchAction(req.body);
+  res.send(result);
+});
+
 Object.keys(NavigationActions).forEach(actionName => {
-  const { path, handler, component } = NavigationActions[actionName];
-  const handlerToUse = handler || ReactComponentHandleGet;
-  const runIt = handlerToUse(component);
+  const navigationAction = NavigationActions[actionName];
+  const { path, handler } = navigationAction;
+  const handlerToUse = handler || HandleReactComponentGet;
   if (path) {
-    app.all(path, runIt);
+    app.all(path, (req, res) => handlerToUse(req, res, navigationAction));
   }
 });
 
-app.use(ReactComponentHandleGet(NotFoundPage));
+app.use((req, res) =>
+  HandleReactComponentGet(req, res, { Component: NotFoundPage })
+);
 
 const server = http.createServer(app);
 const wss = new SocketServer({ server });

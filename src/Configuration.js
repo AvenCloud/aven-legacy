@@ -1,6 +1,6 @@
-var fs = require("fs");
-var secrets;
+const fs = require("fs");
 
+let secrets;
 try {
   secrets = fs.readFileSync("secrets.json", { encoding: "utf8" });
   secrets = JSON.parse(secrets);
@@ -9,12 +9,22 @@ try {
   secrets = JSON.parse(secrets.toString());
 }
 
-var postgresURL = process.env.DATABASE_URL || secrets.postgres_uri;
+const postgresURL = process.env.DATABASE_URL || secrets.postgres_uri;
+
+const env = process.env.NODE_ENV;
+
+const isSecure = env !== "development";
+
+const port = process.env.PORT || 5000;
+
+const publicInfo = { env, isSecure };
 
 const config = {
-  env: process.env.NODE_ENV,
-  port: process.env.PORT || 5000,
+  publicInfo,
+  env,
+  port,
   secrets,
+  isSecure,
   postgresURL
 };
 

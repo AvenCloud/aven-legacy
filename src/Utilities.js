@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const bcrypt = require("bcrypt-nodejs");
 const denodeify = require("denodeify");
 const randomBytes = denodeify(crypto.randomBytes);
 
@@ -7,6 +8,40 @@ async function genSessionId() {
   return randBuf.toString("hex");
 }
 
+async function genAuthCode() {
+  const randBuf = await randomBytes(48);
+  const hex = randBuf.toString("hex");
+  const int = parseInt(hex, 16);
+  const intStr = String(int);
+  return intStr.substr(3, 6);
+}
+
+async function genHash(input) {
+  return new Promise((resolve, reject) => {
+    bcrypt.hash(input, null, null, (err, hash) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(hash);
+    });
+  });
+}
+
+async function compareHash(input, hash) {
+  return new Promise((resolve, reject) => {
+    bcrypt.compare(input, hash, (err, result) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(result);
+    });
+  });
+}
 export default {
-  genSessionId
+  genSessionId,
+  genHash,
+  compareHash,
+  genAuthCode
 };

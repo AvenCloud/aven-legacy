@@ -9,7 +9,6 @@ export async function sendEmail(destEmail, subject, textBody) {
     content: [{ type: "text/plain", value: textBody }]
   };
   const body = JSON.stringify(sendData);
-  console.log(body, "WOAAAH");
   const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
     method: "post",
     headers: {

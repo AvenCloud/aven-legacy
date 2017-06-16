@@ -1,71 +1,40 @@
 import React from "react";
+import SimplePage from "./SimplePage";
 
 export default class HomePage extends React.Component {
   static getTitle = () => null;
   render() {
+    const { authenticatedUser } = this.props;
+    if (authenticatedUser) {
+      return (
+        <SimplePage>
+          <h2>Hello, {authenticatedUser}</h2>
+          <a href="/auth/logout" className="btn btn-lg btn-default">
+            Log out
+          </a>
+        </SimplePage>
+      );
+    }
     return (
-      <div style={{}}>
-        <div
-          style={{
-            backgroundImage: `url('/assets/aven-forest.jpg')`,
-            filter: "blur(15px)",
-            backgroundSize: "cover",
-            position: "fixed",
-            left: -15,
-            right: -15,
-            bottom: -15,
-            top: -15,
-            zIndex: 0
-          }}
-        />
-        <div
-          style={{
-            position: "fixed",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            top: 0,
-            backgroundColor: "rgba(255,255,255,0.7)",
-            zIndex: 1
-          }}
-        />
-
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            top: 0,
-            zIndex: 2
-          }}
-        >
-          <div
-            style={{
-              width: 300,
-              margin: "60px auto",
-              alignItems: "stretch",
-              display: "flex",
-              flexDirection: "column"
-            }}
+      <SimplePage>
+        <h2>Private Preview</h2>
+        <p>
+          If you were invited here, please register with an email
+          address or username that includes your last name.
+        </p>
+        <div style={{ textAlign: "center", margin: "20px 0 10px" }}>
+          <a
+            href="/auth/login"
+            className="btn btn-lg btn-default"
+            style={{ marginRight: 15 }}
           >
-            <a href="/" style={{ textAlign: "center" }}>
-              <img
-                src="/assets/aven.svg"
-                style={{ width: 128, marginBottom: 60 }}
-              />
-            </a>
-            <div className="well" style={{}}>
-              <h2>An Open App Development Network - ALPHA</h2>
-              <p>
-                If you were invited here, be sure to sign up with an email
-                address or username that includes your last name. (And be
-                prepared for bugs- this thing just barely exists!)
-              </p>
-            </div>
-          </div>
+            Sign in
+          </a>
+          <a href="/auth/register" className="btn btn-lg btn-primary">
+            Register
+          </a>
         </div>
-      </div>
+      </SimplePage>
     );
   }
 }

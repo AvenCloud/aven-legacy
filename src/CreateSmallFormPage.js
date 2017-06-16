@@ -107,6 +107,7 @@ export default function CreateSmallFormPage(opts) {
               if (inputConfig.hidden && input[inputConfig.name] != null) {
                 return (
                   <input
+                    key={inputConfig.name}
                     id={inputConfig.name}
                     name={inputConfig.name}
                     type="hidden"
@@ -125,6 +126,7 @@ export default function CreateSmallFormPage(opts) {
                       {inputConfig.label}
                     </label>}
                   <input
+                    onChange={() => {}}
                     className="form-control"
                     id={inputConfig.name}
                     name={inputConfig.name}
