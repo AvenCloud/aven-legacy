@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const multer = require("multer")();
 const express = require("express");
 const http = require("http");
+const path = require("path");
 const SocketServer = require("ws").Server;
 const cookieParser = require("cookie-parser");
 
@@ -51,7 +52,8 @@ app.use((req, res, next) => {
 });
 
 app.get("/wstest", (req, res) => {
-  res.send(`
+  res.send(
+    `
 <html>
   <body>
     <p id='server-time'></p>
@@ -65,7 +67,8 @@ app.get("/wstest", (req, res) => {
     </script>
   </body>
 </html>
-`);
+`
+  );
 });
 
 app.get("/debug", function(req, res) {
@@ -84,11 +87,15 @@ app.post("/_inbound_mail", multer.single(), async (req, res) => {
   res.send("hello kind email service");
 });
 
-app.use("/assets", express.static(__dirname + "/static"));
+app.use("/assets", express.static(path.join(__dirname, "../lib/static")));
 
-let faviconHandler = express.static(__dirname + "/static/favicon.prod.ico");
+let faviconHandler = express.static(
+  path.join(__dirname, "../lib/static/favicon.prod.ico")
+);
 if (Configuration.env === "development") {
-  faviconHandler = express.static(__dirname + "/static/favicon.dev.ico");
+  faviconHandler = express.static(
+    path.join(__dirname, "../lib/static/favicon.dev.ico")
+  );
 }
 
 app.use("/favicon.ico", faviconHandler);
@@ -114,17 +121,26 @@ app.use(async (req, res, next) => {
   next();
 });
 
+function loadBrowserModule(moduleName) {
+  console.log("loading browser moduoe", moduleName);
+}
+
 Object.keys(NavigationActions).forEach(actionName => {
   const navigationAction = NavigationActions[actionName];
-  const { path, handler } = navigationAction;
+  const { path, handler, component } = navigationAction;
+  if (component && component.browserModule) {
+    loadBrowserModule(component.browserModule);
+  }
   const handlerToUse = handler || HandleReactComponentGet;
   if (path) {
-    app.all(path, (req, res) => handlerToUse(req, res, navigationAction));
+    app.all(path, (req, res, next) => {
+      handlerToUse(req, res, next, navigationAction);
+    });
   }
 });
 
-app.use((req, res) =>
-  HandleReactComponentGet(req, res, { component: NotFoundPage })
+app.use((req, res, next) =>
+  HandleReactComponentGet(req, res, next, { component: NotFoundPage })
 );
 
 const server = http.createServer(app);

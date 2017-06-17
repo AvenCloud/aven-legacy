@@ -7,7 +7,7 @@ import Configuration from "./Configuration";
 
 const COOKIE_SETTINGS = { secure: Configuration.isSecure };
 
-export default function ReactComponentHandleForm(req, res, navAction) {
+export default function ReactComponentHandleForm(req, res, next, navAction) {
   const Component = navAction.component;
   if (req.method === "GET") {
     const title = AppPage.getTitle(Component.getTitle());
@@ -40,7 +40,10 @@ export default function ReactComponentHandleForm(req, res, navAction) {
           : action;
         const actionResult = DispatchAction(authAction)
           .then(result => ({ state: "passed", result }))
-          .catch(result => ({ state: "rejected", result }))
+          .catch(result => {
+            console.error("fail", result);
+            return { state: "rejected", result };
+          })
           .then(resultData => {
             const { result } = resultData;
 
@@ -48,8 +51,7 @@ export default function ReactComponentHandleForm(req, res, navAction) {
             console.log(JSON.stringify(resultData, null, 2));
 
             if (
-              resultData.state === "rejected" ||
-              resultData.state !== "passed"
+              resultData.state === "rejected" || resultData.state !== "passed"
             ) {
               res.send(
                 renderToString(

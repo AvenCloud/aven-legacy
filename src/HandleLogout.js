@@ -1,7 +1,7 @@
 import DatabaseService from "./DatabaseService";
 import Utilities from "./Utilities";
 
-export default async function HandleLogout(req, res, navAction) {
+export default async function HandleLogout(req, res, next, navAction) {
   if (req.authenticatedUser) {
     const sessions = [];
     req.authenticatedUserDoc.sessions.forEach(s => {

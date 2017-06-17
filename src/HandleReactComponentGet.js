@@ -1,16 +1,33 @@
 import React from "react";
 import { renderToString } from "react-dom/server";
 import AppPage from "./AppPage";
+import DispatchAction from "./DispatchAction";
 
-export default function ReactComponentHandleGet(req, res, navAction) {
+export default async function ReactComponentHandleGet(
+  req,
+  res,
+  next,
+  navAction
+) {
   const Component = navAction.component;
   if (req.method === "GET") {
-    const title = AppPage.getTitle(Component.getTitle());
-    const { auth } = req;
+    const { auth, params } = req;
+    let data = null;
+    if (Component.load) {
+      try {
+        data = await Component.load({ auth, params }, DispatchAction);
+      } catch (e) {
+        next();
+        return;
+      }
+    }
+    const pageProps = { auth, params, data };
+    const title = AppPage.getTitle(Component.getTitle(pageProps));
+    const script = Component.browserModule;
     res.send(
       renderToString(
-        <AppPage title={title}>
-          <Component auth={auth} />
+        <AppPage title={title} script={script}>
+          <Component {...pageProps} />
         </AppPage>
       )
     );

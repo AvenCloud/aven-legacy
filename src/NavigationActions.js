@@ -9,6 +9,8 @@ import HomePage from "./HomePage";
 import ResetPasswordPage from "./ResetPasswordPage";
 import HandleLogout from "./HandleLogout";
 import CreateFormPage from "./CreateFormPage";
+import ProjectPage from "./ProjectPage";
+import ProfilePage from "./ProfilePage";
 
 const NavigationActions = {
   NavigateResetAction: {
@@ -44,9 +46,16 @@ const NavigationActions = {
     handler: HandleReactComponentForm,
     component: VerifyFormPage
   },
-
   NotFoundAction: {
     component: ComingSoonPage
+  },
+  NavigateProjectAction: {
+    path: "/:user/:project",
+    component: ProjectPage
+  },
+  NavigateProfileAction: {
+    path: "/:user",
+    component: ProfilePage
   }
 };
 

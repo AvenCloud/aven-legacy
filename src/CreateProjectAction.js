@@ -3,17 +3,18 @@ import { getAuth } from "./AuthUtilities";
 import Utilities from "./Utilities";
 
 export default async function CreateProjectAction(action) {
-  console.log("gaaah", action);
   const auth = await getAuth(action.user, action.session);
-  console.log("dumm", auth);
-
   if (!auth) {
     throw "User is not authenticated";
   }
-
-  console.log("authenticated", action);
-
-  return { ok: 1, action };
+  const lastUserDoc = await DatabaseService.getDoc(action.user);
+  const projects = lastUserDoc.projects ? lastUserDoc.projects.slice() : [];
+  projects.push(action.projectName);
+  await DatabaseService.writeDoc(action.user, { ...lastUserDoc, projects });
+  await DatabaseService.writeDoc(action.user + "/" + action.projectName, {
+    name: action.projectName
+  });
+  return { newProject: action.projectName };
 
   // if (!userData) {
   //   throw "Username does not exist. Login with username only right now";

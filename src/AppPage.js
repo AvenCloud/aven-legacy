@@ -2,9 +2,9 @@ import React from "react";
 
 export default class AppPage extends React.Component {
   static getTitle = childTitle =>
-    childTitle ? childTitle + " | Aven" : "Aven";
+    (childTitle ? childTitle + " | Aven" : "Aven");
   render() {
-    const { title, children } = this.props;
+    const { title, children, script } = this.props;
     return (
       <html>
         <head>
@@ -12,7 +12,10 @@ export default class AppPage extends React.Component {
           <link rel="stylesheet" href="/assets/Aven.css" />
           <title>{title}</title>
         </head>
-        <body>{children}</body>
+        <body>
+          {children}
+          {script && <script src={`/assets/${script}.js`} />}
+        </body>
       </html>
     );
   }
