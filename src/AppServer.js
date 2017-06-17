@@ -8,6 +8,7 @@ const http = require("http");
 const SocketServer = require("ws").Server;
 const cookieParser = require("cookie-parser");
 
+import { getAuth } from "./AuthUtilities";
 import Configuration from "./Configuration";
 import DatabaseService from "./DatabaseService";
 import DispatchAction from "./DispatchAction";
@@ -94,23 +95,23 @@ app.use("/favicon.ico", faviconHandler);
 
 app.use(cookieParser());
 
-app.use(async (req, res, next) => {
-  req.authenticatedUser = null;
-  const { username, session } = req.cookies;
-  if (username && session) {
-    const userDoc = await DatabaseService.getDoc(username);
-    if (userDoc.sessions.indexOf(session) !== -1) {
-      req.authenticatedUser = username;
-      req.authenticatedSession = session;
-      req.authenticatedUserDoc = userDoc;
-    }
+app.post("/api/v1/dispatch", bodyParser.json(), async (req, res) => {
+  let action = req.body;
+  if (req.cookies.user) {
+    action = {
+      ...action,
+      user: req.cookies.user,
+      session: req.cookies.session
+    };
   }
-  next();
+  const result = await DispatchAction(action);
+  res.send(result);
 });
 
-app.post("/api/v1/dispatch", bodyParser.json(), async (req, res) => {
-  const result = await DispatchAction(req.body);
-  res.send(result);
+app.use(async (req, res, next) => {
+  const { user, session } = req.cookies;
+  req.auth = await getAuth(user, session);
+  next();
 });
 
 Object.keys(NavigationActions).forEach(actionName => {
@@ -123,7 +124,7 @@ Object.keys(NavigationActions).forEach(actionName => {
 });
 
 app.use((req, res) =>
-  HandleReactComponentGet(req, res, { Component: NotFoundPage })
+  HandleReactComponentGet(req, res, { component: NotFoundPage })
 );
 
 const server = http.createServer(app);

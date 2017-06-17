@@ -8,6 +8,14 @@ const AuthHeader =
   ).toString("base64");
 
 export async function sendSMS(destNumber, textBody) {
+  console.log(
+    "seeending",
+    Configuration.secrets.from_phone,
+    destNumber,
+    textBody,
+    Configuration.secrets.plivo_id,
+    Configuration.secrets.plivo_key
+  );
   const res = await fetch(
     "https://api.plivo.com/v1/Account/" +
       Configuration.secrets.plivo_id +
@@ -25,11 +33,10 @@ export async function sendSMS(destNumber, textBody) {
       })
     }
   );
+  const json = await res.json();
   if (("" + res.status)[0] !== "2") {
-    const json = await res.json();
     json.status = res.status;
     throw json;
   }
-  const json = await res.json();
   return json;
 }

@@ -35,7 +35,10 @@ export default function ReactComponentHandleForm(req, res, navAction) {
       }
       const action = Component.getActionForInput(input);
       if (action) {
-        const actionResult = DispatchAction(action)
+        const authAction = req.auth
+          ? { ...action, session: req.auth.session, user: req.auth.user }
+          : action;
+        const actionResult = DispatchAction(authAction)
           .then(result => ({ state: "passed", result }))
           .catch(result => ({ state: "rejected", result }))
           .then(resultData => {
@@ -65,7 +68,7 @@ export default function ReactComponentHandleForm(req, res, navAction) {
               action.type === "AuthVerifyAction" ||
               action.type === "AuthLoginAction"
             ) {
-              res.cookie("username", result.username, COOKIE_SETTINGS);
+              res.cookie("user", result.username, COOKIE_SETTINGS);
               res.cookie("session", result.session, COOKIE_SETTINGS);
               res.redirect("/");
               return;
@@ -76,6 +79,9 @@ export default function ReactComponentHandleForm(req, res, navAction) {
               Component.successNavigationAction.uri
             ) {
               return res.redirect(Component.successNavigationAction.uri);
+            }
+            if (typeof Component.successNavigationAction === "function") {
+              return res.redirect(Component.successNavigationAction(input).uri);
             }
 
             res.send(

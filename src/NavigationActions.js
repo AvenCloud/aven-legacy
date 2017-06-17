@@ -8,6 +8,7 @@ import VerifyFormPage from "./VerifyFormPage";
 import HomePage from "./HomePage";
 import ResetPasswordPage from "./ResetPasswordPage";
 import HandleLogout from "./HandleLogout";
+import CreateFormPage from "./CreateFormPage";
 
 const NavigationActions = {
   NavigateResetAction: {
@@ -22,6 +23,11 @@ const NavigationActions = {
   NavigateLogoutAction: {
     path: "/auth/logout",
     handler: HandleLogout
+  },
+  NavigateCreateAction: {
+    path: "/create",
+    handler: HandleReactComponentForm,
+    component: CreateFormPage
   },
   NavigateLoginAction: {
     path: "/auth/login",

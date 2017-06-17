@@ -1,9 +1,11 @@
 import AuthRegisterAction from "./AuthRegisterAction";
 import AuthVerifyAction from "./AuthVerifyAction";
 import AuthLoginAction from "./AuthLoginAction";
+import CreateProjectAction from "./CreateProjectAction";
 import EmailRecieveAction from "./EmailRecieveAction";
 
-const DataActions = {
+const Actions = {
+  CreateProjectAction,
   EmailRecieveAction,
   AuthRegisterAction,
   AuthLoginAction,
@@ -11,8 +13,9 @@ const DataActions = {
 };
 
 module.exports = async action => {
-  if (DataActions[action.type]) {
-    return await DataActions[action.type](action);
+  if (Actions[action.type]) {
+    return await Actions[action.type](action);
   }
+
   throw new Error("Action not identified");
 };

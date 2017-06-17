@@ -8,15 +8,16 @@ const validator = require("validator");
 const looksLikeAnEmail = str =>
   typeof str === "string" && str.length > 5 && str.split("@").length === 2;
 
-const looksLikeAPhoneNumber = str => {
-  if (typeof str !== "string") return false;
-  const newStr = str
+const cleanPhoneString = str =>
+  str
     .replace(/-/g, "")
     .replace(/\+/g, "")
     .replace(/\(/g, "")
     .replace(/\)/g, "")
     .replace(/ /g, "");
-  return validator.isNumeric(newStr);
+const looksLikeAPhoneNumber = str => {
+  if (typeof str !== "string") return false;
+  return validator.isNumeric(cleanPhoneString(str));
 };
 
 // if (  Configuration.secrets.alpha_pass_names ) {
@@ -84,7 +85,7 @@ https://aven.io/auth/verify?username=${action.name}&code=${user
   }
   if (user.phoneVerification) {
     await sendSMS(
-      user.phoneVerification.phone,
+      cleanPhoneString(user.phoneVerification.phone),
       `Your Aven authentication code is ${user.phoneVerification.code}`
     );
   }
