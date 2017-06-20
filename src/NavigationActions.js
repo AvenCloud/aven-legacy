@@ -1,21 +1,24 @@
 import React from "react";
 
-import HandleReactComponentForm from "./HandleReactComponentForm";
 import LoginFormPage from "./LoginFormPage";
 import RegisterFormPage from "./RegisterFormPage";
 import ComingSoonPage from "./ComingSoonPage";
 import VerifyFormPage from "./VerifyFormPage";
 import HomePage from "./HomePage";
 import ResetPasswordPage from "./ResetPasswordPage";
-import HandleLogout from "./HandleLogout";
 import CreateFormPage from "./CreateFormPage";
 import ProjectPage from "./ProjectPage";
 import ProfilePage from "./ProfilePage";
+import AccountPage from "./AccountPage";
 
 const NavigationActions = {
+  NavigateAccountAction: {
+    path: "/account",
+    component: AccountPage
+  },
   NavigateResetAction: {
     path: "/auth/reset",
-    handler: HandleReactComponentForm,
+    handler: "form",
     component: ResetPasswordPage
   },
   NavigateHomeAction: {
@@ -24,33 +27,30 @@ const NavigationActions = {
   },
   NavigateLogoutAction: {
     path: "/auth/logout",
-    handler: HandleLogout
+    handler: "logout"
   },
   NavigateCreateAction: {
     path: "/create",
-    handler: HandleReactComponentForm,
+    handler: "form",
     component: CreateFormPage
   },
   NavigateLoginAction: {
     path: "/auth/login",
-    handler: HandleReactComponentForm,
+    handler: "form",
     component: LoginFormPage
   },
   NavigateRegisterAction: {
     path: "/auth/register",
-    handler: HandleReactComponentForm,
+    handler: "form",
     component: RegisterFormPage
   },
   NavigateVerifyAction: {
     path: "/auth/verify",
-    handler: HandleReactComponentForm,
+    handler: "form",
     component: VerifyFormPage
   },
-  NotFoundAction: {
-    component: ComingSoonPage
-  },
   NavigateProjectAction: {
-    path: "/:user/:project",
+    path: "/:userProject*",
     component: ProjectPage
   },
   NavigateProfileAction: {

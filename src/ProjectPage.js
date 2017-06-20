@@ -4,10 +4,12 @@ import SimplePage from "./SimplePage";
 export default class ProjectPage extends React.Component {
   static browserModule = "ProjectIndex";
   static load = async (props, dispatch) => {
+    const pathParts = props.path.split("/");
+    console.log(pathParts);
     const projectData = await dispatch({
       type: "GetProjectAction",
-      user: props.params.user,
-      project: props.params.project
+      user: pathParts[1],
+      project: pathParts[2]
     });
     return { projectData };
   };

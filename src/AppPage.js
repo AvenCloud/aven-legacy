@@ -13,7 +13,9 @@ export default class AppPage extends React.Component {
           <title>{title}</title>
         </head>
         <body>
-          {children}
+          <div id="aven-app">
+            {children}
+          </div>
           {script && <script src={`/assets/${script}.js`} />}
         </body>
       </html>

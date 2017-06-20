@@ -16,6 +16,8 @@ import DispatchAction from "./DispatchAction";
 import NavigationActions from "./NavigationActions";
 import HandleReactComponentGet from "./HandleReactComponentGet";
 import NotFoundPage from "./NotFoundPage";
+import HandleReactComponentForm from "./HandleReactComponentForm";
+import HandleLogout from "./HandleLogout";
 
 const app = express();
 
@@ -131,9 +133,16 @@ Object.keys(NavigationActions).forEach(actionName => {
   if (component && component.browserModule) {
     loadBrowserModule(component.browserModule);
   }
-  const handlerToUse = handler || HandleReactComponentGet;
+  let handlerToUse = HandleReactComponentGet;
+  if (handler === "form") {
+    handlerToUse = HandleReactComponentForm;
+  } else if (handler === "logout") {
+    handlerToUse = HandleLogout;
+  }
   if (path) {
+    console.log("foo", path);
     app.all(path, (req, res, next) => {
+      console.log("using", path, req.path);
       handlerToUse(req, res, next, navigationAction);
     });
   }

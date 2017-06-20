@@ -36,7 +36,11 @@ export default function ReactComponentHandleForm(req, res, next, navAction) {
       const action = Component.getActionForInput(input);
       if (action) {
         const authAction = req.auth
-          ? { ...action, session: req.auth.session, user: req.auth.user }
+          ? {
+              ...action,
+              viewerSession: req.auth.session,
+              viewerUser: req.auth.user
+            }
           : action;
         const actionResult = DispatchAction(authAction)
           .then(result => ({ state: "passed", result }))
@@ -83,7 +87,12 @@ export default function ReactComponentHandleForm(req, res, next, navAction) {
               return res.redirect(Component.successNavigationAction.uri);
             }
             if (typeof Component.successNavigationAction === "function") {
-              return res.redirect(Component.successNavigationAction(input).uri);
+              const navAction = Component.successNavigationAction({
+                input,
+                auth: req.auth
+              });
+              console.log("redirecting to", navAction);
+              return res.redirect(navAction.uri);
             }
 
             res.send(

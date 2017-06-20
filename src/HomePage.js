@@ -1,22 +1,14 @@
 import React from "react";
 import SimplePage from "./SimplePage";
+import ProfilePage from "./ProfilePage";
 
 export default class HomePage extends React.Component {
+  static load = ProfilePage.load;
   static getTitle = () => null;
   render() {
     const { auth } = this.props;
     if (auth) {
-      return (
-        <SimplePage>
-          <h2>Hello, {auth.user}</h2>
-          <a href="/auth/logout" className="btn btn-lg btn-default">
-            Log out
-          </a>
-          <a href="/create" className="btn btn-lg btn-default btn-primary">
-            Create Project
-          </a>
-        </SimplePage>
-      );
+      return <ProfilePage {...this.props} />;
     }
     return (
       <SimplePage>

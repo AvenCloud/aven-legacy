@@ -3,35 +3,34 @@ import { getAuth } from "./AuthUtilities";
 import Utilities from "./Utilities";
 
 export default async function CreateProjectAction(action) {
-  const auth = await getAuth(action.user, action.session);
+  const auth = await getAuth(action.viewerUser, action.viewerSession);
   if (!auth) {
     throw "User is not authenticated";
   }
-  const lastUserDoc = await DatabaseService.getDoc(action.user);
-  const projects = lastUserDoc.projects ? lastUserDoc.projects.slice() : [];
-  projects.push(action.projectName);
-  await DatabaseService.writeDoc(action.user, { ...lastUserDoc, projects });
-  await DatabaseService.writeDoc(action.user + "/" + action.projectName, {
+  //todo: verify project name, no slashes
+  const userDoc = await DatabaseService.getDoc(action.viewerUser);
+  const publicProjects = userDoc.publicProjects
+    ? userDoc.publicProjects.slice()
+    : [];
+  const privateProjects = userDoc.privateProjects
+    ? userDoc.privateProjects.slice()
+    : [];
+  const newProject = {
+    name: action.projectName,
+    isPublic: action.isPublic
+  };
+  if (action.isPublic) {
+    publicProjects.push(newProject);
+  } else {
+    privateProjects.push(newProject);
+  }
+  await DatabaseService.writeDoc(action.viewerUser, {
+    ...userDoc,
+    publicProjects,
+    privateProjects
+  });
+  await DatabaseService.writeDoc(action.viewerUser + "/" + action.projectName, {
     name: action.projectName
   });
-  return { newProject: action.projectName };
-
-  // if (!userData) {
-  //   throw "Username does not exist. Login with username only right now";
-  // }
-  // if (!userData.password) {
-  //   throw "User is not set up yet";
-  // }
-  // if (!await Utilities.compareHash(action.password, userData.password)) {
-  //   throw "Incorrect password!";
-  // }
-  // const newSessionId = await Utilities.genSessionId();
-  // await DatabaseService.writeDoc(action.username, {
-  //   ...userData,
-  //   sessions: [...userData.sessions, newSessionId]
-  // });
-  // return {
-  //   username: action.username,
-  //   session: newSessionId
-  // };
+  return { newProject: action.projectName, isPublic: action.isPublic };
 }

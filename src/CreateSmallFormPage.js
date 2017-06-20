@@ -21,7 +21,7 @@ class EmailPhoneThing extends React.Component {
   }
 }
 
-const SmallFormPage = ({ children }) =>
+const SmallFormPage = ({ children }) => (
   <div style={{}}>
     <div
       style={{
@@ -78,7 +78,8 @@ const SmallFormPage = ({ children }) =>
         </div>
       </div>
     </div>
-  </div>;
+  </div>
+);
 
 export default function CreateSmallFormPage(opts) {
   class FormPage extends React.Component {

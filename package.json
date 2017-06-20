@@ -4,7 +4,7 @@
   "scripts": {
     "start": "NODE_ENV=development forever -c 'node -r babel-register' ./forever-config.json",
     "run-prod": "NODE_ENV=production node lib/AppServer.js",
-    "build-client": "node_modules/browserify/bin/cmd.js lib/ProjectIndex.js -o lib/static/ProjectIndex.js",
+    "build-client": "node_modules/browserify/bin/cmd.js lib/BrowserIndex.js -o lib/static/BrowserIndex.js",
     "build": "node_modules/babel-cli/bin/babel.js src/ --out-dir lib/ && rm -rf lib/static && cp -r src/static lib/static && npm run build-client",
     "upload-secrets": "node lib/upload_secrets.js",
     "postinstall": "npm run build"

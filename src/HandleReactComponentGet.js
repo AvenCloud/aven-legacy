@@ -11,12 +11,19 @@ export default async function ReactComponentHandleGet(
 ) {
   const Component = navAction.component;
   if (req.method === "GET") {
-    const { auth, params } = req;
+    const { auth, params, path } = req;
     let data = null;
     if (Component.load) {
       try {
-        data = await Component.load({ auth, params }, DispatchAction);
+        data = await Component.load({ auth, params, path }, action =>
+          DispatchAction({
+            ...action,
+            viewerUser: auth && auth.user,
+            viewerSession: auth && auth.session
+          })
+        );
       } catch (e) {
+        console.error("duh1", e);
         next();
         return;
       }

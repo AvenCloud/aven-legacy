@@ -5,6 +5,7 @@ import CreateProjectAction from "./CreateProjectAction";
 import EmailRecieveAction from "./EmailRecieveAction";
 import GetProfileAction from "./GetProfileAction";
 import GetProjectAction from "./GetProjectAction";
+import GetAccountAction from "./GetAccountAction";
 
 const Actions = {
   GetProfileAction,
@@ -13,6 +14,7 @@ const Actions = {
   EmailRecieveAction,
   AuthRegisterAction,
   AuthLoginAction,
+  GetAccountAction,
   AuthVerifyAction
 };
 
