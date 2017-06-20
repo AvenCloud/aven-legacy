@@ -104,7 +104,7 @@ app.use("/favicon.ico", faviconHandler);
 
 app.use(cookieParser());
 
-app.post("/api/v1/dispatch", bodyParser.json(), async (req, res) => {
+app.post("/api/dispatch", bodyParser.json(), async (req, res) => {
   let action = req.body;
   if (req.cookies.user) {
     action = {

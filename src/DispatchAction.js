@@ -6,8 +6,10 @@ import EmailRecieveAction from "./EmailRecieveAction";
 import GetProfileAction from "./GetProfileAction";
 import GetProjectAction from "./GetProjectAction";
 import GetAccountAction from "./GetAccountAction";
+import CreateDocAction from "./CreateDocAction";
 
 const Actions = {
+  CreateDocAction,
   GetProfileAction,
   GetProjectAction,
   CreateProjectAction,
