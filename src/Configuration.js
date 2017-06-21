@@ -5,8 +5,12 @@ try {
   secrets = fs.readFileSync("secrets.json", { encoding: "utf8" });
   secrets = JSON.parse(secrets);
 } catch (e) {
-  secrets = new Buffer(process.env.AVEN_SECRETS, "base64");
-  secrets = JSON.parse(secrets.toString());
+  if (process.env.AVEN_SECRETS) {
+    secrets = new Buffer(process.env.AVEN_SECRETS, "base64");
+    secrets = JSON.parse(secrets.toString());
+  } else {
+    throw "Cannot read secrets to start app";
+  }
 }
 
 const postgresURL = process.env.DATABASE_URL || secrets.postgres_uri;
