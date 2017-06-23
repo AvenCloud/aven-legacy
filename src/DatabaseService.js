@@ -7,17 +7,38 @@ import Configuration from "./Configuration";
 const params = url.parse(Configuration.postgresURL);
 const auth = params.auth.split(":");
 
+const shouldUseSSL = Configuration.POSTGRES_DANGER_DISABLE_SSL ? false : true;
+
 const config = {
   user: auth[0],
   password: auth[1],
   host: params.hostname,
   port: params.port,
   database: params.pathname.split("/")[1],
-  ssl: true
+  ssl: shouldUseSSL
 };
 const pool = new pg.Pool(config);
 const query = denodeify(pool.query);
 const connect = denodeify(pool.connect);
+
+const createTableQuery = `
+CREATE TABLE documents (
+name varchar(140) NOT NULL,
+value text NOT NULL,
+CONSTRAINT primarykey PRIMARY KEY (name)
+);
+`;
+
+async function wakeup() {
+  let result = null;
+  try {
+    result = await pool.query("SELECT COUNT (*) FROM documents", []);
+  } catch (e) {
+    if (e.toString() === 'error: relation "documents" does not exist') {
+      await pool.query(createTableQuery);
+    }
+  }
+}
 
 async function createDoc(docName, value) {
   await pool.connect();
@@ -54,7 +75,8 @@ async function getDoc(docName) {
 const DatabaseService = {
   getDoc,
   writeDoc,
-  createDoc
+  createDoc,
+  wakeup
 };
 
 export default DatabaseService;

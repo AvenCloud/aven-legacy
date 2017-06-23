@@ -14,7 +14,7 @@ try {
 }
 
 const postgresURL = process.env.DATABASE_URL || secrets.postgres_uri;
-
+const { POSTGRES_DANGER_DISABLE_SSL } = process.env;
 const env = process.env.NODE_ENV;
 
 const isSecure = env !== "development";
@@ -29,7 +29,8 @@ const config = {
   port,
   secrets,
   isSecure,
-  postgresURL
+  postgresURL,
+  POSTGRES_DANGER_DISABLE_SSL
 };
 
 export default config;

@@ -7,7 +7,12 @@
     "build-client": "node_modules/browserify/bin/cmd.js lib/BrowserIndex.js -o lib/static/BrowserIndex.js",
     "build": "node_modules/babel-cli/bin/babel.js src/ --out-dir lib/ && rm -rf lib/static && cp -r src/static lib/static && npm run build-client",
     "upload-secrets": "node lib/upload_secrets.js",
-    "postinstall": "npm run build"
+    "postinstall": "npm run build",
+    "test": "jest"
+  },
+  "jest": {
+    "transform": {},
+    "rootDir": "src"
   },
   "engines": {
     "node": "6.10.2"
@@ -19,6 +24,7 @@
     "babel-preset-react-native": "^1.9.2",
     "bcrypt-nodejs": "^0.0.3",
     "body-parser": "^1.17.2",
+    "browserify": "^14.4.0",
     "bufferutil": "3.0.1",
     "cookie-parser": "^1.4.3",
     "denodeify": "^1.2.1",
@@ -27,12 +33,16 @@
     "multer": "^1.3.0",
     "node-fetch": "^1.7.0",
     "pg": "^6.2.3",
+    "prop-types": "^15.5.10",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "utf-8-validate": "3.0.2",
     "validator": "^7.0.0",
-    "ws": "3.0.0",
-    "browserify": "^14.4.0"
+    "ws": "3.0.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "babel-jest": "^20.0.3",
+    "jest": "^20.0.4",
+    "regenerator-runtime": "^0.10.5"
+  }
 }

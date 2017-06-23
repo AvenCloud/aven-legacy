@@ -1,6 +1,6 @@
 const Zed = require("./Zed");
 
-import {
+const {
   validate,
   compute,
   ZString,
@@ -11,7 +11,7 @@ import {
   ZOr,
   ZSum,
   Store
-} from "./Zed";
+} = Zed;
 
 test("Store compute basics", () => {
   const store = new Store({
@@ -194,19 +194,20 @@ test("Or validation", () => {
 test.skip("Objects", () => {
   const store = new Store({
     lucy: ZObject({
-      name: ZString('Lucy'),
+      name: ZString("Lucy")
     }),
-    lucyWithAge: ZObject(ZAddress('lucy'), {
-      age: ZNumber(25),
-    }),
+    lucyWithAge: ZObject(ZAddress("lucy"), {
+      age: ZNumber(25)
+    })
   });
 
   expect(store.validate(ZString(), ZOr(ZNumber(42), ZString()))).toBeNull();
 
-  const computedResult = store.compute(ZAddress('lucyWithAge')));
-  expect(computedResult.value).toEqual(expect.objectContaining({
-    name: expect.objectContaining({ value: 'Lucy' }),
-    age: expect.objectContaining({ value: 25 })
-  }));
-
+  const computedResult = store.compute(ZAddress("lucyWithAge"));
+  expect(computedResult.value).toEqual(
+    expect.objectContaining({
+      name: expect.objectContaining({ value: "Lucy" }),
+      age: expect.objectContaining({ value: 25 })
+    })
+  );
 });

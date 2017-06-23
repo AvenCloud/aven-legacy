@@ -1,0 +1,21 @@
+version: '2'
+services:
+  db:
+    image: "postgres:9.6"
+    ports:
+     - "5432:5432"
+    environment:
+     POSTGRES_PASSWORD: aven-test
+     POSTGRES_USER: aven
+  web:
+    build: .
+    ports:
+     - "5000:5000"
+    volumes:
+     - .:/usr/src/app
+    environment:
+     DATABASE_URL: postgres://aven:aven-test@db:5432/aven
+     POSTGRES_DANGER_DISABLE_SSL: "true"
+    links:
+      - db
+    command: ["npm", "start"]

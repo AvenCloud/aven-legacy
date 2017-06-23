@@ -140,9 +140,7 @@ Object.keys(NavigationActions).forEach(actionName => {
     handlerToUse = HandleLogout;
   }
   if (path) {
-    console.log("foo", path);
     app.all(path, (req, res, next) => {
-      console.log("using", path, req.path);
       handlerToUse(req, res, next, navigationAction);
     });
   }
@@ -166,6 +164,7 @@ setInterval(() => {
   });
 }, 1000);
 
-server.listen(Configuration.port, function() {
+server.listen(Configuration.port, async function() {
   console.log("Node app is running on port", Configuration.port);
+  await DatabaseService.wakeup();
 });
