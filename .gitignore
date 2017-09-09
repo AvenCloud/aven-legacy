@@ -2,3 +2,4 @@ node_modules
 secrets.json
 *.DS_Store
 lib
+npm-debug.log

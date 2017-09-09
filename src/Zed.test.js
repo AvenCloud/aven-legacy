@@ -10,11 +10,11 @@ const {
   ZAddress,
   ZOr,
   ZSum,
-  Store
+  ZStore
 } = Zed;
 
 test("Store compute basics", () => {
-  const store = new Store({
+  const store = new ZStore({
     a: ZNumber(12),
     b: ZString("foo"),
     c: ZBoolean(true),
@@ -30,7 +30,7 @@ test("Store compute basics", () => {
 });
 
 test("Store watch and mutate work", () => {
-  const store = new Store({
+  const store = new ZStore({
     a: ZNumber(12)
   });
   expect(store.compute(ZAddress("a")).__zType).toEqual("ZNumber");
@@ -50,7 +50,7 @@ test("Store watch and mutate work", () => {
 });
 
 test("Addresses", () => {
-  const store = new Store({
+  const store = new ZStore({
     x: ZNumber(12),
     y: ZAddress("x")
   });
@@ -59,7 +59,7 @@ test("Addresses", () => {
 });
 
 test("Equality primitives", () => {
-  const store = new Store({
+  const store = new ZStore({
     x: ZNumber(42),
     y: ZString("abc"),
     a: ZEquals(ZAddress("x"), ZNumber(42)),
@@ -76,7 +76,7 @@ test("Equality primitives", () => {
 });
 
 test("Sums", () => {
-  const store = new Store({
+  const store = new ZStore({
     x: ZNumber(42),
     y: ZNumber(5),
     a: ZSum(ZAddress("x"), ZNumber(0)),
@@ -109,7 +109,7 @@ test("Sums", () => {
 });
 
 test("Watching sums", () => {
-  const store = new Store({
+  const store = new ZStore({
     x: ZNumber(42),
     y: ZNumber(5),
     a: ZSum(ZAddress("x"), ZNumber(0.1)),
@@ -144,7 +144,7 @@ test("Basic type errors", () => {
 });
 
 test("Referrential type errors", () => {
-  const store = new Store({
+  const store = new ZStore({
     name: ZString(),
     age: ZNumber(),
     tommysAge: ZNumber(5)
@@ -156,7 +156,7 @@ test("Referrential type errors", () => {
 });
 
 test("Sum type errors", () => {
-  const store = new Store({
+  const store = new ZStore({
     x: ZNumber(42),
     y: ZNumber(5),
     a: ZSum(ZAddress("x"), ZAddress("y"))
@@ -169,7 +169,7 @@ test("Sum type errors", () => {
 });
 
 test("Or validation", () => {
-  const store = new Store({
+  const store = new ZStore({
     x: ZNumber(),
     y: ZString("Foo"),
     a: ZOr(ZAddress("x"), ZAddress("y"))
@@ -192,7 +192,7 @@ test("Or validation", () => {
 });
 
 test.skip("Objects", () => {
-  const store = new Store({
+  const store = new ZStore({
     lucy: ZObject({
       name: ZString("Lucy")
     }),

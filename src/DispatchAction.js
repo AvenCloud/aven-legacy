@@ -20,10 +20,12 @@ const Actions = {
   AuthVerifyAction
 };
 
-module.exports = async action => {
+async function Dispatcher(action) {
   if (Actions[action.type]) {
-    return await Actions[action.type](action);
+    return await Actions[action.type](action, Dispatcher);
   }
-
+  console.log("Unknown action:" + JSON.stringify(action));
   throw new Error("Action not identified");
-};
+}
+
+module.exports = Dispatcher;

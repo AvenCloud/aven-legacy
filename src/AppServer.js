@@ -86,8 +86,60 @@ app.post("/_inbound_mail", multer.single(), async (req, res) => {
     type: "EmailRecieveAction",
     data: req.body
   });
-  res.send("hello kind email service");
+  res.send("ok");
 });
+
+const checkPlivoKey = (req, res, next) => {
+  if (req.query.key !== Configuration.secrets.inbound_plivo_key) {
+    res.setStatus(400).send("Wrong inbound plivo key");
+    return;
+  }
+  next();
+};
+
+app.post("/_handle_call", [
+  checkPlivoKey,
+  async (req, res) => {
+    if (req.query.key !== Configuration.secrets.inbound_plivo_key) {
+      res.setStatus(400).send("Wrong inbound plivo key");
+      return;
+    }
+    const result = await DispatchAction({
+      type: "CallHandleAction",
+      data: req.body
+    });
+    const callHandler = `
+    <Response>
+      <Dial callerId="none">
+        <Number>16502239482</Number>
+      </Dial>
+    </Response>`;
+    res.header("Content-Type", "text/xml");
+    res.send(callHandler);
+  }
+]);
+
+app.post("/_handle_call_end", [
+  checkPlivoKey,
+  async (req, res) => {
+    const result = await DispatchAction({
+      type: "CallEndAction",
+      data: req.body
+    });
+    res.send("ok");
+  }
+]);
+
+app.post("/_inbound_sms", [
+  checkPlivoKey,
+  async (req, res) => {
+    const result = await DispatchAction({
+      type: "CallEndAction",
+      data: req.body
+    });
+    res.send("ok");
+  }
+]);
 
 app.use("/assets", express.static(path.join(__dirname, "../lib/static")));
 
