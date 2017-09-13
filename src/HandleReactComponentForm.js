@@ -35,14 +35,14 @@ export default function ReactComponentHandleForm(req, res, next, navAction) {
       }
       const action = Component.getActionForInput(input);
       if (action) {
-        const authAction = req.auth
+        const actionWithAuth = req.auth
           ? {
               ...action,
               viewerSession: req.auth.session,
               viewerUser: req.auth.user
             }
           : action;
-        const actionResult = DispatchAction(authAction)
+        const actionResult = DispatchAction(actionWithAuth)
           .then(result => ({ state: "passed", result }))
           .catch(result => {
             console.error("fail", result);

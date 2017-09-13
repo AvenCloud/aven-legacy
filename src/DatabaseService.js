@@ -18,8 +18,6 @@ const config = {
   ssl: shouldUseSSL
 };
 const pool = new pg.Pool(config);
-const query = denodeify(pool.query);
-const connect = denodeify(pool.connect);
 
 const createTableQuery = `
 CREATE TABLE documents (
@@ -32,16 +30,20 @@ CONSTRAINT primarykey PRIMARY KEY (name)
 async function wakeup() {
   let result = null;
   try {
+    await pool.connect();
+    console.log("Postgres pool connected!");
     result = await pool.query("SELECT COUNT (*) FROM documents", []);
+    console.log("Postgres table present!");
   } catch (e) {
     if (e.toString() === 'error: relation "documents" does not exist') {
+      console.log("Creating table..");
       await pool.query(createTableQuery);
+      console.log("Created table!");
     }
   }
 }
 
 async function createDoc(docName, value) {
-  await pool.connect();
   await pool.query("INSERT INTO documents (name, value) VALUES ($1, $2)", [
     docName,
     value
@@ -49,7 +51,6 @@ async function createDoc(docName, value) {
 }
 
 async function writeDoc(docName, value) {
-  await pool.connect();
   await pool.query(
     "INSERT INTO documents (name, value) VALUES ($1, $2) ON CONFLICT (name) DO UPDATE SET value = $2;",
     [docName, value]
@@ -57,7 +58,6 @@ async function writeDoc(docName, value) {
 }
 
 async function getDoc(docName) {
-  await pool.connect();
   const res = await pool.query("SELECT value FROM documents WHERE name = $1;", [
     docName
   ]);

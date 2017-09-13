@@ -216,7 +216,24 @@ setInterval(() => {
   });
 }, 1000);
 
-server.listen(Configuration.port, async function() {
-  console.log("Node app is running on port", Configuration.port);
+async function startServer() {
   await DatabaseService.wakeup();
-});
+  return new Promise((resolve, reject) => {
+    server.listen(Configuration.port, function(err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
+startServer()
+  .then(() => {
+    console.log("App started on port " + Configuration.port);
+  })
+  .catch(err => {
+    console.error("App failed to start!");
+    throw err;
+  });
