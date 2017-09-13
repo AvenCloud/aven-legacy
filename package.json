@@ -15,7 +15,8 @@
     "rootDir": "src"
   },
   "engines": {
-    "node": "8.1.4"
+    "node": "8.1.4",
+    "npm": "4.6.1"
   },
   "dependencies": {
     "babel-cli": "^6.24.1",
