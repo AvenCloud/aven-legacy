@@ -13,6 +13,12 @@ const CreateFormPage = CreateSmallFormPage({
       type: "text",
       name: "projectName",
       placeholder: "Project Name"
+    },
+    {
+      type: "checkbox",
+      name: "isPublic",
+      label: "Is public?",
+      default: false
     }
   ],
   getActionForInput: state => ({ type: "CreateProjectAction", ...state }),

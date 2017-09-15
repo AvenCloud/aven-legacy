@@ -10,25 +10,19 @@ export default async function GetProfileAction(action) {
   if (action.viewerUser === action.user) {
     const auth = await getAuth(action.viewerUser, action.viewerSession);
     if (auth) {
-      const {
-        verifiedEmail,
-        verifiedPhone,
-        publicProjects,
-        privateProjects,
-        name
-      } = userData;
+      const { verifiedEmail, verifiedPhone, projects, name } = userData;
       return {
         verifiedEmail,
         verifiedPhone,
-        publicProjects,
-        privateProjects,
+        projects,
         name
       };
     }
   }
-  const { publicProjects, name } = userData;
+  const { projects, name } = userData;
+  const publicProjects = projects.filter(p => p.isPublic);
   return {
     name,
-    publicProjects
+    projects: publicProjects
   };
 }

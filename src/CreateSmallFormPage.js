@@ -1,6 +1,6 @@
 import React from "react";
 
-class EmailPhoneThing extends React.Component {
+class EmailPhoneInput extends React.Component {
   render() {
     return (
       <div>
@@ -84,7 +84,17 @@ const SmallFormPage = ({ children }) => (
 export default function CreateSmallFormPage(opts) {
   class FormPage extends React.Component {
     static successNavigationAction = opts.successNavigationAction;
-    static getActionForInput = opts.getActionForInput;
+    static getActionForInput = inputValues => {
+      const data = {};
+      opts.inputs.forEach(inputConfig => {
+        const value =
+          inputConfig.type === "checkbox"
+            ? !!inputValues[inputConfig.name]
+            : inputValues[inputConfig.name];
+        data[inputConfig.name] = value;
+      });
+      return opts.getActionForInput(data);
+    };
     static getTitle = () => opts.title;
     static validate = opts.validate;
     render() {
@@ -92,17 +102,16 @@ export default function CreateSmallFormPage(opts) {
       return (
         <SmallFormPage>
           <form method="post">
-            <h1 style={{ position: "relative", bottom: 15 }}>
-              {opts.heading}
-            </h1>
-            {opts.subheadingText &&
+            <h1 style={{ position: "relative", bottom: 15 }}>{opts.heading}</h1>
+            {opts.subheadingText && (
               <p style={{ marginTop: -10, marginBottom: 30 }}>
                 {opts.subheadingText}
-              </p>}
+              </p>
+            )}
             {opts.inputs.map((inputConfig, inputIndex) => {
               if (inputConfig.type === "email-phone-signup") {
                 return (
-                  <EmailPhoneThing key="email-phone-signup" {...inputConfig} />
+                  <EmailPhoneInput key="email-phone-signup" {...inputConfig} />
                 );
               }
               if (inputConfig.hidden && input[inputConfig.name] != null) {
@@ -122,10 +131,11 @@ export default function CreateSmallFormPage(opts) {
                   key={inputConfig.name}
                   style={{ marginBottom: 40 }}
                 >
-                  {inputConfig.label &&
+                  {inputConfig.label && (
                     <label className="control-label" for={inputConfig.name}>
                       {inputConfig.label}
-                    </label>}
+                    </label>
+                  )}
                   <input
                     onChange={() => {}}
                     className="form-control"
@@ -135,24 +145,26 @@ export default function CreateSmallFormPage(opts) {
                     type={inputConfig.type}
                     value={input[inputConfig.name]}
                   />
-                  {inputConfig.rightLabel &&
+                  {inputConfig.rightLabel && (
                     <span
                       className="control-label-right"
                       style={{ marginTop: 5 }}
                     >
                       {inputConfig.rightLabel(input)}
-                    </span>}
+                    </span>
+                  )}
                 </div>
               );
             })}
 
-            {validationError &&
+            {validationError && (
               <div className="alert alert-dismissible alert-danger">
                 <a type="button" className="close" data-dismiss="alert" href="">
                   ×
                 </a>
                 <strong>Whoops!</strong> {validationError}
-              </div>}
+              </div>
+            )}
 
             <div
               className="form-group"
@@ -169,10 +181,8 @@ export default function CreateSmallFormPage(opts) {
                 <button className="btn btn-primary btn-lg">
                   {opts.submitButtonLabel}
                 </button>
-
               </div>
             </div>
-
           </form>
         </SmallFormPage>
       );

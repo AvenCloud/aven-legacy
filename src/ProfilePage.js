@@ -28,9 +28,13 @@ export default class ProfilePage extends React.Component {
   render() {
     const { data, auth } = this.props;
     const { projects, name } = data.user;
-    const allProjects = projects || [];
-    const privateProjects = allProjects.filter(p => p.isPublic);
-    const publicProjects = allProjects.filter(p => !p.isPublic);
+    const allProjects = projects || {};
+    const privateProjects = Object.keys(allProjects)
+      .filter(pId => !allProjects[pId].isPublic)
+      .map(pId => ({ ...allProjects[pId], name: pId }));
+    const publicProjects = Object.keys(allProjects)
+      .filter(pId => allProjects[pId].isPublic)
+      .map(pId => ({ ...allProjects[pId], name: pId }));
     return (
       <SimplePage>
         <h2>{name}</h2>
