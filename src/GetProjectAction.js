@@ -2,10 +2,6 @@ import DatabaseService from "./DatabaseService";
 import Utilities from "./Utilities";
 
 export default async function GetProjectAction(action) {
-	console.log("duhh", action);
-	if (!action.viewerUser) {
-		throw "Not logged in!";
-	}
 	const profile = await DatabaseService.getDoc(action.user);
 	if (!profile || !profile.projects) {
 		throw "Not found!";

@@ -44,23 +44,38 @@ export default class ProfilePage extends React.Component {
           publicProjects.map((project, index) => (
             <ProjectRow key={index} project={project} user={name} />
           ))}
-        <h2>Private Projects</h2>
-        {privateProjects &&
-          privateProjects.map((project, index) => (
-            <ProjectRow key={index} project={project} user={name} />
-          ))}
-        <a href="/create" className="btn btn-lg btn-default btn-primary">
-          Create Project
-        </a>
 
-        <h2>My Account</h2>
+        {auth &&
+        auth.user === name && (
+          <span>
+            {" "}
+            <h2>Private Projects</h2>
+            {privateProjects &&
+              privateProjects.map((project, index) => (
+                <ProjectRow key={index} project={project} user={name} />
+              ))}
+          </span>
+        )}
+        {auth &&
+        auth.user === name && (
+          <a href="/create" className="btn btn-lg btn-default btn-primary">
+            Create Project
+          </a>
+        )}
 
-        <a href="/auth/logout" className="btn btn-lg btn-default">
-          Log out
-        </a>
-        <a href="/account" className="btn btn-lg btn-default">
-          Account Settings
-        </a>
+        {auth &&
+        auth.user === name && (
+          <span>
+            <h2>My Account</h2>
+
+            <a href="/auth/logout" className="btn btn-lg btn-default">
+              Log out
+            </a>
+            <a href="/account" className="btn btn-lg btn-default">
+              Account Settings
+            </a>
+          </span>
+        )}
       </SimplePage>
     );
   }

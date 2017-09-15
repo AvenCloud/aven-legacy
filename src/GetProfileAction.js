@@ -20,7 +20,12 @@ export default async function GetProfileAction(action) {
     }
   }
   const { projects, name } = userData;
-  const publicProjects = projects.filter(p => p.isPublic);
+  const publicProjects = {};
+  Object.keys(projects).forEach(pId => {
+    if (projects[pId].isPublic) {
+      publicProjects[pId] = projects[pId];
+    }
+  });
   return {
     name,
     projects: publicProjects

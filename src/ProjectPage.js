@@ -5,7 +5,6 @@ export default class ProjectPage extends React.Component {
   static browserModule = "ProjectIndex";
   static load = async (props, dispatch) => {
     const pathParts = props.path.split("/");
-    console.log(pathParts);
     const projectData = await dispatch({
       type: "GetProjectAction",
       user: pathParts[1],
