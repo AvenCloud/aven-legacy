@@ -4,7 +4,11 @@ import SimplePage from "./SimplePage";
 class ProjectRow extends React.Component {
   render() {
     const { user, project } = this.props;
-    return <a href={`/${user}/${project.name}`}><h3>{project.name}</h3></a>;
+    return (
+      <a href={`/${user}/${project.name}`}>
+        <h3>{project.name}</h3>
+      </a>
+    );
   }
 }
 
@@ -23,11 +27,12 @@ export default class ProfilePage extends React.Component {
   static getTitle = ({ data }) => "User ";
   render() {
     const { data, auth } = this.props;
-    const { publicProjects, privateProjects, name } = data.user;
-    // <pre>{JSON.stringify(this.props.data.user)}</pre>
+    const { projects, name } = data.user;
+    const allProjects = projects || [];
+    const privateProjects = allProjects.filter(p => p.isPublic);
+    const publicProjects = allProjects.filter(p => !p.isPublic);
     return (
       <SimplePage>
-
         <h2>{name}</h2>
 
         <h2>Public Projects</h2>

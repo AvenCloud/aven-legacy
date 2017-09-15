@@ -23,7 +23,6 @@ export default async function ReactComponentHandleGet(
           })
         );
       } catch (e) {
-        console.error("duh1", e);
         next();
         return;
       }

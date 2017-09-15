@@ -156,23 +156,27 @@ app.use("/favicon.ico", faviconHandler);
 
 app.use(cookieParser());
 
-app.post("/api/dispatch", bodyParser.json(), async (req, res) => {
-  let action = req.body;
-  if (req.cookies.user) {
-    action = {
-      ...action,
-      user: req.cookies.user,
-      session: req.cookies.session
-    };
-  }
-  const result = await DispatchAction(action);
-  res.send(result);
-});
-
 app.use(async (req, res, next) => {
   const { user, session } = req.cookies;
   req.auth = await getAuth(user, session);
   next();
+});
+
+app.post("/api/dispatch", bodyParser.json(), async (req, res) => {
+  let action = req.body;
+  if (req.auth) {
+    action = {
+      ...action,
+      viewerUser: req.auth.user,
+      viewerSession: req.auth.session
+    };
+  }
+  try {
+    const result = await DispatchAction(action);
+    res.send(result);
+  } catch (e) {
+    res.status(500).send("Error: " + e);
+  }
 });
 
 function loadBrowserModule(moduleName) {

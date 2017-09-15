@@ -6,10 +6,9 @@ const randomBytes = denodeify(crypto.randomBytes);
 function digest(input) {
   const shasum = crypto.createHash("sha1");
   shasum.update(input);
-  return shasum.digest("hex");
+  return "sha-1-" + shasum.digest("hex");
 }
 
-const shasum = crypto.createHash("sha1");
 async function genSessionId() {
   const randBuf = await randomBytes(48);
   return randBuf.toString("hex");

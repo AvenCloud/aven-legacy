@@ -7,6 +7,7 @@ import GetProfileAction from "./GetProfileAction";
 import GetProjectAction from "./GetProjectAction";
 import GetAccountAction from "./GetAccountAction";
 import CreateDocAction from "./CreateDocAction";
+import SetProjectAction from "./SetProjectAction";
 
 const Actions = {
   CreateDocAction,
@@ -17,7 +18,8 @@ const Actions = {
   AuthRegisterAction,
   AuthLoginAction,
   GetAccountAction,
-  AuthVerifyAction
+  AuthVerifyAction,
+  SetProjectAction
 };
 
 async function Dispatcher(action) {

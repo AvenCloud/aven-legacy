@@ -1,16 +1,14 @@
 import DatabaseService from "./DatabaseService";
 import Utilities from "./Utilities";
 
-export default async function AuthRegisterAction(action) {
+export default async function AuthVerifyAction(action) {
   const userData = await DatabaseService.getDoc(action.username);
-  console.log("erm", userData);
   if (
     userData.emailVerification &&
     "" + userData.emailVerification.code === action.code
   ) {
     // todo: check emailVerification.verificationTime to make sure the code is still valid
     const sessionId = await Utilities.genSessionId();
-    console.log("wat", sessionId);
     const { emailVerification } = userData;
     await DatabaseService.writeDoc(action.username, {
       ...userData,

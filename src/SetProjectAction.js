@@ -2,22 +2,21 @@ import DatabaseService from "./DatabaseService";
 import { getAuth } from "./AuthUtilities";
 import Utilities from "./Utilities";
 
-export default async function CreateProjectAction(action) {
+export default async function SetProjectAction(action) {
   const auth = await getAuth(action.viewerUser, action.viewerSession);
   if (!auth) {
     throw "User is not authenticated";
   }
-  //todo: verify project name, no slashes
   const userDoc = await DatabaseService.getDoc(action.viewerUser);
   const projects = userDoc.projects || {};
-  if (projects[action.projectName]) {
-    throw "Project with this name already exists!";
+  if (!projects[action.projectName]) {
+    throw "Project with this name does not exist!";
   }
-  const creationTime = Math.floor(Date.now() / 1000);
+  const updateTime = Math.floor(Date.now() / 1000);
   const newProject = {
-    rootDoc: null,
-    creationTime,
-    updateTime: creationTime,
+    ...projects[action.projectName],
+    rootDoc: action.rootDoc,
+    updateTime,
     isPublic: action.isPublic
   };
   await DatabaseService.writeDoc(action.viewerUser, {
@@ -27,5 +26,5 @@ export default async function CreateProjectAction(action) {
       [action.projectName]: newProject
     }
   });
-  return { projectName: action.projectName, isPublic: action.isPublic };
+  return { projectName: action.projectName, ...newProject };
 }
