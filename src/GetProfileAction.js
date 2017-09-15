@@ -10,16 +10,16 @@ export default async function GetProfileAction(action) {
   if (action.viewerUser === action.user) {
     const auth = await getAuth(action.viewerUser, action.viewerSession);
     if (auth) {
-      const { verifiedEmail, verifiedPhone, projects, name } = userData;
+      const { verifiedEmail, verifiedPhone, projects } = userData;
       return {
         verifiedEmail,
         verifiedPhone,
         projects,
-        name
+        name: action.user
       };
     }
   }
-  const { projects, name } = userData;
+  const { projects } = userData;
   const publicProjects = {};
   Object.keys(projects).forEach(pId => {
     if (projects[pId].isPublic) {
@@ -27,7 +27,7 @@ export default async function GetProfileAction(action) {
     }
   });
   return {
-    name,
+    name: action.user,
     projects: publicProjects
   };
 }

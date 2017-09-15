@@ -1,4 +1,5 @@
 import AuthRegisterAction from "./AuthRegisterAction";
+import AuthResetAction from "./AuthResetAction";
 import AuthVerifyAction from "./AuthVerifyAction";
 import AuthLoginAction from "./AuthLoginAction";
 import CreateProjectAction from "./CreateProjectAction";
@@ -16,6 +17,7 @@ const Actions = {
   CreateProjectAction,
   EmailRecieveAction,
   AuthRegisterAction,
+  AuthResetAction,
   AuthLoginAction,
   GetAccountAction,
   AuthVerifyAction,

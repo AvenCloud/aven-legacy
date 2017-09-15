@@ -15,8 +15,8 @@ const LoginFormPage = CreateSmallFormPage({
   ],
   getActionForInput: state => ({ type: "AuthResetAction", ...state }),
   validate: state => {
-    if (!state.username || !state.code) {
-      return "Must provide both the username and the validation code";
+    if (!state.username_email_or_phone) {
+      return "Must provide the username, email, or phone number";
     }
     return null;
   }
