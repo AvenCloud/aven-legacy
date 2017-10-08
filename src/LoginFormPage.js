@@ -13,7 +13,9 @@ const LoginFormPage = CreateSmallFormPage({
       placeholder: "Username, Email, or Phone #",
       rightLabel: () => [
         "Need an account? ",
-        <a href="/auth/register" key="a">Register here</a>
+        <a href="/auth/register" key="a">
+          Register here
+        </a>
       ]
     },
     {
@@ -22,7 +24,9 @@ const LoginFormPage = CreateSmallFormPage({
       placeholder: "Password",
       rightLabel: () => [
         "Forgot? ",
-        <a href="/auth/reset" key="a">Reset password here</a>
+        <a href="/auth/reset" key="a">
+          Reset password here
+        </a>
       ]
     }
   ],
@@ -30,9 +34,6 @@ const LoginFormPage = CreateSmallFormPage({
   validate: state => {
     if (!state.password || !state.username) {
       return "Must provide both the username and the password";
-    }
-    if (state.password.length < 6) {
-      return "Please choose a longer _password_";
     }
     return null;
   }

@@ -1,10 +1,11 @@
 import React from "react";
+import { renderToString } from "react-dom/server";
 
 export default class AppPage extends React.Component {
   static getTitle = childTitle =>
-    (childTitle ? childTitle + " | Aven" : "Aven");
+    childTitle ? childTitle + " | Aven" : "Aven";
   render() {
-    const { title, children, script } = this.props;
+    const { title, children, script, pageProps } = this.props;
     return (
       <html>
         <head>
@@ -13,9 +14,15 @@ export default class AppPage extends React.Component {
           <title>{title}</title>
         </head>
         <body>
-          <div id="aven-app">
-            {children}
-          </div>
+          <div
+            id="aven-app"
+            dangerouslySetInnerHTML={{ __html: renderToString(children) }}
+          />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.pageProps = ${JSON.stringify(pageProps)};`
+            }}
+          />
           {script && <script src={`/assets/${script}.js`} />}
         </body>
       </html>

@@ -1,4 +1,4 @@
-// alert("hello, world!");
+alert("hello, world!");
 
 const React = require("react");
 const ReactDOM = require("react-dom");
@@ -11,9 +11,9 @@ const query = window.location.query;
 debugger;
 
 class Component extends React.Component {
-  render() {
-    return <div>Hello {this.props.name}</div>;
-  }
+	render() {
+		return <div>Hello {this.props.name}</div>;
+	}
 }
 
 ReactDOM.render(<Component name="John" />, document.getElementById("aven-app"));

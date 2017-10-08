@@ -5,8 +5,8 @@ const CreateFormPage = CreateSmallFormPage({
   submitButtonLabel: "Create",
   title: "Create",
   heading: "New Project",
-  successNavigationAction: ({ input, auth }) => ({
-    uri: "/" + auth.user + "/" + input.projectName
+  successNavigationAction: ({ input, auth, result }) => ({
+    uri: "/" + auth.user + "/" + result.projectName
   }),
   inputs: [
     {

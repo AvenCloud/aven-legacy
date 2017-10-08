@@ -13,7 +13,9 @@ export default function ReactComponentHandleForm(req, res, next, navAction) {
     const title = AppPage.getTitle(Component.getTitle());
     res.send(
       renderToString(
-        <AppPage title={title}><Component input={req.query} /></AppPage>
+        <AppPage title={title}>
+          <Component input={req.query} />
+        </AppPage>
       )
     );
     return;
@@ -55,7 +57,8 @@ export default function ReactComponentHandleForm(req, res, next, navAction) {
             console.log(JSON.stringify(resultData, null, 2));
 
             if (
-              resultData.state === "rejected" || resultData.state !== "passed"
+              resultData.state === "rejected" ||
+              resultData.state !== "passed"
             ) {
               res.send(
                 renderToString(
@@ -89,9 +92,9 @@ export default function ReactComponentHandleForm(req, res, next, navAction) {
             if (typeof Component.successNavigationAction === "function") {
               const navAction = Component.successNavigationAction({
                 input,
-                auth: req.auth
+                auth: req.auth,
+                result
               });
-              console.log("redirecting to", navAction);
               return res.redirect(navAction.uri);
             }
 

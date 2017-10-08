@@ -15,10 +15,14 @@ export default async function SetProjectAction(action) {
   const updateTime = Math.floor(Date.now() / 1000);
   const newProject = {
     ...projects[action.projectName],
-    rootDoc: action.rootDoc,
-    updateTime,
-    isPublic: action.isPublic
+    updateTime
   };
+  if (action.rootDoc != null) {
+    newProject.rootDoc = action.rootDoc;
+  }
+  if (action.isPublic != null) {
+    newProject.isPublic = action.isPublic;
+  }
   await DatabaseService.writeDoc(action.viewerUser, {
     ...userDoc,
     projects: {

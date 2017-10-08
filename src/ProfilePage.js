@@ -13,12 +13,12 @@ class ProjectRow extends React.Component {
 }
 
 export default class ProfilePage extends React.Component {
-  static load = async (props, dispatch) => {
+  static load = async props => {
     const userName = props.params.user || (props.auth && props.auth.user);
     if (!userName) {
       return { user: null };
     }
-    const user = await dispatch({
+    const user = await props.dispatch({
       type: "GetProfileAction",
       user: userName
     });
@@ -46,36 +46,36 @@ export default class ProfilePage extends React.Component {
           ))}
 
         {auth &&
-        auth.user === name && (
-          <span>
-            {" "}
-            <h2>Private Projects</h2>
-            {privateProjects &&
-              privateProjects.map((project, index) => (
-                <ProjectRow key={index} project={project} user={name} />
-              ))}
-          </span>
-        )}
+          auth.user === name && (
+            <span>
+              {" "}
+              <h2>Private Projects</h2>
+              {privateProjects &&
+                privateProjects.map((project, index) => (
+                  <ProjectRow key={index} project={project} user={name} />
+                ))}
+            </span>
+          )}
         {auth &&
-        auth.user === name && (
-          <a href="/create" className="btn btn-lg btn-default btn-primary">
-            Create Project
-          </a>
-        )}
+          auth.user === name && (
+            <a href="/create" className="btn btn-lg btn-default btn-primary">
+              Create Project
+            </a>
+          )}
 
         {auth &&
-        auth.user === name && (
-          <span>
-            <h2>My Account</h2>
+          auth.user === name && (
+            <span>
+              <h2>My Account</h2>
 
-            <a href="/auth/logout" className="btn btn-lg btn-default">
-              Log out
-            </a>
-            <a href="/account" className="btn btn-lg btn-default">
-              Account Settings
-            </a>
-          </span>
-        )}
+              <a href="/auth/logout" className="btn btn-lg btn-default">
+                Log out
+              </a>
+              <a href="/account" className="btn btn-lg btn-default">
+                Account Settings
+              </a>
+            </span>
+          )}
       </SimplePage>
     );
   }

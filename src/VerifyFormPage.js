@@ -30,6 +30,9 @@ const LoginFormPage = CreateSmallFormPage({
     if (!state.username || !state.code) {
       return "Must provide both the username and the validation code";
     }
+    if (state.password.length < 6) {
+      return "Please choose a longer _password_";
+    }
     return null;
   }
 });

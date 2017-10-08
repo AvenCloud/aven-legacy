@@ -10,7 +10,12 @@ export default async function CreateProjectAction(action) {
   //todo: verify project name, no slashes
   const userDoc = await DatabaseService.getDoc(action.viewerUser);
   const projects = userDoc.projects || {};
-  if (projects[action.projectName]) {
+
+  const projectName = action.projectName
+    .trim()
+    .replace(/ /g, "-")
+    .replace(/_/g, "-");
+  if (projects[projectName]) {
     throw "Project with this name already exists!";
   }
   const creationTime = Math.floor(Date.now() / 1000);
@@ -24,8 +29,8 @@ export default async function CreateProjectAction(action) {
     ...userDoc,
     projects: {
       ...projects,
-      [action.projectName]: newProject
+      [projectName]: newProject
     }
   });
-  return { projectName: action.projectName, isPublic: action.isPublic };
+  return { projectName, isPublic: action.isPublic };
 }

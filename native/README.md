@@ -1,1 +1,0 @@
-A storytelling approach of learning programming

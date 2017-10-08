@@ -1,1 +1,0 @@
-- Change UI so that all child editing happens within the edit pane, not on top of it.

@@ -37,6 +37,11 @@ export default async function AuthRegisterAction(action) {
     emailVerification: null,
     phoneVerification: null
   };
+  const validatedName = action.name
+    .trim()
+    .replace(/ /g, "-")
+    .replace(/_/g, "-");
+
   const email = looksLikeAnEmail(action.email)
     ? action.email
     : looksLikeAnEmail(action.email_or_phone) ? action.email_or_phone : null;
@@ -61,11 +66,11 @@ export default async function AuthRegisterAction(action) {
     throw "No valid email address or phone number!";
   }
   try {
-    await DatabaseService.createDoc(action.name, user);
+    await DatabaseService.createDoc(validatedName, user);
   } catch (e) {
     if (e.constraint === "primarykey") {
       throw {
-        detail: `A user with the name '${action.name}' already exists.`,
+        detail: `A user with the name '${validatedName}' already exists.`,
         code: "DUPE_USER"
       };
     }
@@ -75,10 +80,10 @@ export default async function AuthRegisterAction(action) {
     await sendEmail(
       user.emailVerification.email,
       `Welcome to Aven`,
-      `Hello, ${action.name}! Your auth code is ${user.emailVerification.code}
+      `Hello, ${validatedName}! Your auth code is ${user.emailVerification.code}
 Or, click here:
 
-https://aven.io/auth/verify?username=${action.name}&code=${user
+https://aven.io/auth/verify?username=${validatedName}&code=${user
         .emailVerification.code}
       `
     );
@@ -89,5 +94,5 @@ https://aven.io/auth/verify?username=${action.name}&code=${user
       `Your Aven authentication code is ${user.phoneVerification.code}`
     );
   }
-  return { name: action.name };
+  return { name: validatedName };
 }

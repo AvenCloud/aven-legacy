@@ -1,3 +1,4 @@
+import AuthLogoutAction from "./AuthLogoutAction";
 import AuthRegisterAction from "./AuthRegisterAction";
 import AuthResetAction from "./AuthResetAction";
 import AuthVerifyAction from "./AuthVerifyAction";
@@ -6,6 +7,7 @@ import CreateProjectAction from "./CreateProjectAction";
 import EmailRecieveAction from "./EmailRecieveAction";
 import GetProfileAction from "./GetProfileAction";
 import GetProjectAction from "./GetProjectAction";
+import GetDocAction from "./GetDocAction";
 import GetAccountAction from "./GetAccountAction";
 import CreateDocAction from "./CreateDocAction";
 import SetProjectAction from "./SetProjectAction";
@@ -14,11 +16,13 @@ const Actions = {
   CreateDocAction,
   GetProfileAction,
   GetProjectAction,
+  GetDocAction,
   CreateProjectAction,
   EmailRecieveAction,
   AuthRegisterAction,
   AuthResetAction,
   AuthLoginAction,
+  AuthLogoutAction,
   GetAccountAction,
   AuthVerifyAction,
   SetProjectAction
@@ -26,7 +30,8 @@ const Actions = {
 
 async function Dispatcher(action) {
   if (Actions[action.type]) {
-    return await Actions[action.type](action, Dispatcher);
+    const result = await Actions[action.type](action, Dispatcher);
+    return result;
   }
   console.log("Unknown action:" + JSON.stringify(action));
   throw new Error("Action not identified");

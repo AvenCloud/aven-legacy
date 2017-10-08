@@ -1,68 +1,93 @@
-const fetch = require("node-fetch");
-const homedir = require("os").homedir();
 const join = require("path").join;
 const fs = require("fs");
 const commander = require("commander");
 const prompt = require("prompt");
+const denodeify = require("denodeify");
+const { dispatch } = require("./CLI-utilities");
 
-async function init(server, username, password, project) {
-  const destFolder = fs.new;
-  let configData = {};
-  try {
-    configData = Object.assign({}, JSON.parse(fs.readFileSync(configFile)));
-  } catch (e) {}
+const fsExists = denodeify(fs.exists);
+const fsMkdir = denodeify(fs.mkdir);
+const fsWriteFile = denodeify(fs.writeFile);
+
+require("babel-core/register");
+require("babel-polyfill");
+
+async function init(server, username, password, projectPath) {
+  const projectUser = projectPath.split("/")[0];
+  const projectName = projectPath.split("/")[1];
+  const destFolder = join(process.cwd(), projectName);
+  if (await fsExists(destFolder)) {
+    throw "Folder already exists!";
+  }
+  const auth = {
+    server
+  };
   const loginResult = await dispatch(
     {
       type: "AuthLoginAction",
       username,
       password
     },
-    {
-      server
-    }
+    auth
   );
-
-  if (!actionResult || !actionResult.session) {
-    console.error("Login failed!");
-    process.exit(1);
+  if (!loginResult || !loginResult.session) {
+    throw "Login failed!";
   }
-  configData.username = actionResult.username;
-  configData.session = actionResult.session;
-  configData.server = server;
-  fs.writeFileSync(configFile, JSON.stringify(configData));
-  console.log("Login successful!");
-}
+  auth.username = loginResult.username;
+  auth.session = loginResult.session;
+  auth.projectUser = projectUser;
+  auth.projectName = projectName;
+  const project = await dispatch(
+    {
+      type: "GetProjectAction",
+      user: projectUser,
+      project: projectName
+    },
+    auth
+  );
+  if (!project) {
+    throw "cannot find project. create one plz";
+  }
+  await fsMkdir(destFolder);
+  const configFile = join(destFolder, ".avenconfig");
+  const configData = {
+    server,
+    username: loginResult.username,
+    session: loginResult.session,
+    projectName,
+    projectUser
+  };
+  await fsWriteFile(configFile, JSON.stringify(configData));
 
-const defaultConfigFile = join(homedir, ".avenconfig");
+  console.log("durr, ok. should download right now");
+}
 
 commander
   .version("0.1.0")
-  .command("init", "Log in and create or download a new Aven project folder")
+  .command(
+    "init [user_and_project]",
+    "Log in and create or download a new Aven project folder"
+  )
   .option(
     "--server [protocol_and_host]",
     "Specify the aven server to point to",
     a => a,
     "https://aven.io"
   )
-  .action(function(username) {
+  .action(function(user_and_project) {
     prompt.get(
       {
         properties: {
           username: {
-            description: "Aven username, must already be registered",
+            description: "Registered Aven Username",
             type: "string",
             required: true
           },
           password: {
-            description: "Enter your password",
+            description: "Password",
             type: "string",
             required: true,
             hidden: true
-          },
-          project: {
-            description: "Project name (new or existing)",
-            type: "string",
-            required: true
           }
         }
       },
@@ -71,12 +96,18 @@ commander
           console.error("Invalid options input!");
           process.exit(1);
         }
-        init(commander.server, result.username, result.password, result.project)
+        init(
+          commander.server,
+          result.username,
+          result.password,
+          user_and_project
+        )
           .then(() => {
             console.log("Init completed!");
           })
-          .catch(() => {
+          .catch(e => {
             console.log("Init failure!");
+            console.error(e);
           });
       }
     );

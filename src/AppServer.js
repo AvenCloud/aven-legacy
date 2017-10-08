@@ -158,7 +158,14 @@ app.use(cookieParser());
 
 app.use(async (req, res, next) => {
   const { user, session } = req.cookies;
-  req.auth = await getAuth(user, session);
+  if (req.headers["x-aven-auth-username"]) {
+    req.auth = await getAuth(
+      req.headers["x-aven-auth-username"],
+      req.headers["x-aven-auth-session"]
+    );
+  } else {
+    req.auth = await getAuth(user, session);
+  }
   next();
 });
 
@@ -179,16 +186,9 @@ app.post("/api/dispatch", bodyParser.json(), async (req, res) => {
   }
 });
 
-function loadBrowserModule(moduleName) {
-  console.log("loading browser moduoe", moduleName);
-}
-
 Object.keys(NavigationActions).forEach(actionName => {
   const navigationAction = NavigationActions[actionName];
   const { path, handler, component } = navigationAction;
-  if (component && component.browserModule) {
-    loadBrowserModule(component.browserModule);
-  }
   let handlerToUse = HandleReactComponentGet;
   if (handler === "form") {
     handlerToUse = HandleReactComponentForm;
