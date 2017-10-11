@@ -8,9 +8,55 @@ const { dispatch } = require("./CLI-utilities");
 const fsExists = denodeify(fs.exists);
 const fsMkdir = denodeify(fs.mkdir);
 const fsWriteFile = denodeify(fs.writeFile);
+const fsLstat = denodeify(fs.lstat);
 
-require("babel-core/register");
-require("babel-polyfill");
+// require("babel-core/register");
+// require("babel-polyfill");
+
+async function downloadFile(auth, projectUser, projectName, id, destPath) {
+  console.log("downloading", auth, projectUser, projectName, id, destPath);
+  const stat = await fsLstat(destPath);
+  const doc = await dispatch(
+    {
+      type: "GetDocAction",
+      user: projectUser,
+      project: projectName,
+      id
+    },
+    auth
+  );
+  console.log("homie", doc);
+  if (doc.type === "Folder") {
+    console.log("wat");
+    if (!await fsExists(destPath)) {
+      console.log("making!!", destPath);
+      await fsMkdir(destPath);
+    } else if (!stat.isDirectory()) {
+      console.log("zzzzz!!", destPath);
+      throw `${destPath} already exists and it is not a folder!`;
+    }
+    console.log("homie2");
+
+    const fileNames = Object.keys(doc.files);
+    console.log("homie4", fileNames);
+    await Promise.all(
+      fileNames.map(async fileName => {
+        console.log("ding it!!", fileName);
+        const file = doc.files[fileName];
+        return await downloadFile(
+          auth,
+          projectUser,
+          projectName,
+          file.value,
+          `${destPath}/${fileName}`
+        );
+      })
+    );
+    return;
+  }
+
+  await fsWriteFile(destPath, JSON.stringify(doc));
+}
 
 async function init(server, username, password, projectPath) {
   const projectUser = projectPath.split("/")[0];
@@ -59,7 +105,18 @@ async function init(server, username, password, projectPath) {
   };
   await fsWriteFile(configFile, JSON.stringify(configData));
 
-  console.log("durr, ok. should download right now");
+  if (!project.rootDoc) {
+    console.log("Project initialized but seems to be empty");
+    return;
+  }
+
+  await downloadFile(
+    auth,
+    projectUser,
+    projectName,
+    project.rootDoc,
+    destFolder
+  );
 }
 
 commander

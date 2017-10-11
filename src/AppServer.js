@@ -6,10 +6,11 @@ const multer = require("multer")();
 const express = require("express");
 const http = require("http");
 const path = require("path");
-const SocketServer = require("ws").Server;
+const WSServer = require("ws").Server;
 const cookieParser = require("cookie-parser");
 
 import { getAuth } from "./AuthUtilities";
+import SocketConnection from "./SocketConnection";
 import Configuration from "./Configuration";
 import DatabaseService from "./DatabaseService";
 import DispatchAction from "./DispatchAction";
@@ -207,18 +208,11 @@ app.use((req, res, next) =>
 );
 
 const server = http.createServer(app);
-const wss = new SocketServer({ server });
+const wss = new WSServer({ server });
 
-wss.on("connection", ws => {
-  console.log("Client connected");
-  ws.on("close", () => console.log("Client disconnected"));
-});
+SocketConnection.init(wss);
 
-setInterval(() => {
-  wss.clients.forEach(client => {
-    client.send(new Date().toTimeString());
-  });
-}, 1000);
+// const _clientHandlers =
 
 async function startServer() {
   await DatabaseService.wakeup();

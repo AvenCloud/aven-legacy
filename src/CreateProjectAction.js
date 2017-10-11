@@ -1,6 +1,7 @@
 import DatabaseService from "./DatabaseService";
 import { getAuth } from "./AuthUtilities";
 import Utilities from "./Utilities";
+import SocketConnection from "./SocketConnection";
 
 export default async function CreateProjectAction(action) {
   const auth = await getAuth(action.viewerUser, action.viewerSession);
@@ -32,5 +33,6 @@ export default async function CreateProjectAction(action) {
       [projectName]: newProject
     }
   });
+  SocketConnection.notifyAccount(action.viewerUser);
   return { projectName, isPublic: action.isPublic };
 }

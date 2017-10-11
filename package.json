@@ -47,9 +47,10 @@
     "prop-types": "^15.5.10",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
+    "redis": "^2.8.0",
     "utf-8-validate": "3.0.2",
     "validator": "^7.0.0",
-    "ws": "3.0.0"
+    "ws": "^3.2.0"
   },
   "devDependencies": {
     "babel-jest": "^20.0.3",

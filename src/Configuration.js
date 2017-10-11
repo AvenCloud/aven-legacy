@@ -14,6 +14,7 @@ try {
 }
 
 const postgresURL = process.env.DATABASE_URL || secrets.postgres_uri;
+const redisURL = process.env.REDIS_URL || secrets.redis_url;
 const { POSTGRES_DANGER_DISABLE_SSL } = process.env;
 const env = process.env.NODE_ENV;
 
@@ -30,6 +31,7 @@ const config = {
   secrets,
   isSecure,
   postgresURL,
+  redisURL,
   POSTGRES_DANGER_DISABLE_SSL
 };
 

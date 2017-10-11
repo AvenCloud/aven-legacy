@@ -1,4 +1,5 @@
 import DatabaseService from "./DatabaseService";
+import SocketConnection from "./SocketConnection";
 import { getAuth } from "./AuthUtilities";
 import Utilities from "./Utilities";
 
@@ -30,5 +31,9 @@ export default async function SetProjectAction(action) {
       [action.projectName]: newProject
     }
   });
+  SocketConnection.notifyProject(
+    `${action.viewerUser}/${action.projectName}`,
+    newProject.rootDoc
+  );
   return { projectName: action.projectName, ...newProject };
 }

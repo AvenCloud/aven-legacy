@@ -22,6 +22,12 @@ async function genAuthCode() {
   return intStr.substr(3, 6);
 }
 
+async function genClientId() {
+  const randBuf = await randomBytes(48);
+  const hex = randBuf.toString("hex");
+  return hex;
+}
+
 async function genHash(input) {
   return new Promise((resolve, reject) => {
     bcrypt.hash(input, null, null, (err, hash) => {
@@ -50,5 +56,6 @@ export default {
   digest,
   genHash,
   compareHash,
-  genAuthCode
+  genAuthCode,
+  genClientId
 };

@@ -13,8 +13,8 @@ const fsReaddir = denodeify(fs.readdir);
 const fsLstat = denodeify(fs.lstat);
 const fsReadFile = denodeify(fs.readFile);
 
-require("babel-core/register");
-require("babel-polyfill");
+// require("babel-core/register");
+// require("babel-polyfill");
 
 async function putFileObject(auth, path) {
 	let fileData = await fsReadFile(path, { encoding: "utf8" }); // uh no bin support yet
