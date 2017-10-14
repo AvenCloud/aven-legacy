@@ -1,16 +1,19 @@
 const fs = require("fs");
 
-let secrets;
+let secretsFile = null;
 try {
-  secrets = fs.readFileSync("secrets.json", { encoding: "utf8" });
-  secrets = JSON.parse(secrets);
-} catch (e) {
-  if (process.env.AVEN_SECRETS) {
-    secrets = new Buffer(process.env.AVEN_SECRETS, "base64");
-    secrets = JSON.parse(secrets.toString());
-  } else {
-    throw "Cannot read secrets to start app";
-  }
+  secretsFile = fs.readFileSync("secrets.json", { encoding: "utf8" });
+  secretsFile = JSON.parse(secretsFile);
+} catch (e) {}
+
+let secrets = secretsFile;
+if (process.env.NODE_ENV === "test") {
+  secrets = {};
+} else if (process.env.AVEN_SECRETS) {
+  secrets = new Buffer(process.env.AVEN_SECRETS, "base64");
+  secrets = JSON.parse(secrets.toString());
+} else {
+  throw "Cannot read secrets to start app";
 }
 
 const postgresURL = process.env.DATABASE_URL || secrets.postgres_uri;

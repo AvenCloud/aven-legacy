@@ -33,7 +33,7 @@ async function wakeup() {
     await pool.connect();
     console.log("Postgres pool connected!");
     result = await pool.query("SELECT COUNT (*) FROM documents", []);
-    console.log("Postgres table present!");
+    console.log("Postgres table present!", result);
   } catch (e) {
     if (e.toString() === 'error: relation "documents" does not exist') {
       console.log("Creating table..");

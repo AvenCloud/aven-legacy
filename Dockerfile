@@ -11,9 +11,6 @@ WORKDIR /usr/src/app
 COPY src src
 COPY .babelrc .babelrc
 COPY package.json package.json
-COPY secrets.json secrets.json
 RUN yarn install
-RUN yarn build
 
 EXPOSE 5000
-CMD yarn run-prod

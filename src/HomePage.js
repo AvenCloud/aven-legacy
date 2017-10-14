@@ -7,11 +7,9 @@ export default class HomePage extends React.Component {
   static getTitle = () => null;
   render() {
     const { auth } = this.props;
-    console.log("durr", auth);
     if (auth) {
       return <ProfilePage {...this.props} />;
     }
-    console.log("damn wat");
     return (
       <SimplePage>
         <h2>Private Preview</h2>
