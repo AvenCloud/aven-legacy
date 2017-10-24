@@ -10,24 +10,40 @@ export default class ProjectPage extends React.Component {
     const pathParts = props.path.split("/");
     const user = pathParts[1];
     const project = pathParts[2];
+    const projectPath = pathParts.slice(3);
     const projectData = await props.dispatch({
       type: "GetProjectAction",
       user,
       project
     });
-
+    let queryId = null;
+    if (projectPath.length === 1) {
+      const match = /^_(.*)$/.exec(projectPath[0]);
+      if (match) {
+        queryId = match[1];
+      }
+    }
     let componentData = null;
-    const id = projectData && projectData.rootDoc;
-    if (id) {
+    if (queryId) {
       componentData = await GenericComponent.load({
         user,
         project,
-        id,
+        id: queryId,
+        dispatch: props.dispatch
+      }); 
+    }
+    const projectRootDoc = projectData && projectData.rootDoc;
+    if (!componentData && projectRootDoc) {
+      componentData = await GenericComponent.load({
+        user,
+        project,
+        id: projectRootDoc,
         dispatch: props.dispatch
       });
     }
     const shouldRun = isTruthy(props.params.run);
-    return { projectData, componentData, shouldRun, user, project, id };
+    return { projectData, componentData, shouldRun, user, project, id: queryId || projectRootDoc };
+
   };
   static getTitle = ({ data }) => data.projectData && data.projectData.name;
   render() {
@@ -40,6 +56,7 @@ export default class ProjectPage extends React.Component {
       componentData,
       id
     } = this.props.data;
+
     return (
       <SimplePage>
         <h1>

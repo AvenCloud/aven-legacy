@@ -16,6 +16,7 @@ export default class GenericComponent extends React.Component {
 			project: props.project,
 			id: props.id
 		});
+		console.log('loaded le doc: ', doc, props);
 		let componentData = null;
 		if (doc && doc.type && ComponentTypes[doc.type]) {
 			const Component = ComponentTypes[doc.type];
@@ -36,6 +37,7 @@ export default class GenericComponent extends React.Component {
 		if (!data || !data.doc) {
 			return <div>Project Empty!</div>;
 		}
+		console.log('wtfsss', this.props);
 		const { doc, componentData } = data;
 		if (doc && doc.type && ComponentTypes[doc.type]) {
 			const Component = ComponentTypes[doc.type];

@@ -1,18 +1,25 @@
 const fs = require("fs");
+let secrets = null;
 
-let secretsFile = null;
-try {
-  secretsFile = fs.readFileSync("secrets.json", { encoding: "utf8" });
-  secretsFile = JSON.parse(secretsFile);
-} catch (e) {}
-
-let secrets = secretsFile;
-if (process.env.NODE_ENV === "test") {
-  secrets = {};
-} else if (process.env.AVEN_SECRETS) {
+if (!secrets && process.env.AVEN_SECRETS) {
   secrets = new Buffer(process.env.AVEN_SECRETS, "base64");
   secrets = JSON.parse(secrets.toString());
-} else {
+}
+
+if (process.env.NODE_ENV === "test") {
+  secrets = {};
+}
+
+if (!secrets) {
+  try {
+  const secretsFile = fs.readFileSync("secrets.json", { encoding: "utf8" });
+  secrets = JSON.parse(secretsFile);
+} catch (e) {}
+}
+
+
+
+if (!secrets) {
   throw "Cannot read secrets to start app";
 }
 
