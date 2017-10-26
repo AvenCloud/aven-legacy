@@ -3,6 +3,9 @@ const join = require("path").join;
 const fs = require("fs");
 const commander = require("commander");
 const babel = require("babel-core");
+const presetEs2015 = require("babel-preset-es2015");
+const presetStage0 = require("babel-preset-stage-0");
+const presetReact = require("babel-preset-react");
 const prompt = require("prompt");
 const denodeify = require("denodeify");
 const { dispatch } = require("./CLI-utilities");
@@ -13,17 +16,17 @@ const fsReaddir = denodeify(fs.readdir);
 const fsLstat = denodeify(fs.lstat);
 const fsReadFile = denodeify(fs.readFile);
 
-// require("babel-core/register");
-// require("babel-polyfill");
+require("babel-core/register");
+require("babel-polyfill");
 
 async function putFileObject(auth, path) {
 	let fileData = await fsReadFile(path, { encoding: "utf8" }); // uh no bin support yet
 	if (path.split(".js").length === 2 && path.split(".js")[1] === "") {
 		const source = fileData;
-		const dependencies = null;
+		let dependencies = null;
 		const parsedBabel = babel.transform(source, {
 			sourceMaps: true,
-			presets: ["es2015", "stage-0", "react"],
+			presets: [presetEs2015, presetStage0, presetReact],
 			plugins: [
 				({ parse, traverse }) => ({
 					visitor: {
@@ -96,9 +99,8 @@ async function putFolderObject(auth, path) {
 	return uploadResult.docId;
 }
 
-async function upload(server) {
+async function upload() {
 	const auth = {
-		server,
 		...JSON.parse(fs.readFileSync(join(process.cwd(), ".avenconfig")))
 	};
 	if (auth.projectUser !== auth.username) {
@@ -119,15 +121,9 @@ async function upload(server) {
 
 commander
 	.version("0.1.0")
-	.option(
-		"--server [protocol_and_host]",
-		"Specify the aven server to point to",
-		a => a,
-		"https://aven.io"
-	)
 	.parse(process.argv);
 
-upload(commander.server)
+upload()
 	.then(() => {
 		console.log("Upload completed!");
 	})

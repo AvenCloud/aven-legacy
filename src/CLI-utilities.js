@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+const fileType = require("file-type");
 const cookie = require("cookie");
 
 const dispatch = async (action, auth) => {
@@ -24,8 +25,19 @@ const dispatch = async (action, auth) => {
   if (result.status !== 200) {
     throw await result.text();
   }
-  const resultJSON = await result.json();
-  return resultJSON;
+  let resultData = await result.buffer();
+  const binaryType = fileType(resultData);
+  try {
+    if (!binaryType) {
+      resultData = resultData.toString('utf8');
+    }
+  } catch (e) {}
+  try {
+    const resultJSON = JSON.parse(resultData);
+    return resultJSON;
+  } catch (e) {
+    return resultData;
+  }
 };
 
 module.exports = {

@@ -77,18 +77,23 @@ class ProjectLoader extends React.Component {
 
 class DocLoader extends React.Component {
   state = this.props.id ? null : { doc: this.props.defaultDoc };
-  componentDidMount() {
+  async componentDidMount() {
     if (this.props.id) {
       this._localId = `Document_${this.props.projectId}_${this.props.id}`;
-      Store.getAndListen(this._localId, this._setDoc);
+      const doc = await Store.get(this._localId);
+      this.setState({doc});
       return;
     }
   }
-  _setDoc = doc => {
-    this.setState({ doc });
-  };
+  async componentWillReceiveProps(props) {
+    if (props.id !== this.props.id) {
+      this._localId = `Document_${props.projectId}_${props.id}`;
+      const doc = await Store.get(this._localId);
+      this.setState({doc});
+    }
+  }
   componentWillUnmount() {
-    this._localId && Store.unlisten(this._localId, this._setProject);
+    this._localId && Store.unlisten(this._localId, this._setDoc);
   }
   render() {
     const { state } = this;
@@ -617,6 +622,51 @@ class LoadingView extends React.Component {
   }
 }
 
+const computeDoc = (doc) => {
+return eval(doc.code)({
+            React,
+            View,
+            Button,
+            Text,
+          });
+}
+
+class JSModuleView extends React.Component {
+  state = {isRunning: false, runComponent: null };
+  componentWillReceiveProps(props) {
+    if (props.doc && props.doc !== this.props.doc) {
+this.setState({
+              runComponent: computeDoc(props.doc)
+
+            });
+    }
+  }
+  render() {
+    let content = <Text>{this.props.doc.code}</Text>
+    if (this.state.isRunning) {
+      const Component = this.state.runComponent;
+      content = <Component />;
+    }
+    return <View>
+      <Button onPress={() => {
+        if (this.state.isRunning) {
+          this.setState({
+            isRunning: false,
+            runComponent: null,
+          });
+        } else {
+          this.setState({
+            isRunning: true,
+            runComponent: computeDoc(this.props.doc)
+          });
+        }
+      }}
+      title={this.state.isRunning ? "Stop!" : "Run!"} />
+      {content}
+    </View>;
+  }
+}
+
 class DocumentView extends React.Component {
   render() {
     const { defaultDoc } = this.props;
@@ -677,6 +727,17 @@ class DocumentView extends React.Component {
           }
 
           // handle more types!!
+          if (type === "JSModule") {
+            return (
+              <JSModuleView
+                doc={displayDoc}
+                navigation={this.props.navigation}
+                path={path}
+                projectId={projectId}
+              />
+                       );
+          }
+
 
           // fallback type:
           return (
@@ -687,7 +748,6 @@ class DocumentView extends React.Component {
         }}
         projectId={this.props.projectId}
         id={this.props.id}
-        key={this.props.id}
       />
     );
   }
@@ -717,7 +777,6 @@ class ProjectScreen extends React.Component {
               navigation={this.props.navigation}
               defaultDoc={{ type: "Folder", files: {} }}
               id={rootDoc}
-              key={rootDoc}
               projectId={projectId}
               path={path || []}
             />

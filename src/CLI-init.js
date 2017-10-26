@@ -5,18 +5,23 @@ const prompt = require("prompt");
 const denodeify = require("denodeify");
 const { dispatch } = require("./CLI-utilities");
 
-const fsExists = denodeify(fs.exists);
+const fsExists = dir => new Promise((resolve, reject) => fs.exists(dir, doesExist => resolve(doesExist)));
 const fsMkdir = denodeify(fs.mkdir);
 const fsWriteFile = denodeify(fs.writeFile);
 const fsLstat = denodeify(fs.lstat);
 
-// require("babel-core/register");
-// require("babel-polyfill");
+require("babel-core/register");
+require("babel-polyfill");
 
 async function downloadFile(auth, projectUser, projectName, id, destPath) {
-  console.log("downloading", auth, projectUser, projectName, id, destPath);
-  const stat = await fsLstat(destPath);
-  const doc = await dispatch(
+  console.log(`Downloading ${id} to ${destPath}`);
+  let stat = null;
+  if (await fsExists(destPath)) {
+    stat = await fsLstat(destPath);
+  }
+  let doc = null;
+  try {
+   doc = await dispatch(
     {
       type: "GetDocAction",
       user: projectUser,
@@ -25,23 +30,19 @@ async function downloadFile(auth, projectUser, projectName, id, destPath) {
     },
     auth
   );
-  console.log("homie", doc);
+} catch(e) {
+  console.error('woah there buddy', e);
+}
   if (doc.type === "Folder") {
-    console.log("wat");
     if (!await fsExists(destPath)) {
-      console.log("making!!", destPath);
       await fsMkdir(destPath);
     } else if (!stat.isDirectory()) {
-      console.log("zzzzz!!", destPath);
       throw `${destPath} already exists and it is not a folder!`;
     }
-    console.log("homie2");
 
     const fileNames = Object.keys(doc.files);
-    console.log("homie4", fileNames);
     await Promise.all(
       fileNames.map(async fileName => {
-        console.log("ding it!!", fileName);
         const file = doc.files[fileName];
         return await downloadFile(
           auth,
@@ -55,12 +56,14 @@ async function downloadFile(auth, projectUser, projectName, id, destPath) {
     return;
   }
 
-  await fsWriteFile(destPath, JSON.stringify(doc));
+  const fileData = JSON.stringify(doc);
+
+  await fsWriteFile(destPath, fileData);
 }
 
-async function init(server, username, password, projectPath) {
-  const projectUser = projectPath.split("/")[0];
-  const projectName = projectPath.split("/")[1];
+async function init({server, username, password, projectId}) {
+  const projectUser = projectId.split("/")[0];
+  const projectName = projectId.split("/")[1];
   const destFolder = join(process.cwd(), projectName);
   if (await fsExists(destFolder)) {
     throw "Folder already exists!";
@@ -131,7 +134,33 @@ commander
     a => a,
     "https://aven.io"
   )
-  .action(function(user_and_project) {
+  .option(
+    "--username [user]",
+    "Specify your username who is allowed to see this project",
+    a => a,
+  )
+  .option(
+    "--password [secret]",
+    "INSECURE! FOR TESTING ONLY: provide your password in PLAINTEXT to log in",
+    a => a,
+  )
+  .action(function(projectId) {
+    const initData = {
+      projectId,
+      server: commander.server,
+      password: commander.password,
+      username: commander.username,
+    };
+    if (initData.password && initData.username) {
+      init(initData).then(() => {
+            console.log("Init completed!");
+          })
+          .catch(e => {
+            console.log("Init failure!");
+            console.error(e);
+          });
+          return;
+    }
     prompt.get(
       {
         properties: {
@@ -153,12 +182,13 @@ commander
           console.error("Invalid options input!");
           process.exit(1);
         }
-        init(
-          commander.server,
-          result.username,
-          result.password,
-          user_and_project
-        )
+        if (result.username) {
+          initData.username = result.username;
+        }
+        if (result.password) {
+          initData.password = result.password;
+        }
+        init(initData)
           .then(() => {
             console.log("Init completed!");
           })

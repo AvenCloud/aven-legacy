@@ -39,6 +39,7 @@ function login(configFile, server, username, password) {
 
 const defaultConfigFile = join(homedir, ".avenconfig");
 
+let hasBegan = false; // wtf commander.. this is so lame
 commander
 	.version("0.1.0")
 	.command("login [username]", "Log in to the Aven backend")
@@ -55,6 +56,7 @@ commander
 		defaultConfigFile
 	)
 	.action(function(username) {
+		hasBegan = true;
 		prompt.get(
 			{
 				properties: {
@@ -81,4 +83,7 @@ commander
 		);
 	});
 
-commander.parse(process.argv);
+const a= commander.parse(process.argv);
+if (!hasBegan) {
+throw 'Invalid username provided to `aven login [username]`';
+}
