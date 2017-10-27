@@ -1,35 +1,35 @@
-const homedir = require("os").homedir();
 const join = require("path").join;
-const fs = require("fs");
 const commander = require("commander");
-const babel = require("babel-core");
-const presetEs2015 = require("babel-preset-es2015");
-const presetStage0 = require("babel-preset-stage-0");
-const presetReact = require("babel-preset-react");
 const prompt = require("prompt");
-const denodeify = require("denodeify");
-const { dispatch } = require("./CLI-utilities");
 
-const fsExists = denodeify(fs.exists);
-const fsMkdir = denodeify(fs.mkdir);
-const fsReaddir = denodeify(fs.readdir);
-const fsLstat = denodeify(fs.lstat);
-const fsReadFile = denodeify(fs.readFile);
+const {
+  dispatch,
+  fsExists,
+  fsMkdir,
+  fsReaddir,
+  fsLstat,
+  fsReadFile,
+  download
+} = require("./CLI-utilities");
 
 require("babel-core/register");
 require("babel-polyfill");
 
-const download = async () => console.log('woah');
+const doDownload = async () => {
+  const auth = {
+    ...JSON.parse(await fsReadFile(join(process.cwd(), ".avenconfig")))
+  };
 
-commander
-	.version("0.1.0")
-	.parse(process.argv);
+  await download(auth, process.cwd());
+};
 
-download(commander.server)
-	.then(() => {
-		console.log("Download completed!");
-	})
-	.catch(e => {
-		console.log("Download failure!");
-		console.error(e);
-	});
+commander.version("0.1.0").parse(process.argv);
+
+doDownload(commander.server)
+  .then(() => {
+    console.log("Download completed!");
+  })
+  .catch(e => {
+    console.log("Download failure!");
+    console.error(e);
+  });
