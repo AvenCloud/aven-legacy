@@ -22,6 +22,9 @@ import HandleLogout from "./HandleLogout";
 
 const app = express();
 
+const { CommonTest } = require("./common");
+console.log("zey, 2222!", CommonTest("evv"));
+
 app.use((req, res, next) => {
   const proto = req.headers["x-forwarded-proto"] || req.protocol;
 
