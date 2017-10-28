@@ -123,23 +123,23 @@ class MyProjectList extends React.Component {
     return (
       <View>
         <ARowSection title="Recent Projects">
-          {Object.keys(projects)
-            .map(projectName => {
-              return (
-                <ARow
-                  key={projectName}
-                  title={`${projectName} - ${projects[projectName].isPublic
-                    ? "Public"
-                    : "Private"}`}
-                  onPress={() => {
-                    this.props.navigation.navigate("Project", {
-                      projectId: `${this.props.session.username}/${projectName}`
-                    });
-                  }}
-                />
-              );
-            })
-            .slice(-5)}
+          {Object.keys(projects).map(projectName => {
+            return (
+              <ARow
+                key={projectName}
+                title={`${projectName} - ${projects[projectName].isPublic
+                  ? "Public"
+                  : "Private"}`}
+                onPress={() => {
+                  this.props.navigation.navigate("Project", {
+                    projectId: `${this.props.session.username}/${projectName}`
+                  });
+                }}
+              />
+            );
+          })
+          // .slice(-5)
+          }
         </ARowSection>
         <AButton
           title="See all projects"
@@ -741,8 +741,13 @@ class LoginScreen extends React.Component {
           {
             key: "host",
             placeholder: "Aven Host",
-            default: "https://aven.io",
+            default: "aven.io",
             autoCapitalize: "none"
+          },
+          {
+            key: "isSecure",
+            type: "boolean",
+            default: true
           },
           {
             key: "username",

@@ -278,15 +278,12 @@ class Store {
     Store._localDocuments[localId] = data;
     return data;
   }
-  static async dispatchRemote(action) {
-    const session = await Store.getLocal("Session");
-    let host = action.host;
-    if (session) {
-      host = session.host;
-    } else if (!host) {
-      throw "No valid session or host!";
-    }
-    const res = await fetch(`${host}/api/dispatch`, {
+  static async dispatchRemote(action, inputSession) {
+    const session = inputSession || (await Store.getLocal("Session"));
+    const { isSecure, host } = session;
+    const methodHost = `http${isSecure ? "s" : ""}://${host}`;
+    console.log("dude", methodHost);
+    const res = await fetch(`${methodHost}/api/dispatch`, {
       method: "post",
       headers: {
         Accept: "application/json",
@@ -305,15 +302,24 @@ class Store {
     return body;
   }
   static async login(data) {
-    const body = await Store.dispatchRemote({
-      type: "AuthLoginAction",
-      ...data
-    });
+    // {username, session, host, isSecure}
+    const body = await Store.dispatchRemote(
+      {
+        type: "AuthLoginAction",
+        username: data.username,
+        password: data.password
+      },
+      {
+        host: data.host,
+        isSecure: data.isSecure
+      }
+    );
     if (body && body.session) {
       Store.setLocal("Session", {
         session: body.session,
         username: body.username,
-        host: data.host
+        host: data.host,
+        isSecure: data.isSecure
       });
       return;
     } else {
