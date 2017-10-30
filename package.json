@@ -9,7 +9,7 @@
     "build-client":
       "node_modules/browserify/bin/cmd.js lib/ProjectIndex.js -o lib/static/ProjectIndex.js",
     "build-web-common":
-      "rm lib/common.js && mkdir lib/common && node_modules/babel-cli/bin/babel.js mobile/common --out-dir lib/common",
+      "rm lib/common.js && mkdir -p lib/common && mv mobile/.babelrc mobile/mvd.babelrc && node_modules/babel-cli/bin/babel.js mobile/common/ --out-dir lib/common/ && mv mobile/mvd.babelrc mobile/.babelrc",
     "build-web-static": "rm -rf lib/static && cp -r src/static lib/static",
     "build-web-main": "node_modules/babel-cli/bin/babel.js src/ --out-dir lib/",
     "build-web":

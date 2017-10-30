@@ -3,7 +3,7 @@
     "name": "Aven",
     "description": "An open source notes app",
     "slug": "Aven",
-    "privacy": "private",
+    "privacy": "unlisted",
     "sdkVersion": "21.0.0",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -16,7 +16,11 @@
       "assetExts": ["ttf", "mp4"]
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "io.aven.mobile"
+    },
+    "android": {
+      "package": "io.aven.mobile"
     }
   }
 }
