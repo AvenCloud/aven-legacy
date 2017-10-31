@@ -1,79 +1,83 @@
 import { Alert, AsyncStorage } from "react-native";
 
-let ws = null;
-let wsIsReady = false;
-
-const onWsOpen = () => {
-  console.log(
-    "Connection Open. TODO- send list of currently subscribed projects"
-  );
-  wsIsReady = true;
-  queuedWsMessages.map(sendWs);
-  queuedWsMessages = [];
-};
-
-const onWsMessage = async e => {
-  const msgParts = e.data.split("_");
-  const type = msgParts[0];
-  const name = msgParts[1];
-  const value = msgParts[2];
-  switch (type) {
-    case "PublishAccount":
-      Store.freshenRemote("Account");
-      return;
-    case "PublishProject":
-      const project = await Store.getLocal(`Project_${name}`);
-      if (!project) {
-        return;
-      }
-      Store.setLocal(`Project_${name}`, {
-        ...project,
-        rootDoc: value
-      });
-      return;
-  }
-};
-
-const onWsError = e => {};
-
-const onWsClose = e => {
-  wsIsReady = false;
-  console.log("Connection Closed", e.code, e.reason);
-  ws = null;
-
-  setTimeout(() => {
-    ws = new WebSocket("ws://localhost:5000");
-    ws.onopen = onWsOpen;
-    ws.onclose = onWsClose;
-    ws.onerror = onWsError;
-    ws.onmessage = onWsMessage;
-  }, 3000);
-};
-
-ws = new WebSocket("ws://localhost:5000");
-ws.onopen = onWsOpen;
-ws.onclose = onWsClose;
-ws.onerror = onWsError;
-ws.onmessage = onWsMessage;
-
-let queuedWsMessages = [];
-const sendWs = message => {
-  if (wsIsReady) {
-    ws.send(message);
-  } else {
-    queuedWsMessages.push(message);
-  }
-};
-
-//   // connection opened
-//   ws.send("subscribe", "foo"); // send a message
-//   ws.send("subscribe", "bar"); // send a message
-//   ws.send("unsubscribe", "foo"); // send a message
-// };
-
 class Store {
   static _localDocuments = {};
   static _listeners = {};
+  static _isWsConnected = false;
+  static _ws = null;
+
+  static _onWebsocketOpen = () => {
+    console.log("Websocket connected!");
+    Store.sendListeners();
+    Store._isWsConnected = true;
+    Store._queuedWsMessages.map(Store.sendWebsocketMessage);
+    Store._queuedWsMessages = [];
+  };
+
+  static _onWebsocketMessage = async e => {
+    const msgParts = e.data.split("_");
+    const type = msgParts[0];
+    const name = msgParts[1];
+    const value = msgParts[2];
+    switch (type) {
+      case "PublishAccount":
+        Store.freshenRemote("Account");
+        return;
+      case "PublishProject":
+        const project = await Store.getLocal(`Project_${name}`);
+        if (!project) {
+          return;
+        }
+        Store.setLocal(`Project_${name}`, {
+          ...project,
+          rootDoc: value
+        });
+        return;
+    }
+  };
+
+  static _onWebsocketClose = e => {
+    Store.detachWebsocket();
+    console.log("Connection Closed or Errored", e.code, e.reason);
+
+    // we assume this diconnection. Wait a bit and retry
+    setTimeout(() => {
+      Store.attachWebsocket();
+    }, 200);
+  };
+
+  static attachWebsocket = async () => {
+    await Store.detachWebsocket();
+    const session = await Store.getLocal("Session");
+    if (!session) {
+      return;
+    }
+    const { isSecure, host } = session;
+    const protocolAndHost = `ws${isSecure ? "s" : ""}://${host}`;
+    console.log("Connecting to ", protocolAndHost);
+    Store._ws = new WebSocket(protocolAndHost);
+    Store._ws.onopen = Store._onWebsocketOpen;
+    Store._ws.onclose = Store._onWebsocketClose;
+    Store._ws.onerror = Store._onWebsocketClose;
+    Store._ws.onmessage = Store._onWebsocketMessage;
+  };
+
+  static detachWebsocket = async () => {
+    if (Store._ws) {
+      Store._ws.close();
+      Store._ws = null;
+    }
+    Store._isWsConnected = false;
+  };
+
+  static _queuedWsMessages = [];
+  static sendWebsocketMessage = message => {
+    if (Store._ws && Store._isWsConnected) {
+      Store._ws.send(message);
+    } else {
+      Store._queuedWsMessages.push(message);
+    }
+  };
 
   static emit(name, data) {
     const listenerSet = Store._listeners[name] || (Store._listeners[name] = []);
@@ -147,23 +151,43 @@ class Store {
     });
   }
 
-  static async listen(name, handler) {
-    const localIdParts = name.split("_");
+  static async listen(localId, handler) {
+    const localIdParts = localId.split("_");
     const type = localIdParts[0];
     const arg0 = localIdParts[1];
     switch (type) {
       case "Account":
         const session = await Store.getLocal("Session");
-        sendWs(`ListenAccount_${session.username}`);
+        Store.sendWebsocketMessage(`ListenAccount_${session.username}`);
         break;
       case "Project":
-        sendWs(`ListenProject_${arg0}`);
+        Store.sendWebsocketMessage(`ListenProject_${arg0}`);
         break;
       default:
         break;
     }
-    const listenerSet = Store._listeners[name] || (Store._listeners[name] = []);
+    const listenerSet =
+      Store._listeners[localId] || (Store._listeners[localId] = []);
     listenerSet.push(handler);
+  }
+
+  static async sendListeners() {
+    Object.keys(Store._listeners).forEach(async localId => {
+      const localIdParts = localId.split("_");
+      const type = localIdParts[0];
+      const arg0 = localIdParts[1];
+      switch (type) {
+        case "Account":
+          const session = await Store.getLocal("Session");
+          Store.sendWebsocketMessage(`ListenAccount_${session.username}`);
+          break;
+        case "Project":
+          Store.sendWebsocketMessage(`ListenProject_${arg0}`);
+          break;
+        default:
+          break;
+      }
+    });
   }
 
   static async unlisten(name, handler) {
@@ -173,10 +197,10 @@ class Store {
     switch (type) {
       case "Account":
         const session = await Store.getLocal("Session");
-        sendWs(`UnlistenAccount_${session.username}`);
+        Store.sendWebsocketMessage(`UnlistenAccount_${session.username}`);
         break;
       case "Project":
-        sendWs(`UnlistenProject_${arg0}`);
+        Store.sendWebsocketMessage(`UnlistenProject_${arg0}`);
         break;
       default:
         break;
@@ -281,9 +305,8 @@ class Store {
   static async dispatchRemote(action, inputSession) {
     const session = inputSession || (await Store.getLocal("Session"));
     const { isSecure, host } = session;
-    const methodHost = `http${isSecure ? "s" : ""}://${host}`;
-    console.log("dude", methodHost);
-    const res = await fetch(`${methodHost}/api/dispatch`, {
+    const protocolAndHost = `http${isSecure ? "s" : ""}://${host}`;
+    const res = await fetch(`${protocolAndHost}/api/dispatch`, {
       method: "post",
       headers: {
         Accept: "application/json",
@@ -298,11 +321,10 @@ class Store {
     try {
       body = textBody && JSON.parse(textBody);
     } catch (e) {}
-    console.log("Dispatch! ", action, body);
+    console.log(action.type, action, body);
     return body;
   }
   static async login(data) {
-    // {username, session, host, isSecure}
     const body = await Store.dispatchRemote(
       {
         type: "AuthLoginAction",
@@ -315,12 +337,13 @@ class Store {
       }
     );
     if (body && body.session) {
-      Store.setLocal("Session", {
+      await Store.setLocal("Session", {
         session: body.session,
         username: body.username,
         host: data.host,
         isSecure: data.isSecure
       });
+      await Store.attachWebsocket();
       return;
     } else {
       throw "Error on server";
@@ -356,5 +379,7 @@ class Store {
     await Store.setLocal("Session", null);
   }
 }
+
+Store.attachWebsocket();
 
 module.exports = Store;

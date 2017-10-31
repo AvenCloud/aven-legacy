@@ -116,8 +116,8 @@ class DocLoader extends React.Component {
 
 class MyProjectList extends React.Component {
   render() {
-    const { projects } = this.props.account;
-    if (!this.props.session) {
+    const projects = this.props.account && this.props.account.projects;
+    if (!this.props.session || !projects) {
       return null;
     }
     return (
@@ -448,6 +448,7 @@ class DocumentView extends React.Component {
 
           // handle more types!!
           if (type === "JSModule") {
+            debugger;
             return (
               <JSModuleView
                 doc={displayDoc}
@@ -808,7 +809,7 @@ const HeaderButton = ({ onPress, name }) => (
     onPress={onPress}
     hitSlop={{ left: 20, top: 20, right: 20, bottom: 5 }}
   >
-    <FontAwesome name={name} size={20} color={0x333333ff} />
+    <FontAwesome name={name} size={20} color={"#333333ff"} />
   </TouchableOpacity>
 );
 

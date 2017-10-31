@@ -128,41 +128,53 @@ const presetReact = require("babel-preset-react");
 
 async function putFileObject(auth, path) {
   let fileData = await fsReadFile(path, { encoding: "utf8" }); // uh no bin support yet
-  // if (path.split(".js").length === 2 && path.split(".js")[1] === "") {
-  //   const source = fileData;
-  //   let dependencies = null;
-  //   const parsedBabel = babel.transform(source, {
-  //     sourceMaps: true,
-  //     presets: [presetEs2015, presetStage0, presetReact],
-  //     plugins: [
-  //       ({ parse, traverse }) => ({
-  //         visitor: {
-  //           ArrowFunctionExpression(path) {
-  //             if (!dependencies) {
-  //               const input = path.node.params[0];
-  //               dependencies = input.properties.map(a => {
-  //                 return a.value.name;
-  //               });
-  //             }
-  //           }
-  //         }
-  //       })
-  //     ]
-  //   });
-  //   fileData = JSON.stringify({
-  //     dependencies,
-  //     type: "JSModule",
-  //     code: parsedBabel.code,
-  //     map: parsedBabel.map,
-  //     source
-  //   });
-  // }
+
   const uploadResult = await dispatch(
     {
       type: "CreateDocAction",
       project: auth.projectName,
       user: auth.projectUser,
       data: fileData
+    },
+    auth
+  );
+  return uploadResult.docId;
+}
+
+async function putJSModule(auth, sourcePath) {
+  const source = await fsReadFile(sourcePath, { encoding: "utf8" });
+  let dependencies = null;
+  const parsedBabel = babel.transform(source, {
+    sourceMaps: true,
+    presets: [presetEs2015, presetStage0, presetReact],
+    plugins: [
+      ({ parse, traverse }) => ({
+        visitor: {
+          ArrowFunctionExpression(path) {
+            if (!dependencies) {
+              const input = path.node.params[0];
+              dependencies = input.properties.map(a => {
+                return a.value.name;
+              });
+            }
+          }
+        }
+      })
+    ]
+  });
+  const moduleData = JSON.stringify({
+    dependencies,
+    type: "JSModule",
+    code: parsedBabel.code,
+    map: parsedBabel.map,
+    source
+  });
+  const uploadResult = await dispatch(
+    {
+      type: "CreateDocAction",
+      project: auth.projectName,
+      user: auth.projectUser,
+      data: moduleData
     },
     auth
   );
@@ -180,17 +192,28 @@ async function putPathObject(auth, path) {
 
 async function putFolderObject(auth, path) {
   const items = await fsReaddir(path);
-  const uploadableItems = items.filter(item => item !== ".avenconfig");
+  const uploadableFiles = items.filter(item => item !== ".avenconfig");
   const allIDs = await Promise.all(
-    uploadableItems.map(item => putPathObject(auth, join(path, item)))
+    uploadableFiles.map(fileName => putPathObject(auth, join(path, fileName)))
   );
   const files = {};
-  uploadableItems.forEach((itemName, index) => {
-    files[itemName] = {
-      name: itemName,
-      value: allIDs[index]
-    };
-  });
+  await Promise.all(
+    uploadableFiles.map(async (fileName, index) => {
+      files[fileName] = {
+        name: fileName,
+        value: allIDs[index]
+      };
+      if (fileName.match(/.js$/)) {
+        const sourcePath = join(path, fileName);
+        const compiledFile = await putJSModule(auth, sourcePath);
+        const destFileName = fileName + ".jsmodule";
+        files[destFileName] = {
+          name: destFileName,
+          value: compiledFile
+        };
+      }
+    })
+  );
   const uploadResult = await dispatch(
     {
       type: "CreateDocAction",
