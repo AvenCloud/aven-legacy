@@ -229,7 +229,7 @@ async function putFolderObject(auth, path) {
   return uploadResult.docId;
 }
 
-const upload = async (auth, path) => {
+async function upload(auth, path) {
   if (auth.projectUser !== auth.username) {
     throw "Cannot upload a project that is not yours";
   }
@@ -244,12 +244,13 @@ const upload = async (auth, path) => {
   );
 
   console.log("uploading..", uploadResult);
-};
+}
 
-const fsExists = dir =>
-  new Promise((resolve, reject) =>
+function fsExists(dir) {
+  return new Promise((resolve, reject) =>
     fs.exists(dir, doesExist => resolve(doesExist))
   );
+}
 
 module.exports = {
   dispatch,
