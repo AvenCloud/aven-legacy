@@ -93,9 +93,7 @@ const downloadFile = async (auth, projectUser, projectName, id, destPath) => {
     return;
   }
 
-  const fileData = JSON.stringify(doc);
-
-  await fsWriteFile(destPath, fileData);
+  await fsWriteFile(destPath, doc);
 };
 
 const download = async (auth, path) => {

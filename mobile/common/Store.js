@@ -1,10 +1,16 @@
-import { Alert, AsyncStorage } from "react-native";
-
 class Store {
   static _localDocuments = {};
   static _listeners = {};
   static _isWsConnected = false;
   static _ws = null;
+  static _localStorage = null;
+
+  static init = ({ localStorage, platformDeps }) => {
+    Store._localStorage = localStorage;
+    Store.attachWebsocket();
+    Store._platformDeps = platformDeps;
+    Store._platformDepNames = Object.keys(platformDeps);
+  };
 
   static _onWebsocketOpen = () => {
     console.log("Websocket connected!");
@@ -43,7 +49,7 @@ class Store {
     // we assume this diconnection. Wait a bit and retry
     setTimeout(() => {
       Store.attachWebsocket();
-    }, 200);
+    }, 10000);
   };
 
   static attachWebsocket = async () => {
@@ -54,7 +60,7 @@ class Store {
     }
     const { isSecure, host } = session;
     const protocolAndHost = `ws${isSecure ? "s" : ""}://${host}`;
-    console.log("Connecting to ", protocolAndHost);
+    console.log("Connecting to ", protocolAndHost, session);
     Store._ws = new WebSocket(protocolAndHost);
     Store._ws.onopen = Store._onWebsocketOpen;
     Store._ws.onclose = Store._onWebsocketClose;
@@ -266,11 +272,69 @@ class Store {
     return await Store.get(`Project_${projectId}`);
   }
 
+  static async getProjectRoot(projectId) {
+    const project = await Store.getProject(projectId);
+    if (!project || !project.rootDoc) {
+      return null;
+    }
+    const rootDoc = await Store.getDocument(projectId, project.rootDoc);
+    return rootDoc;
+  }
+
+  static async getFolder(projectId, path) {
+    // TODO, handle path traversal!!!!
+    const folder = await Store.getProjectRoot(projectId);
+    if (!folder || folder.type !== "Folder") {
+      return null;
+    }
+    return folder;
+  }
+
   static async getDocument(projectId, docId) {
     if (docId === "null" || !docId) {
       debugger;
     }
     return await Store.get(`Document_${projectId}_${docId}`);
+  }
+
+  static async computeDoc(doc, projectId, path, createErrorComponent) {
+    let computedDoc = null;
+    const deps = {
+      ...Store._platformDeps,
+      Store
+    };
+    const remoteDeps = doc.dependencies.filter(
+      dep => Store._platformDepNames.indexOf(dep) === -1
+    );
+
+    // TODO: process path recursively for dependency resolution!!!!!!
+    const ourPath = path.slice(0, path.length - 1);
+    const folder = await Store.getFolder(projectId, ourPath);
+
+    const resolvedRemoteDeps = await Promise.all(
+      remoteDeps.map(async depName => {
+        const depFile = folder.files[depName + ".js.jsmodule"];
+        if (depFile && depFile.value) {
+          const depDoc = await Store.getDocument(projectId, depFile.value);
+          const dep = await Store.computeDoc(depDoc, projectId, [
+            ...path,
+            depFile.name
+          ]);
+          return dep;
+        }
+        return null;
+      })
+    );
+    resolvedRemoteDeps.forEach((dep, depIndex) => {
+      const depName = remoteDeps[depIndex];
+      deps[depName] = dep;
+    });
+    try {
+      computedDoc = eval(doc.code)(deps);
+    } catch (e) {
+      return createErrorComponent(e);
+    }
+    return computedDoc;
   }
 
   static async getAndListen(localId, handler) {
@@ -282,7 +346,7 @@ class Store {
   }
   static async setLocal(localId, data) {
     const storedData = JSON.stringify(data);
-    await AsyncStorage.setItem("AvenDocument_" + localId, storedData);
+    await Store._localStorage.setItem("AvenDocument_" + localId, storedData);
     Store._localDocuments[localId] = data;
     Store.emit(localId, data);
   }
@@ -291,7 +355,9 @@ class Store {
     if (data !== undefined) {
       return data;
     }
-    const storedData = await AsyncStorage.getItem("AvenDocument_" + localId);
+    const storedData = await Store._localStorage.getItem(
+      "AvenDocument_" + localId
+    );
     if (storedData) {
       try {
         data = JSON.parse(storedData);
@@ -349,37 +415,22 @@ class Store {
       throw "Error on server";
     }
   }
+  static async logoutLocal() {
+    await Store._localStorage.clear();
+    await Store.setLocal("Session", null);
+  }
   static async logout() {
     try {
       await Store.dispatchRemote({
         type: "AuthLogoutAction"
       });
     } catch (e) {
-      Alert.alert(
-        "Logout request failed",
-        "Would you still like to dismiss your local session?",
-        [
-          {
-            text: "Yes, Log Out",
-            onPress: async () => {
-              await AsyncStorage.clear();
-              await Store.setLocal("Session", null);
-            }
-          },
-          {
-            text: "Cancel Logout",
-            onPress: () => {},
-            style: "cancel"
-          }
-        ],
-        { cancelable: true }
-      );
+      // todo: ask the user if they want to logoutLocal
+      await Store.logoutLocal();
       return;
     }
-    await Store.setLocal("Session", null);
+    await Store.logoutLocal();
   }
 }
-
-Store.attachWebsocket();
 
 module.exports = Store;

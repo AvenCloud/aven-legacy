@@ -26,8 +26,43 @@ async function dispatch(action) {
   return resultJSON;
 }
 
-const { CommonTest } = require("./common");
-console.log("ey, yo browzer!", CommonTest("evv"));
+const { Store } = require("./common");
+const Cookie = require("js-cookie");
+
+const sessionDoc = {
+  username: Cookie.get("user"),
+  session: Cookie.get("session"),
+  host: window.location.host,
+  isSecure: window.location.protocol === "https:"
+};
+
+window.store = Store;
+
+Store.init({
+  platformDeps: {
+    ReactNative: null,
+    ReactWeb: true,
+    React,
+    Platform: {
+      os: "web"
+    }
+  },
+  localStorage: {
+    setItem: async (name, data) => {
+      window.localStorage.setItem(name, data);
+    },
+    clear: async () => {
+      window.localStorage.clear();
+    },
+    getItem(localId) {
+      // this is kind of a hack with a hardcoded string:
+      if (localId === "AvenDocument_Session") {
+        return sessionDoc;
+      }
+      return window.localStorage.getItem(localId);
+    }
+  }
+});
 
 ReactDOM.render(
   <ProjectPage

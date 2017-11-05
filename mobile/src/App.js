@@ -1,9 +1,10 @@
 import React from "react";
-import {
+import ReactNative, {
   ActivityIndicator,
   Text,
   View,
   Alert,
+  Platform,
   AlertIOS,
   Button,
   Switch,
@@ -17,7 +18,16 @@ import {
 import { StackNavigator } from "react-navigation";
 import { FontAwesome } from "@expo/vector-icons";
 
-const Store = require("./Store");
+const { Store, Loaders } = require("./common");
+
+const PLATFORM_DEPS = {
+  ReactNative,
+  ReactWeb: null,
+  React,
+  Platform
+};
+
+Store.init({ localStorage: AsyncStorage, platformDeps: PLATFORM_DEPS });
 
 class LoggedOutHome extends React.Component {
   render() {
@@ -47,70 +57,6 @@ class LoggedOutHome extends React.Component {
 class ALoading extends React.Component {
   render() {
     return <ActivityIndicator />;
-  }
-}
-
-class AccountLoader extends React.Component {
-  state = null;
-  componentDidMount() {
-    Store.getAndListen("Account", this._setAccount);
-  }
-  _setAccount = account => {
-    this.setState({ account });
-  };
-  componentWillUnmount() {
-    Store.unlisten("Account", this._setAccount);
-  }
-  render() {
-    const { state } = this;
-    if (!state && !this.props.handlesLoading) return <ALoading />;
-    return this.props.render(state.account);
-  }
-}
-
-class ProjectLoader extends React.Component {
-  state = null;
-  componentDidMount() {
-    this._localId = `Project_${this.props.projectId}`;
-    Store.getAndListen(this._localId, this._setProject);
-  }
-  _setProject = project => {
-    this.setState({ project });
-  };
-  componentWillUnmount() {
-    this._localId && Store.unlisten(this._localId, this._setProject);
-  }
-  render() {
-    const { state } = this;
-    if (!state && !this.props.handlesLoading) return <ALoading />;
-    return this.props.render(state.project);
-  }
-}
-
-class DocLoader extends React.Component {
-  state = this.props.id ? null : { doc: this.props.defaultDoc };
-  async componentDidMount() {
-    if (this.props.id) {
-      this._localId = `Document_${this.props.projectId}_${this.props.id}`;
-      const doc = await Store.get(this._localId);
-      this.setState({ doc });
-      return;
-    }
-  }
-  async componentWillReceiveProps(props) {
-    if (props.id !== this.props.id) {
-      this._localId = `Document_${props.projectId}_${props.id}`;
-      const doc = await Store.get(this._localId);
-      this.setState({ doc });
-    }
-  }
-  componentWillUnmount() {
-    this._localId && Store.unlisten(this._localId, this._setDoc);
-  }
-  render() {
-    const { state } = this;
-    if (!state && !this.props.handlesLoading) return <ALoading />;
-    return this.props.render(state.doc);
   }
 }
 
@@ -167,7 +113,7 @@ class LoggedInHome extends React.Component {
       <GenericScreen
         header={<Header title={session.username} navigation={navigation} />}
       >
-        <AccountLoader
+        <Loaders.Account
           render={account => (
             <View>
               {account && (
@@ -183,6 +129,11 @@ class LoggedInHome extends React.Component {
         <AButton
           title="Account"
           onPress={() => navigation.navigate("Account")}
+        />
+        <AButton
+          title="New task"
+          onPress={() =>
+            navigation.navigate("Project", { projectId: "aven/new-task" })}
         />
         <AButton title="Logout" onPress={Store.logout} style="secondary" />
         <View style={{ flexDirection: "row" }}>
@@ -202,15 +153,15 @@ class AccountScreen extends React.Component {
           <Header title={"My Account"} navigation={this.props.navigation} />
         }
       >
-        <SessionLoader
-          render={() => (
+        <Loaders.Session
+          render={session => (
             <View>
-              <Text>Username: {session.username}!</Text>
+              <Text>Username: {session.username}</Text>
               <Text>Server: {session.host}</Text>
             </View>
           )}
         />
-        <AccountLoader
+        <Loaders.Account
           render={account => (
             <View>
               <Text>{account.projects.length} Projects</Text>
@@ -221,24 +172,6 @@ class AccountScreen extends React.Component {
         <AButton title="Logout" onPress={Store.logout} style="secondary" />
       </GenericScreen>
     );
-  }
-}
-
-class SessionLoader extends React.Component {
-  state = null;
-  componentDidMount() {
-    Store.getAndListen("Session", this._setSession);
-  }
-  _setSession = session => {
-    this.setState({ session });
-  };
-  render() {
-    const state = this.state;
-    const { navigation } = this.props;
-    if (!state) {
-      return null;
-    }
-    return this.props.render(state.session);
   }
 }
 
@@ -253,7 +186,7 @@ class HomeScreen extends React.Component {
   render() {
     const { navigation } = this.props;
     return (
-      <SessionLoader
+      <Loaders.Session
         render={session => {
           if (session) {
             return <LoggedInHome session={session} navigation={navigation} />;
@@ -339,51 +272,49 @@ class PlaintextView extends React.Component {
   }
 }
 
-const computeDoc = doc => {
-  return eval(doc.code)({
-    React,
-    View,
-    Button,
-    Text
-  });
+const createErrorComponent = err => () => {
+  return (
+    <View style={{ flex: 1, backgroundColor: "red" }}>
+      <Text style={{ color: "white" }}>Error! {err.toString()}</Text>
+    </View>
+  );
 };
 
 class JSModuleView extends React.Component {
-  state = { isRunning: false, runComponent: null };
-  componentWillReceiveProps(props) {
-    if (props.doc && props.doc !== this.props.doc) {
+  state = { computedComponent: null };
+  async componentWillMount() {
+    const { doc, projectId, path } = this.props;
+    if (doc) {
       this.setState({
-        runComponent: computeDoc(props.doc)
+        computedComponent: await Store.computeDoc(
+          doc,
+          projectId,
+          path,
+          createErrorComponent
+        )
+      });
+    }
+  }
+  async componentWillReceiveProps(props) {
+    const { doc, projectId, path } = props;
+    if (doc && doc !== this.props.doc) {
+      this.setState({
+        computedComponent: await Store.computeDoc(
+          doc,
+          projectId,
+          path,
+          createErrorComponent
+        )
       });
     }
   }
   render() {
-    let content = <Text>{this.props.doc.code}</Text>;
-    if (this.state.isRunning) {
-      const Component = this.state.runComponent;
-      content = <Component />;
+    if (this.state.computedComponent) {
+      const Component = this.state.computedComponent;
+      return <Component />;
+    } else {
+      return <Text>Durr</Text>;
     }
-    return (
-      <View>
-        <AButton
-          onPress={() => {
-            if (this.state.isRunning) {
-              this.setState({
-                isRunning: false,
-                runComponent: null
-              });
-            } else {
-              this.setState({
-                isRunning: true,
-                runComponent: computeDoc(this.props.doc)
-              });
-            }
-          }}
-          title={this.state.isRunning ? "Stop!" : "Run!"}
-        />
-        {content}
-      </View>
-    );
   }
 }
 
@@ -391,7 +322,7 @@ class DocumentView extends React.Component {
   render() {
     const { defaultDoc } = this.props;
     return (
-      <DocLoader
+      <Loaders.Doc
         defaultDoc={defaultDoc}
         render={displayDoc => {
           const { path, projectId, id, parentPath } = this.props;
@@ -448,7 +379,6 @@ class DocumentView extends React.Component {
 
           // handle more types!!
           if (type === "JSModule") {
-            debugger;
             return (
               <JSModuleView
                 doc={displayDoc}
@@ -480,11 +410,12 @@ class ProjectScreen extends React.Component {
     if (path && path.length) {
       title = path[0];
     }
+
     return (
       <GenericScreen
         header={<Header title={title} navigation={this.props.navigation} />}
       >
-        <ProjectLoader
+        <Loaders.Project
           projectId={projectId}
           render={project => {
             if (!project) {
@@ -776,6 +707,7 @@ const HEADER_HEIGHT = 80;
 const GenericScreen = ({ header, children }) => (
   <View style={{ flex: 1, backgroundColor: 0xdfdfffff }}>
     <ScrollView
+      style={{ flex: 1 }}
       contentInset={{ top: HEADER_HEIGHT }}
       ref={sv => {
         setTimeout(() => {
@@ -787,6 +719,7 @@ const GenericScreen = ({ header, children }) => (
         });
       }}
     >
+      {Platform.OS === "android" && <View style={{ height: HEADER_HEIGHT }} />}
       {children}
     </ScrollView>
     <View
