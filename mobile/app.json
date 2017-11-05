@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "Aven",
-    "description": "An open source notes app",
-    "slug": "Aven",
+    "description": "Create and publish dynamic documents and tasks",
+    "slug": "aven",
     "privacy": "unlisted",
     "sdkVersion": "21.0.0",
     "version": "1.0.0",
@@ -10,10 +10,14 @@
     "primaryColor": "#154E61",
     "icon": "./assets/icons/app-icon.png",
     "loading": {
-      "icon": "./assets/icons/loading-icon.png"
+      "icon": "./assets/icons/loading-icon.png",
+      "hideExponentText": true
     },
     "packagerOpts": {
-      "assetExts": ["ttf", "mp4"]
+      "assetExts": [
+        "ttf",
+        "mp4"
+      ]
     },
     "ios": {
       "supportsTablet": true,
