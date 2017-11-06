@@ -9,6 +9,7 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 COPY src src
+COPY mobile/common mobile/common
 COPY .babelrc .babelrc
 COPY package.json package.json
 RUN yarn install

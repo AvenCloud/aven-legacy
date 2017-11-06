@@ -1,9 +1,13 @@
+const SHA1 = require("crypto-js/sha1");
+const Hex = require("crypto-js/format-hex");
+
 class Store {
   static _localDocuments = {};
   static _listeners = {};
   static _isWsConnected = false;
   static _ws = null;
   static _localStorage = null;
+  static _remoteActionRequests = [];
 
   static init = ({ localStorage, platformDeps }) => {
     Store._localStorage = localStorage;
@@ -71,15 +75,18 @@ class Store {
   static detachWebsocket = async () => {
     if (Store._ws) {
       Store._ws.close();
-      Store._ws = null;
     }
+    Store._ws = null;
     Store._isWsConnected = false;
   };
 
   static _queuedWsMessages = [];
   static sendWebsocketMessage = message => {
     if (Store._ws && Store._isWsConnected) {
-      Store._ws.send(message);
+      // So, the ws library fails if the ready state is 'connecting'
+      if (Store._ws.readyState === 1) {
+        Store._ws.send(message);
+      }
     } else {
       Store._queuedWsMessages.push(message);
     }
@@ -94,7 +101,7 @@ class Store {
 
   static async writeProjectFile(data, projectId, path) {
     const project = await Store.getProject(projectId);
-    const docId = await Store.writeDocument(data, projectId);
+    const { docId } = await Store.writeDocument(data, projectId);
     const newRootDoc = await Store.writeInFolder(
       projectId,
       project.rootDoc,
@@ -132,19 +139,26 @@ class Store {
     } else {
       return null;
     }
-    const docId = await Store.writeDocument({ ...folder, files }, projectId);
+    const { docId } = await Store.writeDocument(
+      { ...folder, files },
+      projectId
+    );
     return docId;
   }
 
-  static async writeDocument(data, projectId) {
+  static async writeDocument(doc, projectId) {
     const projectIdPaths = projectId.split("/");
-    const result = await Store.dispatchRemote({
-      type: "CreateDocAction",
-      user: projectIdPaths[0],
-      project: projectIdPaths[1],
-      data: JSON.stringify(data)
-    });
-    return result && result.docId;
+    const data = JSON.stringify(doc);
+    const docId = `sha-1-${SHA1(data).toString()}`;
+    return {
+      docId,
+      remoteResult: Store.dispatchRemote({
+        type: "CreateDocAction",
+        user: projectIdPaths[0],
+        project: projectIdPaths[1],
+        data
+      })
+    };
   }
 
   static async writeProject(projectId, rootDoc) {
@@ -164,7 +178,8 @@ class Store {
     switch (type) {
       case "Account":
         const session = await Store.getLocal("Session");
-        Store.sendWebsocketMessage(`ListenAccount_${session.username}`);
+        session &&
+          Store.sendWebsocketMessage(`ListenAccount_${session.username}`);
         break;
       case "Project":
         Store.sendWebsocketMessage(`ListenProject_${arg0}`);
@@ -185,7 +200,8 @@ class Store {
       switch (type) {
         case "Account":
           const session = await Store.getLocal("Session");
-          Store.sendWebsocketMessage(`ListenAccount_${session.username}`);
+          session &&
+            Store.sendWebsocketMessage(`ListenAccount_${session.username}`);
           break;
         case "Project":
           Store.sendWebsocketMessage(`ListenProject_${arg0}`);
@@ -203,7 +219,8 @@ class Store {
     switch (type) {
       case "Account":
         const session = await Store.getLocal("Session");
-        Store.sendWebsocketMessage(`UnlistenAccount_${session.username}`);
+        session &&
+          Store.sendWebsocketMessage(`UnlistenAccount_${session.username}`);
         break;
       case "Project":
         Store.sendWebsocketMessage(`UnlistenProject_${arg0}`);
@@ -368,8 +385,51 @@ class Store {
     Store._localDocuments[localId] = data;
     return data;
   }
+
   static async dispatchRemote(action, inputSession) {
-    const session = inputSession || (await Store.getLocal("Session"));
+    return new Promise((resolve, reject) => {
+      this._remoteActionRequests = [
+        ...this._remoteActionRequests,
+        { action, resolve, reject }
+      ];
+      clearTimeout(this._sendRemoteActions);
+      this._sendRemoteActions = setTimeout(async () => {
+        if (this._remoteActionRequests.length === 1) {
+          const { action, resolve, reject } = this._remoteActionRequests[0];
+          const session = inputSession || (await Store.getLocal("Session"));
+          try {
+            const result = await Store.dispatchRemoteImmediate(action, session);
+            resolve(result);
+          } catch (e) {
+            reject(e);
+          }
+        } else if (this._remoteActionRequests.length > 1) {
+          const actionRequests = this._remoteActionRequests;
+          this._sendRemoteActions = [];
+          const action = {
+            type: "PluralAction",
+            actions: actionRequests.map(pa => pa.action)
+          };
+          const session = inputSession || (await Store.getLocal("Session"));
+          try {
+            const result = await Store.dispatchRemoteImmediate(action, session);
+            result.results.forEach((innerResult, index) => {
+              if (innerResult.error) {
+                actionRequests[index].reject(innerResult.error);
+              } else {
+                actionRequests[index].resolve(innerResult.result);
+              }
+            });
+          } catch (err) {
+            // something errored on the plural result call itself. reject every dispatch
+            actionRequests.forEach(({ reject }) => reject(err));
+          }
+        }
+      }, 50);
+    });
+  }
+
+  static async dispatchRemoteImmediate(action, session) {
     const { isSecure, host } = session;
     const protocolAndHost = `http${isSecure ? "s" : ""}://${host}`;
     const res = await fetch(`${protocolAndHost}/api/dispatch`, {
@@ -390,8 +450,9 @@ class Store {
     console.log(action.type, action, body);
     return body;
   }
+
   static async login(data) {
-    const body = await Store.dispatchRemote(
+    const body = await Store.dispatchRemoteImmediate(
       {
         type: "AuthLoginAction",
         username: data.username,
@@ -415,10 +476,12 @@ class Store {
       throw "Error on server";
     }
   }
+
   static async logoutLocal() {
     await Store._localStorage.clear();
     await Store.setLocal("Session", null);
   }
+
   static async logout() {
     try {
       await Store.dispatchRemote({

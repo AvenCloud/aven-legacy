@@ -44,7 +44,8 @@ Store.init({
     ReactWeb: true,
     React,
     Platform: {
-      os: "web"
+      os: "web",
+      select: obj => ("web" in obj ? obj.web : obj.default)
     }
   },
   localStorage: {

@@ -8,9 +8,11 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "primaryColor": "#154E61",
-    "icon": "./assets/icons/app-icon.png",
+    "scheme": "aven",
+    "icon": "./assets/IconIPhone.png",
     "loading": {
-      "icon": "./assets/icons/loading-icon.png",
+      "backgroundImage": "./assets/Loading.png",
+      "backgroundColor": "#f9fcfd",
       "hideExponentText": true
     },
     "packagerOpts": {
@@ -21,10 +23,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "io.aven.mobile"
+      "bundleIdentifier": "io.aven.mobile",
+      "buildNumber": "1.0.0a1",
+      "icon": "./assets/IconIPhone.png"
     },
     "android": {
-      "package": "io.aven.mobile"
+      "package": "io.aven.mobile",
+      "icon": "./assets/IconAndroid.png",
+      "versionCode": 1
     }
   }
 }

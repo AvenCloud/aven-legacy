@@ -30,7 +30,7 @@ export default class ProjectPage extends React.Component {
         project,
         id: queryId,
         dispatch: props.dispatch
-      }); 
+      });
     }
     const projectRootDoc = projectData && projectData.rootDoc;
     if (!componentData && projectRootDoc) {
@@ -42,8 +42,14 @@ export default class ProjectPage extends React.Component {
       });
     }
     const shouldRun = isTruthy(props.params.run);
-    return { projectData, componentData, shouldRun, user, project, id: queryId || projectRootDoc };
-
+    return {
+      projectData,
+      componentData,
+      shouldRun,
+      user,
+      project,
+      id: queryId || projectRootDoc
+    };
   };
   static getTitle = ({ data }) => data.projectData && data.projectData.name;
   render() {

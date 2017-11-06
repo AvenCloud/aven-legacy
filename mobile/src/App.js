@@ -3,22 +3,29 @@ import ReactNative, {
   ActivityIndicator,
   Text,
   View,
+  Animated,
   Alert,
   Platform,
   AlertIOS,
   Button,
+  Dimensions,
+  StatusBar,
   Switch,
   AsyncStorage,
   TextInput,
   TouchableOpacity,
   TouchableHighlight,
+  TouchableWithoutFeedback,
   StyleSheet,
-  ScrollView
+  ScrollView,
+  Keyboard,
+  KeyboardAvoidingView
 } from "react-native";
 import { StackNavigator } from "react-navigation";
 import { FontAwesome } from "@expo/vector-icons";
 
 const { Store, Loaders } = require("./common");
+import * as Expo from "expo";
 
 const PLATFORM_DEPS = {
   ReactNative,
@@ -32,13 +39,13 @@ Store.init({ localStorage: AsyncStorage, platformDeps: PLATFORM_DEPS });
 class LoggedOutHome extends React.Component {
   render() {
     return (
-      <GenericScreen
+      <AGenericScreen
         header={
-          <Header
+          <AHeader
             title="Aven"
             navigation={this.props.navigation}
             right={
-              <HeaderButton
+              <AHeaderButton
                 name="user-circle"
                 onPress={() => {
                   this.props.navigation.navigate("Login");
@@ -49,7 +56,7 @@ class LoggedOutHome extends React.Component {
         }
       >
         <Text>Welcome! Content will come here :-)</Text>
-      </GenericScreen>
+      </AGenericScreen>
     );
   }
 }
@@ -73,9 +80,7 @@ class MyProjectList extends React.Component {
             return (
               <ARow
                 key={projectName}
-                title={`${projectName} - ${projects[projectName].isPublic
-                  ? "Public"
-                  : "Private"}`}
+                title={`${projectName} - ${projects[projectName].isPublic ? "Public" : "Private"}`}
                 onPress={() => {
                   this.props.navigation.navigate("Project", {
                     projectId: `${this.props.session.username}/${projectName}`
@@ -109,20 +114,34 @@ class MyProjectList extends React.Component {
 class LoggedInHome extends React.Component {
   render() {
     const { navigation, session } = this.props;
+    if (!session) {
+      return null;
+    }
     return (
-      <GenericScreen
-        header={<Header title={session.username} navigation={navigation} />}
+      <AGenericScreen
+        header={
+          <AHeader
+            left={<AHeaderButton name="home" onPress={() => {}} />}
+            right={
+              <AHeaderButton
+                name="gear"
+                onPress={() => navigation.navigate("Account")}
+              />
+            }
+            title={session.username}
+            navigation={navigation}
+          />
+        }
       >
         <Loaders.Account
           render={account => (
             <View>
-              {account && (
+              {account &&
                 <MyProjectList
                   account={account}
                   session={session}
                   navigation={navigation}
-                />
-              )}
+                />}
             </View>
           )}
         />
@@ -140,7 +159,7 @@ class LoggedInHome extends React.Component {
           <AButton title="Terms and Privacy" onPress={() => {}} style="small" />
           <AButton title="About Aven" onPress={() => {}} style="small" />
         </View>
-      </GenericScreen>
+      </AGenericScreen>
     );
   }
 }
@@ -148,9 +167,9 @@ class LoggedInHome extends React.Component {
 class AccountScreen extends React.Component {
   render() {
     return (
-      <GenericScreen
+      <AGenericScreen
         header={
-          <Header title={"My Account"} navigation={this.props.navigation} />
+          <AHeader title={"My Account"} navigation={this.props.navigation} />
         }
       >
         <Loaders.Session
@@ -162,15 +181,24 @@ class AccountScreen extends React.Component {
           )}
         />
         <Loaders.Account
-          render={account => (
-            <View>
-              <Text>{account.projects.length} Projects</Text>
-              <Text>{JSON.stringify(account)}</Text>
-            </View>
-          )}
+          render={account => {
+            if (!account) {
+              return (
+                <View>
+                  <Text>Account could not be loaded</Text>
+                </View>
+              );
+            }
+            return (
+              <View>
+                <Text>{account.projects.length} Projects</Text>
+                <Text>{JSON.stringify(account)}</Text>
+              </View>
+            );
+          }}
         />
         <AButton title="Logout" onPress={Store.logout} style="secondary" />
-      </GenericScreen>
+      </AGenericScreen>
     );
   }
 }
@@ -226,7 +254,7 @@ class FolderView extends React.Component {
         </ARowSection>
         <AButton
           title="New File"
-          color="#22dd22"
+          color={CREATION_COLOR}
           key="NewFile"
           onPress={() => {
             AlertIOS.prompt("New file name:", null, fileName => {
@@ -249,6 +277,7 @@ class NullView extends React.Component {
     return <Text>Empty</Text>;
   }
 }
+const screenHeight = Dimensions.get("window").height - 80;
 
 class PlaintextView extends React.Component {
   onChangeText = text => {
@@ -258,15 +287,86 @@ class PlaintextView extends React.Component {
       Store.writeProjectFile(text, projectId, path);
     }, 2000);
   };
+
+  state = { kbInset: 0 };
+
+  componentWillMount() {
+    this._kbWillShowSub = Keyboard.addListener(
+      "keyboardWillShow",
+      this.kbWillShow
+    );
+    this._kbWillHideSub = Keyboard.addListener(
+      "keyboardWillHide",
+      this.kbWillHide
+    );
+  }
+
+  componentWillUnmount() {
+    this._kbWillShowSub.remove();
+    this._kbWillHideSub.remove();
+  }
+
+  kbWillShow = event => {
+    this.setState({ kbInset: event.endCoordinates.height });
+  };
+
+  kbWillHide = event => {
+    this.setState({ kbInset: 0 });
+  };
+
   render() {
     const { doc } = this.props;
-    // debugger;
-    // return <Text>ok..</Text>;
+    if (Platform.OS === "android") {
+      return (
+        <KeyboardAvoidingView
+          behavior="padding"
+          style={{
+            flex: 1
+          }}
+        >
+          <TextInput
+            multiline
+            autoGrow={true}
+            blurOnSubmit={false}
+            onChangeText={this.onChangeText}
+            style={{ flex: 1 }}
+          >
+            {doc}
+          </TextInput>
+        </KeyboardAvoidingView>
+      );
+    }
     return (
-      <ScrollView>
-        <TextInput multiline onChangeText={this.onChangeText}>
-          {doc}
-        </TextInput>
+      <ScrollView
+        style={{
+          flex: 1
+        }}
+        contentInset={{ bottom: this.state.kbInset, top: -20 }}
+        keyboardDismissMode="interactive"
+      >
+        <View
+          style={{
+            flex: 1
+          }}
+        >
+          <TextInput
+            multiline
+            autoGrow={true}
+            underlineColorAndroid="transparent"
+            onChangeText={this.onChangeText}
+            returnKeyType="none"
+            style={{
+              textAlignVertical: "top",
+              flex: 1,
+              borderTopWidth: StyleSheet.hairlineWidth,
+              borderBottomWidth: StyleSheet.hairlineWidth,
+              borderColor: HAIR_BORDER_COLOR,
+              backgroundColor: 0xffffff77
+            }}
+          >
+            {doc}
+          </TextInput>
+        </View>
       </ScrollView>
     );
   }
@@ -313,7 +413,7 @@ class JSModuleView extends React.Component {
       const Component = this.state.computedComponent;
       return <Component />;
     } else {
-      return <Text>Durr</Text>;
+      return <ALoading />;
     }
   }
 }
@@ -412,14 +512,15 @@ class ProjectScreen extends React.Component {
     }
 
     return (
-      <GenericScreen
-        header={<Header title={title} navigation={this.props.navigation} />}
+      <AGenericScreen
+        scroll={false}
+        header={<AHeader title={title} navigation={this.props.navigation} />}
       >
         <Loaders.Project
           projectId={projectId}
           render={project => {
             if (!project) {
-              return <Text>Loading..</Text>;
+              return <ALoading />;
             }
             const rootDoc = project && project.rootDoc;
             return (
@@ -433,7 +534,7 @@ class ProjectScreen extends React.Component {
             );
           }}
         />
-      </GenericScreen>
+      </AGenericScreen>
     );
   }
 }
@@ -524,14 +625,13 @@ class FormScreen extends React.Component {
     const { error } = this.state;
     const inputs = this.props.inputs.map(this._renderInput);
     return (
-      <GenericScreen header={this.props.header}>
-        {error && (
+      <AGenericScreen header={this.props.header}>
+        {error &&
           <View
             style={{ backgroundColor: ERROR_COLOR, margin: 20, padding: 15 }}
           >
             <Text style={{ color: "white", fontSize: 16 }}>{error}</Text>
-          </View>
-        )}
+          </View>}
         {inputs}
         {this.state.isLoading && <ActivityIndicator />}
         <AButton
@@ -539,13 +639,14 @@ class FormScreen extends React.Component {
           title="Submit"
           disabled={this.state.isLoading}
         />
-      </GenericScreen>
+      </AGenericScreen>
     );
   }
 }
 
 const AVEN_COLOR = 0x2d495bff;
-const HAIR_BORDER_COLOR = 0x2d495bff;
+const AVEN_BG_COLOR = Expo.Constants.manifest.loading.backgroundColor;
+const HAIR_BORDER_COLOR = 0xccccccdd;
 const INTERACTABLE_WASH = 0xffffffff;
 // const INTERACTABLE_WASH = 0xd0d0d0ff;
 const CREATION_COLOR = 0x22bb22ff;
@@ -574,7 +675,7 @@ class ARowSection extends React.Component {
     const { title, children } = this.props;
     return (
       <View style={{}}>
-        {title && (
+        {title &&
           <Text
             style={{
               fontSize: 20,
@@ -584,8 +685,7 @@ class ARowSection extends React.Component {
             }}
           >
             {title}
-          </Text>
-        )}
+          </Text>}
         <View
           style={{
             borderBottomWidth: StyleSheet.hairlineWidth,
@@ -634,7 +734,7 @@ class NewProjectScreen extends React.Component {
     const { navigation } = this.props;
     return (
       <FormScreen
-        header={<Header title="New Project" navigation={navigation} />}
+        header={<AHeader title="New Project" navigation={navigation} />}
         inputs={[
           { key: "projectName", placeholder: "Project Name" },
           {
@@ -668,7 +768,7 @@ class LoginScreen extends React.Component {
     const { data } = this.state;
     return (
       <FormScreen
-        header={<Header title="Login" navigation={this.props.navigation} />}
+        header={<AHeader title="Login" navigation={this.props.navigation} />}
         inputs={[
           {
             key: "host",
@@ -702,41 +802,52 @@ class LoginScreen extends React.Component {
   }
 }
 
-const HEADER_HEIGHT = 80;
+const HEADER_HEIGHT = Platform.OS === "android" ? 80 : 64;
 
-const GenericScreen = ({ header, children }) => (
-  <View style={{ flex: 1, backgroundColor: 0xdfdfffff }}>
-    <ScrollView
-      style={{ flex: 1 }}
-      contentInset={{ top: HEADER_HEIGHT }}
-      ref={sv => {
-        setTimeout(() => {
-          sv &&
-            sv.scrollTo({
-              y: -HEADER_HEIGHT,
-              animated: false
-            });
-        });
-      }}
-    >
-      {Platform.OS === "android" && <View style={{ height: HEADER_HEIGHT }} />}
-      {children}
-    </ScrollView>
-    <View
-      style={{
-        height: HEADER_HEIGHT,
-        position: "absolute",
-        left: 0,
-        top: 0,
-        right: 0
-      }}
-    >
-      {header}
-    </View>
-  </View>
+const StyledContainer = ({ children }) => (
+  <View style={{ flex: 1, backgroundColor: AVEN_BG_COLOR }}>{children}</View>
 );
 
-const HeaderButton = ({ onPress, name }) => (
+const AGenericScreen = ({ header, children, scroll }) => {
+  if (scroll === false) {
+    return <StyledContainer>{header}{children}</StyledContainer>;
+  }
+  return (
+    <StyledContainer>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentInset={{ top: HEADER_HEIGHT }}
+        keyboardDismissMode={"on-drag"}
+        ref={sv => {
+          setTimeout(() => {
+            sv &&
+              sv.scrollTo({
+                y: -HEADER_HEIGHT,
+                animated: false
+              });
+          });
+        }}
+      >
+        {Platform.OS === "android" &&
+          <View style={{ height: HEADER_HEIGHT }} />}
+        {children}
+      </ScrollView>
+      <View
+        style={{
+          height: HEADER_HEIGHT,
+          position: "absolute",
+          left: 0,
+          top: 0,
+          right: 0
+        }}
+      >
+        {header}
+      </View>
+    </StyledContainer>
+  );
+};
+
+const AHeaderButton = ({ onPress, name }) => (
   <TouchableOpacity
     style={{ paddingHorizontal: 18, paddingVertical: 6 }}
     onPress={onPress}
@@ -746,9 +857,9 @@ const HeaderButton = ({ onPress, name }) => (
   </TouchableOpacity>
 );
 
-class Header extends React.Component {
+class AHeader extends React.Component {
   render() {
-    const { navigation, title, right } = this.props;
+    const { navigation, title, right, left } = this.props;
     const canGoBack = navigation.state.routeName !== "Home";
     return (
       <View
@@ -756,10 +867,10 @@ class Header extends React.Component {
           backgroundColor: 0xffffffcc,
           width: "100%",
           height: HEADER_HEIGHT,
-          paddingTop: 40,
+          paddingTop: HEADER_HEIGHT - 38,
           flexDirection: "row",
           borderBottomWidth: StyleSheet.hairlineWidth,
-          borderBottomColor: 0xccccccdd
+          borderBottomColor: HAIR_BORDER_COLOR
         }}
       >
         <Text
@@ -778,12 +889,12 @@ class Header extends React.Component {
         >
           {title}
         </Text>
-        {canGoBack && (
-          <HeaderButton
-            onPress={() => navigation.goBack()}
-            name={"chevron-left"}
-          />
-        )}
+        {canGoBack
+          ? <AHeaderButton
+              onPress={() => navigation.goBack()}
+              name={"chevron-left"}
+            />
+          : left}
         <View style={{ flex: 1 }} />
         {right}
       </View>
