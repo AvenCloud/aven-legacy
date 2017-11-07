@@ -234,7 +234,7 @@ class FolderView extends React.Component {
       files = {};
     }
     return (
-      <View>
+      <ScrollView>
         <ARowSection title="Files">
           {Object.keys(files).map(fileName => {
             const path = [...this.props.path, fileName];
@@ -267,7 +267,7 @@ class FolderView extends React.Component {
             });
           }}
         />
-      </View>
+      </ScrollView>
     );
   }
 }

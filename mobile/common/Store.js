@@ -8,6 +8,8 @@ class Store {
   static _ws = null;
   static _localStorage = null;
   static _remoteActionRequests = [];
+  static _publishedDocuments = [];
+  static _optimisticProjectRoots = {};
 
   static init = ({ localStorage, platformDeps }) => {
     Store._localStorage = localStorage;
@@ -18,7 +20,7 @@ class Store {
 
   static _onWebsocketOpen = () => {
     console.log("Websocket connected!");
-    Store.sendListeners();
+    Store.sendRemoteListeners();
     Store._isWsConnected = true;
     Store._queuedWsMessages.map(Store.sendWebsocketMessage);
     Store._queuedWsMessages = [];
@@ -164,14 +166,19 @@ class Store {
   static async writeProject(projectId, rootDoc) {
     const projectIdPaths = projectId.split("/");
     const projectName = projectIdPaths[1];
-    Store.dispatchRemote({
-      type: "SetProjectAction",
-      rootDoc,
-      projectName
-    });
+    Store._optimisticProjectRoots[projectId] = rootDoc;
+    try {
+      await Store.dispatchRemote({
+        type: "SetProjectAction",
+        rootDoc,
+        projectName
+      });
+    } finally {
+      Store._optimisticProjectRoots[projectId] = null;
+    }
   }
 
-  static async listen(localId, handler) {
+  static async listenRemote(localId, handler) {
     const localIdParts = localId.split("_");
     const type = localIdParts[0];
     const arg0 = localIdParts[1];
@@ -192,7 +199,7 @@ class Store {
     listenerSet.push(handler);
   }
 
-  static async sendListeners() {
+  static async sendRemoteListeners() {
     Object.keys(Store._listeners).forEach(async localId => {
       const localIdParts = localId.split("_");
       const type = localIdParts[0];
@@ -255,15 +262,13 @@ class Store {
           type: "GetAccountAction"
         });
       case "Project":
-        return Store._handleRemoteGet(localId, {
+        const projectData = await Store._handleRemoteGet(localId, {
           type: "GetProjectAction",
           user,
           project
         });
+        return projectData;
       case "Document":
-        if (!id || id == null || id === "null") {
-          debugger;
-        }
         // document IDs are immutable (content-addressable), so we don't need to load them remotely if we have them here
         const localDoc = await Store.getLocal(localId);
         if (localDoc) {
@@ -286,7 +291,17 @@ class Store {
   }
 
   static async getProject(projectId) {
-    return await Store.get(`Project_${projectId}`);
+    const project = await Store.get(`Project_${projectId}`);
+    if (!project) {
+      return project;
+    }
+    if (Store._optimisticProjectRoots[projectId]) {
+      return {
+        ...project,
+        rootDoc: Store._optimisticProjectRoots[projectId]
+      };
+    }
+    return project;
   }
 
   static async getProjectRoot(projectId) {
@@ -355,7 +370,7 @@ class Store {
   }
 
   static async getAndListen(localId, handler) {
-    await Store.listen(localId, handler);
+    await Store.listenRemote(localId, handler);
     const data = await Store.getLocal(localId);
     handler(data);
     // todo, propaer caching somehow lol
@@ -386,50 +401,13 @@ class Store {
     return data;
   }
 
-  static async dispatchRemote(action, inputSession) {
-    return new Promise((resolve, reject) => {
-      this._remoteActionRequests = [
-        ...this._remoteActionRequests,
-        { action, resolve, reject }
-      ];
-      clearTimeout(this._sendRemoteActions);
-      this._sendRemoteActions = setTimeout(async () => {
-        if (this._remoteActionRequests.length === 1) {
-          const { action, resolve, reject } = this._remoteActionRequests[0];
-          const session = inputSession || (await Store.getLocal("Session"));
-          try {
-            const result = await Store.dispatchRemoteImmediate(action, session);
-            resolve(result);
-          } catch (e) {
-            reject(e);
-          }
-        } else if (this._remoteActionRequests.length > 1) {
-          const actionRequests = this._remoteActionRequests;
-          this._sendRemoteActions = [];
-          const action = {
-            type: "PluralAction",
-            actions: actionRequests.map(pa => pa.action)
-          };
-          const session = inputSession || (await Store.getLocal("Session"));
-          try {
-            const result = await Store.dispatchRemoteImmediate(action, session);
-            result.results.forEach((innerResult, index) => {
-              if (innerResult.error) {
-                actionRequests[index].reject(innerResult.error);
-              } else {
-                actionRequests[index].resolve(innerResult.result);
-              }
-            });
-          } catch (err) {
-            // something errored on the plural result call itself. reject every dispatch
-            actionRequests.forEach(({ reject }) => reject(err));
-          }
-        }
-      }, 50);
-    });
+  static async dispatchRemote(action) {
+    const session = await Store.getLocal("Session");
+    const result = await Store.dispatchRemoteWithSession(action, session);
+    return result;
   }
 
-  static async dispatchRemoteImmediate(action, session) {
+  static async dispatchRemoteWithSession(action, session) {
     const { isSecure, host } = session;
     const protocolAndHost = `http${isSecure ? "s" : ""}://${host}`;
     const res = await fetch(`${protocolAndHost}/api/dispatch`, {
@@ -452,7 +430,7 @@ class Store {
   }
 
   static async login(data) {
-    const body = await Store.dispatchRemoteImmediate(
+    const body = await Store.dispatchRemoteWithSession(
       {
         type: "AuthLoginAction",
         username: data.username,
