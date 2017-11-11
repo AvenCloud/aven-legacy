@@ -4,14 +4,13 @@
     "description": "Create and publish dynamic documents and tasks",
     "slug": "aven",
     "privacy": "unlisted",
-    "sdkVersion": "21.0.0",
+    "sdkVersion": "22.0.0",
     "version": "1.0.0",
     "orientation": "portrait",
     "primaryColor": "#154E61",
     "scheme": "aven",
-    "icon": "./assets/IconIPhone.png",
+    "icon": "./assets/iPhoneIcon.png",
     "loading": {
-      "backgroundImage": "./assets/Loading.png",
       "backgroundColor": "#f9fcfd",
       "hideExponentText": true
     },
@@ -23,14 +22,25 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "io.aven.mobile",
+      "bundleIdentifier": "io.aven.iosapp",
       "buildNumber": "1.0.0a1",
-      "icon": "./assets/IconIPhone.png"
-    },
+      "icon": "./assets/iPhoneIcon.png",
+      "associatedDomains": [],
+      "config": {
+      	"branch": {
+      	  "apiKey": "key_live_mjwSvsNRaU2BgRRteDiPHdckErd9AVd7",
+      	}
+      }
+     },
     "android": {
-      "package": "io.aven.mobile",
-      "icon": "./assets/IconAndroid.png",
-      "versionCode": 1
+      "package": "io.aven.androidapp",
+      "icon": "./assets/AndroidIcon.png",
+      "versionCode": 1,
+      "config": {
+      	"branch": {
+      	  "apiKey": "key_live_mjwSvsNRaU2BgRRteDiPHdckErd9AVd7"
+      	}
+      }
     }
   }
 }
