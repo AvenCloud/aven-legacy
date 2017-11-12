@@ -11,6 +11,7 @@ import GetDocAction from "./GetDocAction";
 import GetAccountAction from "./GetAccountAction";
 import PluralAction from "./PluralAction";
 import CreateDocAction from "./CreateDocAction";
+import LogProjectAction from "./LogProjectAction";
 import SetProjectAction from "./SetProjectAction";
 
 const Actions = {
@@ -27,6 +28,7 @@ const Actions = {
   GetAccountAction,
   PluralAction,
   AuthVerifyAction,
+  LogProjectAction,
   SetProjectAction
 };
 

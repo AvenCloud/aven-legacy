@@ -23,9 +23,9 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "io.aven.iosapp",
-      "buildNumber": "1.0.0a1",
+      "buildNumber": "1.0.0",
       "icon": "./assets/iPhoneIcon.png",
-      "associatedDomains": [],
+      "associatedDomains": ["applinks:aven.io","applinks:to.aven.io"],
       "config": {
       	"branch": {
       	  "apiKey": "key_live_mjwSvsNRaU2BgRRteDiPHdckErd9AVd7",

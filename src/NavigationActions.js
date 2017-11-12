@@ -51,7 +51,7 @@ const NavigationActions = {
     component: VerifyFormPage
   },
   NavigateDocAction: {
-    path: "/:user/:project/_:id",
+    path: "/:user/:project/~:id",
     component: DocPage
   },
   NavigateProjectAction: {

@@ -151,7 +151,7 @@ class Store {
   static async writeDocument(doc, projectId) {
     const projectIdPaths = projectId.split("/");
     const data = JSON.stringify(doc);
-    const docId = `sha-1-${SHA1(data).toString()}`;
+    const docId = SHA1(data).toString();
     return {
       docId,
       remoteResult: Store.dispatchRemote({

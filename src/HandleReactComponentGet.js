@@ -20,10 +20,12 @@ export default async function ReactComponentHandleGet(
         viewerSession: auth && auth.session
       });
     if (Component.load) {
+      const  exportedParams = { ...params, ...query };
+      delete exportedParams['0'];
       try {
         data = await Component.load({
           auth,
-          params: { ...params, ...query },
+          params: exportedParams,
           path,
           dispatch
         });
