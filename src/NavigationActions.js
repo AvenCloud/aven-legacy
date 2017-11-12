@@ -9,7 +9,6 @@ import ResetPasswordPage from "./ResetPasswordPage";
 import CreateFormPage from "./CreateFormPage";
 import ProjectPage from "./ProjectPage";
 import ProfilePage from "./ProfilePage";
-import DocPage from "./DocPage";
 import AccountPage from "./AccountPage";
 
 const NavigationActions = {
@@ -49,10 +48,6 @@ const NavigationActions = {
     path: "/auth/verify",
     handler: "form",
     component: VerifyFormPage
-  },
-  NavigateDocAction: {
-    path: "/:user/:project/~:id",
-    component: DocPage
   },
   NavigateProjectAction: {
     path: "/:user/:project*",

@@ -14,7 +14,7 @@ export default class FolderComponent extends React.Component {
         {Object.keys(doc.files).map(fileName => {
           const id = doc.files[fileName].value;
           return (
-            <a key={fileName} href={`/${user}/${project}/_${id}`}>
+            <a key={fileName} href={`/${user}/${project}/~${id}`}>
               {fileName}
             </a>
           );

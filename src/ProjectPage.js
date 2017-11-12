@@ -12,32 +12,19 @@ export default class ProjectPage extends React.Component {
     const project = props.params.project;
     const query = props.query;
     const projectPath = pathParts.slice(3);
-    console.log("loading for p", {
-      user,
-      query,
-      project,
-      projectPath
-    });
     const projectData = await props.dispatch({
       type: "GetProjectAction",
       user,
       project
     });
-    console.log("a");
     let queryId = null;
     if (projectPath.length === 1) {
-      const match = /^_(.*)$/.exec(projectPath[0]);
+      const match = /^~(.*)$/.exec(projectPath[0]);
       if (match) {
         queryId = match[1];
       }
     }
     let componentData = null;
-    console.log("Loading generic component ", {
-      user,
-      project,
-      queryId,
-      dispatch: !!props.dispatch
-    });
     if (queryId) {
       componentData = await GenericComponent.load({
         user,
@@ -46,21 +33,15 @@ export default class ProjectPage extends React.Component {
         dispatch: props.dispatch
       });
     }
-    console.log("c", projectData, componentData);
     const projectRootDoc = projectData && projectData.rootDoc;
     if (!componentData && projectRootDoc) {
-      try {
-        componentData = await GenericComponent.load({
-          user,
-          project,
-          id: projectRootDoc,
-          dispatch: props.dispatch
-        });
-      } catch (e) {
-        console.log("failed to load generic component", e);
-      }
+      componentData = await GenericComponent.load({
+        user,
+        project,
+        id: projectRootDoc,
+        dispatch: props.dispatch
+      });
     }
-    console.log("d");
     const shouldRun = isTruthy(props.params.run);
     const result = {
       projectData,
@@ -70,7 +51,6 @@ export default class ProjectPage extends React.Component {
       project,
       id: queryId || projectRootDoc
     };
-    console.log({ result });
     return result;
   };
   static getTitle = ({ data }) => data.projectData && data.projectData.name;

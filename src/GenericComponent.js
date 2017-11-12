@@ -16,7 +16,6 @@ export default class GenericComponent extends React.Component {
       project: props.project,
       id: props.id
     });
-    console.log("got ze doc", doc);
     let componentData = null;
     if (doc && doc.type && ComponentTypes[doc.type]) {
       const Component = ComponentTypes[doc.type];
