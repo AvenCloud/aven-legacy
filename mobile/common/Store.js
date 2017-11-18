@@ -2,45 +2,45 @@ const SHA1 = require("crypto-js/sha1");
 const Hex = require("crypto-js/format-hex");
 
 class Store {
-  static _localDocuments = {};
-  static _listeners = {};
-  static _isWsConnected = false;
-  static _ws = null;
-  static _localStorage = null;
-  static _remoteActionRequests = [];
-  static _publishedDocuments = [];
-  static _optimisticProjectRoots = {};
+  _localDocuments = {};
+  _listeners = {};
+  _isWsConnected = false;
+  _ws = null;
+  _localStorage = null;
+  _remoteActionRequests = [];
+  _publishedDocuments = [];
+  _optimisticProjectRoots = {};
 
-  static init = ({ localStorage, platformDeps }) => {
-    Store._localStorage = localStorage;
-    Store.attachWebsocket();
-    Store._platformDeps = platformDeps;
-    Store._platformDepNames = Object.keys(platformDeps);
+  init = ({ localStorage, platformDeps }) => {
+    this._localStorage = localStorage;
+    this.attachWebsocket();
+    this._platformDeps = platformDeps;
+    this._platformDepNames = Object.keys(platformDeps);
   };
 
-  static _onWebsocketOpen = () => {
+  _onWebsocketOpen = () => {
     console.log("Websocket connected!");
-    Store.sendRemoteListeners();
-    Store._isWsConnected = true;
-    Store._queuedWsMessages.map(Store.sendWebsocketMessage);
-    Store._queuedWsMessages = [];
+    this.sendRemoteListeners();
+    this._isWsConnected = true;
+    this._queuedWsMessages.map(this.sendWebsocketMessage);
+    this._queuedWsMessages = [];
   };
 
-  static _onWebsocketMessage = async e => {
+  _onWebsocketMessage = async e => {
     const msgParts = e.data.split("_");
     const type = msgParts[0];
     const name = msgParts[1];
     const value = msgParts[2];
     switch (type) {
       case "PublishAccount":
-        Store.freshenRemote("Account");
+        this.freshenRemote("Account");
         return;
       case "PublishProject":
-        const project = await Store.getLocal(`Project_${name}`);
+        const project = await this.getLocal(`Project_${name}`);
         if (!project) {
           return;
         }
-        Store.setLocal(`Project_${name}`, {
+        this.setLocal(`Project_${name}`, {
           ...project,
           rootDoc: value
         });
@@ -48,73 +48,73 @@ class Store {
     }
   };
 
-  static _onWebsocketClose = e => {
-    Store.detachWebsocket();
+  _onWebsocketClose = e => {
+    this.detachWebsocket();
     console.log("Connection Closed or Errored", e.code, e.reason);
 
     // we assume this diconnection. Wait a bit and retry
     setTimeout(() => {
-      Store.attachWebsocket();
+      this.attachWebsocket();
     }, 10000);
   };
 
-  static attachWebsocket = async () => {
-    await Store.detachWebsocket();
-    const session = await Store.getLocal("Session");
+  attachWebsocket = async () => {
+    await this.detachWebsocket();
+    const session = await this.getLocal("Session");
     if (!session) {
       return;
     }
     const { isSecure, host } = session;
     const protocolAndHost = `ws${isSecure ? "s" : ""}://${host}`;
     console.log("Connecting to ", protocolAndHost, session);
-    Store._ws = new WebSocket(protocolAndHost);
-    Store._ws.onopen = Store._onWebsocketOpen;
-    Store._ws.onclose = Store._onWebsocketClose;
-    Store._ws.onerror = Store._onWebsocketClose;
-    Store._ws.onmessage = Store._onWebsocketMessage;
+    this._ws = new WebSocket(protocolAndHost);
+    this._ws.onopen = this._onWebsocketOpen;
+    this._ws.onclose = this._onWebsocketClose;
+    this._ws.onerror = this._onWebsocketClose;
+    this._ws.onmessage = this._onWebsocketMessage;
   };
 
-  static detachWebsocket = async () => {
-    if (Store._ws) {
-      Store._ws.close();
+  detachWebsocket = async () => {
+    if (this._ws) {
+      this._ws.close();
     }
-    Store._ws = null;
-    Store._isWsConnected = false;
+    this._ws = null;
+    this._isWsConnected = false;
   };
 
-  static _queuedWsMessages = [];
-  static sendWebsocketMessage = message => {
-    if (Store._ws && Store._isWsConnected) {
+  _queuedWsMessages = [];
+  sendWebsocketMessage = message => {
+    if (this._ws && this._isWsConnected) {
       // So, the ws library fails if the ready state is 'connecting'
-      if (Store._ws.readyState === 1) {
-        Store._ws.send(message);
+      if (this._ws.readyState === 1) {
+        this._ws.send(message);
       }
     } else {
-      Store._queuedWsMessages.push(message);
+      this._queuedWsMessages.push(message);
     }
   };
 
-  static emit(name, data) {
-    const listenerSet = Store._listeners[name] || (Store._listeners[name] = []);
+  emit(name, data) {
+    const listenerSet = this._listeners[name] || (this._listeners[name] = []);
     listenerSet.forEach(listener => {
       listener(data);
     });
   }
 
-  static async writeProjectFile(data, projectId, path) {
-    const project = await Store.getProject(projectId);
-    const { docId } = await Store.writeDocument(data, projectId);
-    const newRootDoc = await Store.writeInFolder(
+  async writeProjectFile(data, projectId, path) {
+    const project = await this.getProject(projectId);
+    const { docId } = await this.writeDocument(data, projectId);
+    const newRootDoc = await this.writeInFolder(
       projectId,
       project.rootDoc,
       path,
       docId
     );
-    await Store.writeProject(projectId, newRootDoc);
+    await this.writeProject(projectId, newRootDoc);
   }
 
-  static async writeInFolder(projectId, lastId, path, newFileValue) {
-    const lastFolder = lastId && (await Store.getDocument(projectId, lastId));
+  async writeInFolder(projectId, lastId, path, newFileValue) {
+    const lastFolder = lastId && (await this.getDocument(projectId, lastId));
     const folder = lastFolder
       ? { ...lastFolder }
       : { type: "Folder", files: {} };
@@ -141,20 +141,17 @@ class Store {
     } else {
       return null;
     }
-    const { docId } = await Store.writeDocument(
-      { ...folder, files },
-      projectId
-    );
+    const { docId } = await this.writeDocument({ ...folder, files }, projectId);
     return docId;
   }
 
-  static async writeDocument(doc, projectId) {
+  async writeDocument(doc, projectId) {
     const projectIdPaths = projectId.split("/");
     const data = JSON.stringify(doc);
     const docId = SHA1(data).toString();
     return {
       docId,
-      remoteResult: Store.dispatchRemote({
+      remoteResult: this.dispatchRemote({
         type: "CreateDocAction",
         user: projectIdPaths[0],
         project: projectIdPaths[1],
@@ -163,55 +160,55 @@ class Store {
     };
   }
 
-  static async writeProject(projectId, rootDoc) {
+  async writeProject(projectId, rootDoc) {
     const projectIdPaths = projectId.split("/");
     const projectName = projectIdPaths[1];
-    Store._optimisticProjectRoots[projectId] = rootDoc;
+    this._optimisticProjectRoots[projectId] = rootDoc;
     try {
-      await Store.dispatchRemote({
+      await this.dispatchRemote({
         type: "SetProjectAction",
         rootDoc,
         projectName
       });
     } finally {
-      Store._optimisticProjectRoots[projectId] = null;
+      this._optimisticProjectRoots[projectId] = null;
     }
   }
 
-  static async listenRemote(localId, handler) {
+  async listenRemote(localId, handler) {
     const localIdParts = localId.split("_");
     const type = localIdParts[0];
     const arg0 = localIdParts[1];
     switch (type) {
       case "Account":
-        const session = await Store.getLocal("Session");
+        const session = await this.getLocal("Session");
         session &&
-          Store.sendWebsocketMessage(`ListenAccount_${session.username}`);
+          this.sendWebsocketMessage(`ListenAccount_${session.username}`);
         break;
       case "Project":
-        Store.sendWebsocketMessage(`ListenProject_${arg0}`);
+        this.sendWebsocketMessage(`ListenProject_${arg0}`);
         break;
       default:
         break;
     }
     const listenerSet =
-      Store._listeners[localId] || (Store._listeners[localId] = []);
+      this._listeners[localId] || (this._listeners[localId] = []);
     listenerSet.push(handler);
   }
 
-  static async sendRemoteListeners() {
-    Object.keys(Store._listeners).forEach(async localId => {
+  async sendRemoteListeners() {
+    Object.keys(this._listeners).forEach(async localId => {
       const localIdParts = localId.split("_");
       const type = localIdParts[0];
       const arg0 = localIdParts[1];
       switch (type) {
         case "Account":
-          const session = await Store.getLocal("Session");
+          const session = await this.getLocal("Session");
           session &&
-            Store.sendWebsocketMessage(`ListenAccount_${session.username}`);
+            this.sendWebsocketMessage(`ListenAccount_${session.username}`);
           break;
         case "Project":
-          Store.sendWebsocketMessage(`ListenProject_${arg0}`);
+          this.sendWebsocketMessage(`ListenProject_${arg0}`);
           break;
         default:
           break;
@@ -219,37 +216,37 @@ class Store {
     });
   }
 
-  static async unlisten(name, handler) {
+  async unlisten(name, handler) {
     const localIdParts = name.split("_");
     const type = localIdParts[0];
     const arg0 = localIdParts[1];
     switch (type) {
       case "Account":
-        const session = await Store.getLocal("Session");
+        const session = await this.getLocal("Session");
         session &&
-          Store.sendWebsocketMessage(`UnlistenAccount_${session.username}`);
+          this.sendWebsocketMessage(`UnlistenAccount_${session.username}`);
         break;
       case "Project":
-        Store.sendWebsocketMessage(`UnlistenProject_${arg0}`);
+        this.sendWebsocketMessage(`UnlistenProject_${arg0}`);
         break;
       default:
         break;
     }
 
-    const listenerSet = Store._listeners[name] || (Store._listeners[name] = []);
+    const listenerSet = this._listeners[name] || (this._listeners[name] = []);
     const listenerIndex = listenerSet.indexOf(handler);
     if (listenerIndex !== -1) {
       listenerSet.splice(listenerIndex, 1);
     }
   }
 
-  static async _handleRemoteGet(localId, action) {
-    const remoteDoc = await Store.dispatchRemote(action);
-    await Store.setLocal(localId, remoteDoc);
+  async _handleRemoteGet(localId, action) {
+    const remoteDoc = await this.dispatchRemote(action);
+    await this.setLocal(localId, remoteDoc);
     return remoteDoc;
   }
 
-  static async freshenRemote(localId) {
+  async freshenRemote(localId) {
     const localIdParts = localId.split("_");
     const type = localIdParts[0];
     const projectId = localIdParts[1];
@@ -258,11 +255,16 @@ class Store {
     const id = localIdParts[2];
     switch (type) {
       case "Account":
-        return Store._handleRemoteGet(localId, {
+        return this._handleRemoteGet(localId, {
           type: "GetAccountAction"
         });
+      case "Profile":
+        return this._handleRemoteGet(localId, {
+          type: "GetProfileAction",
+          user: projectId
+        });
       case "Project":
-        const projectData = await Store._handleRemoteGet(localId, {
+        const projectData = await this._handleRemoteGet(localId, {
           type: "GetProjectAction",
           user,
           project
@@ -270,11 +272,11 @@ class Store {
         return projectData;
       case "Document":
         // document IDs are immutable (content-addressable), so we don't need to load them remotely if we have them here
-        const localDoc = await Store.getLocal(localId);
+        const localDoc = await this.getLocal(localId);
         if (localDoc) {
           return localDoc;
         }
-        return Store._handleRemoteGet(localId, {
+        return this._handleRemoteGet(localId, {
           type: "GetDocAction",
           user,
           project,
@@ -285,70 +287,78 @@ class Store {
     }
   }
 
-  static async get(localId) {
-    await Store.freshenRemote(localId);
-    return await Store.getLocal(localId);
+  async getAccount() {
+    return this.get("Account");
   }
 
-  static async getProject(projectId) {
-    const project = await Store.get(`Project_${projectId}`);
+  async getProfile(userId) {
+    return this.get("Profile_" + userId);
+  }
+
+  async get(localId) {
+    await this.freshenRemote(localId);
+    return await this.getLocal(localId);
+  }
+
+  async getProject(projectId) {
+    const project = await this.get(`Project_${projectId}`);
     if (!project) {
       return project;
     }
-    if (Store._optimisticProjectRoots[projectId]) {
+    if (this._optimisticProjectRoots[projectId]) {
       return {
         ...project,
-        rootDoc: Store._optimisticProjectRoots[projectId]
+        rootDoc: this._optimisticProjectRoots[projectId]
       };
     }
     return project;
   }
 
-  static async getProjectRoot(projectId) {
-    const project = await Store.getProject(projectId);
+  async getProjectRoot(projectId) {
+    const project = await this.getProject(projectId);
     if (!project || !project.rootDoc) {
       return null;
     }
-    const rootDoc = await Store.getDocument(projectId, project.rootDoc);
+    const rootDoc = await this.getDocument(projectId, project.rootDoc);
     return rootDoc;
   }
 
-  static async getFolder(projectId, path) {
+  async getFolder(projectId, path) {
     // TODO, handle path traversal!!!!
-    const folder = await Store.getProjectRoot(projectId);
+    const folder = await this.getProjectRoot(projectId);
     if (!folder || folder.type !== "Folder") {
       return null;
     }
     return folder;
   }
 
-  static async getDocument(projectId, docId) {
+  async getDocument(projectId, docId) {
     if (docId === "null" || !docId) {
       debugger;
     }
-    return await Store.get(`Document_${projectId}_${docId}`);
+    return await this.get(`Document_${projectId}_${docId}`);
   }
 
-  static async computeDoc(doc, projectId, path, createErrorComponent) {
+  async computeDoc(doc, projectId, path, createErrorComponent) {
     let computedDoc = null;
     const deps = {
-      ...Store._platformDeps,
+      ...this._platformDeps,
       Store
     };
     const remoteDeps = doc.dependencies.filter(
-      dep => Store._platformDepNames.indexOf(dep) === -1
+      dep => this._platformDepNames.indexOf(dep) === -1
     );
 
     // TODO: process path recursively for dependency resolution!!!!!!
     const ourPath = path.slice(0, path.length - 1);
-    const folder = await Store.getFolder(projectId, ourPath);
+    const folder = await this.getFolder(projectId, ourPath);
 
     const resolvedRemoteDeps = await Promise.all(
       remoteDeps.map(async depName => {
         const depFile = folder.files[depName + ".js.jsmodule"];
         if (depFile && depFile.value) {
-          const depDoc = await Store.getDocument(projectId, depFile.value);
-          const dep = await Store.computeDoc(depDoc, projectId, [
+          const depDoc = await this.getDocument(projectId, depFile.value);
+          const dep = await this.computeDoc(depDoc, projectId, [
             ...path,
             depFile.name
           ]);
@@ -369,25 +379,25 @@ class Store {
     return computedDoc;
   }
 
-  static async getAndListen(localId, handler) {
-    await Store.listenRemote(localId, handler);
-    const data = await Store.getLocal(localId);
+  async getAndListen(localId, handler) {
+    await this.listenRemote(localId, handler);
+    const data = await this.getLocal(localId);
     handler(data);
     // todo, propaer caching somehow lol
-    await Store.freshenRemote(localId);
+    await this.freshenRemote(localId);
   }
-  static async setLocal(localId, data) {
+  async setLocal(localId, data) {
     const storedData = JSON.stringify(data);
-    await Store._localStorage.setItem("AvenDocument_" + localId, storedData);
-    Store._localDocuments[localId] = data;
-    Store.emit(localId, data);
+    await this._localStorage.setItem("AvenDocument_" + localId, storedData);
+    this._localDocuments[localId] = data;
+    this.emit(localId, data);
   }
-  static async getLocal(localId) {
-    let data = Store._localDocuments[localId];
+  async getLocal(localId) {
+    let data = this._localDocuments[localId];
     if (data !== undefined) {
       return data;
     }
-    const storedData = await Store._localStorage.getItem(
+    const storedData = await this._localStorage.getItem(
       "AvenDocument_" + localId
     );
     if (storedData) {
@@ -397,17 +407,17 @@ class Store {
         data = storedData;
       }
     }
-    Store._localDocuments[localId] = data;
+    this._localDocuments[localId] = data;
     return data;
   }
 
-  static async dispatchRemote(action) {
-    const session = await Store.getLocal("Session");
-    const result = await Store.dispatchRemoteWithSession(action, session);
+  async dispatchRemote(action) {
+    const session = await this.getLocal("Session");
+    const result = await this.dispatchRemoteWithSession(action, session);
     return result;
   }
 
-  static async dispatchRemoteWithSession(action, session) {
+  async dispatchRemoteWithSession(action, session) {
     const { isSecure, host } = session;
     const protocolAndHost = `http${isSecure ? "s" : ""}://${host}`;
     const res = await fetch(`${protocolAndHost}/api/dispatch`, {
@@ -429,8 +439,8 @@ class Store {
     return body;
   }
 
-  static async login(data) {
-    const body = await Store.dispatchRemoteWithSession(
+  async login(data) {
+    const body = await this.dispatchRemoteWithSession(
       {
         type: "AuthLoginAction",
         username: data.username,
@@ -442,35 +452,35 @@ class Store {
       }
     );
     if (body && body.session) {
-      await Store.setLocal("Session", {
+      await this.setLocal("Session", {
         session: body.session,
         username: body.username,
         host: data.host,
         isSecure: data.isSecure
       });
-      await Store.attachWebsocket();
+      await this.attachWebsocket();
       return;
     } else {
       throw "Error on server";
     }
   }
 
-  static async logoutLocal() {
-    await Store._localStorage.clear();
-    await Store.setLocal("Session", null);
+  async logoutLocal() {
+    await this._localStorage.clear();
+    await this.setLocal("Session", null);
   }
 
-  static async logout() {
+  async logout() {
     try {
-      await Store.dispatchRemote({
+      await this.dispatchRemote({
         type: "AuthLogoutAction"
       });
     } catch (e) {
       // todo: ask the user if they want to logoutLocal
-      await Store.logoutLocal();
+      await this.logoutLocal();
       return;
     }
-    await Store.logoutLocal();
+    await this.logoutLocal();
   }
 }
 

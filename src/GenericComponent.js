@@ -9,22 +9,23 @@ const ComponentTypes = {
 };
 
 export default class GenericComponent extends React.Component {
-  static load = async props => {
-    const doc = await props.dispatch({
-      type: "GetDocAction",
-      user: props.user,
-      project: props.project,
-      id: props.id
-    });
+  static load = async (props, store) => {
+    const doc = await store.getDocument(
+      `${props.user}/${props.projectt}`,
+      props.id
+    );
     let componentData = null;
     if (doc && doc.type && ComponentTypes[doc.type]) {
       const Component = ComponentTypes[doc.type];
       componentData =
         Component.load &&
-        (await Component.load({
-          ...props,
-          doc
-        }));
+        (await Component.load(
+          {
+            ...props,
+            doc
+          },
+          store
+        ));
     }
     return {
       doc,

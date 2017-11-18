@@ -6,17 +6,13 @@ import { isTruthy } from "./QueryUtils";
 
 export default class ProjectPage extends React.Component {
   static getBrowserModule = () => "ProjectIndex";
-  static load = async props => {
+  static load = async (props, store) => {
     const pathParts = props.path.split("/");
     const user = props.params.user;
     const project = props.params.project;
     const query = props.query;
     const projectPath = pathParts.slice(3);
-    const projectData = await props.dispatch({
-      type: "GetProjectAction",
-      user,
-      project
-    });
+    const projectData = await store.getProject(user + "/" + project);
     let queryId = null;
     if (projectPath.length === 1) {
       const match = /^~(.*)$/.exec(projectPath[0]);
@@ -26,21 +22,25 @@ export default class ProjectPage extends React.Component {
     }
     let componentData = null;
     if (queryId) {
-      componentData = await GenericComponent.load({
-        user,
-        project,
-        id: queryId,
-        dispatch: props.dispatch
-      });
+      componentData = await GenericComponent.load(
+        {
+          user,
+          project,
+          id: queryId
+        },
+        store
+      );
     }
     const projectRootDoc = projectData && projectData.rootDoc;
     if (!componentData && projectRootDoc) {
-      componentData = await GenericComponent.load({
-        user,
-        project,
-        id: projectRootDoc,
-        dispatch: props.dispatch
-      });
+      componentData = await GenericComponent.load(
+        {
+          user,
+          project,
+          id: projectRootDoc
+        },
+        store
+      );
     }
     const shouldRun = isTruthy(props.params.run);
     const result = {
@@ -57,7 +57,7 @@ export default class ProjectPage extends React.Component {
   render() {
     const {
       user,
-      dispatch,
+      store,
       project,
       shouldRun,
       projectData,
@@ -87,7 +87,7 @@ export default class ProjectPage extends React.Component {
             )}
         </p>
         <GenericComponent
-          dispatch={dispatch}
+          store={store}
           id={id}
           data={componentData}
           user={user}

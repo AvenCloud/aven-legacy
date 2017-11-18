@@ -34,7 +34,16 @@ const PLATFORM_DEPS = {
   Platform
 };
 
-Store.init({ localStorage: AsyncStorage, platformDeps: PLATFORM_DEPS });
+const AppStore = new Store({
+  localStorage: AsyncStorage,
+  platformDeps: PLATFORM_DEPS
+});
+
+import Sentry from "sentry-expo";
+
+Sentry.config(
+  "https://2129e0b7797f4d9fa448b8795afd7be7@sentry.io/245392"
+).install();
 
 class LoggedOutHome extends React.Component {
   render() {
@@ -154,7 +163,7 @@ class LoggedInHome extends React.Component {
           onPress={() =>
             navigation.navigate("Project", { projectId: "aven/new-task" })}
         />
-        <AButton title="Logout" onPress={Store.logout} style="secondary" />
+        <AButton title="Logout" onPress={AppStore.logout} style="secondary" />
         <View style={{ flexDirection: "row" }}>
           <AButton title="Terms and Privacy" onPress={() => {}} style="small" />
           <AButton title="About Aven" onPress={() => {}} style="small" />
@@ -197,7 +206,7 @@ class AccountScreen extends React.Component {
             );
           }}
         />
-        <AButton title="Logout" onPress={Store.logout} style="secondary" />
+        <AButton title="Logout" onPress={AppStore.logout} style="secondary" />
       </AGenericScreen>
     );
   }
@@ -206,7 +215,7 @@ class AccountScreen extends React.Component {
 class HomeScreen extends React.Component {
   state = null;
   componentDidMount() {
-    Store.getAndListen("Session", this._setSession);
+    AppStore.getAndListen("Session", this._setSession);
   }
   _setSession = session => {
     this.setState({ session });
@@ -284,7 +293,7 @@ class PlaintextView extends React.Component {
     const { projectId, path } = this.props;
     clearTimeout(this._timeout);
     this._timeout = setTimeout(() => {
-      Store.writeProjectFile(text, projectId, path);
+      AppStore.writeProjectFile(text, projectId, path);
     }, 2000);
   };
 
@@ -386,7 +395,7 @@ class JSModuleView extends React.Component {
     const { doc, projectId, path } = this.props;
     if (doc) {
       this.setState({
-        computedComponent: await Store.computeDoc(
+        computedComponent: await AppStore.computeDoc(
           doc,
           projectId,
           path,
@@ -399,7 +408,7 @@ class JSModuleView extends React.Component {
     const { doc, projectId, path } = props;
     if (doc && doc !== this.props.doc) {
       this.setState({
-        computedComponent: await Store.computeDoc(
+        computedComponent: await AppStore.computeDoc(
           doc,
           projectId,
           path,
@@ -745,7 +754,7 @@ class NewProjectScreen extends React.Component {
           }
         ]}
         onSubmit={async values => {
-          const remoteProject = await Store.dispatchRemote({
+          const remoteProject = await AppStore.dispatchRemote({
             type: "CreateProjectAction",
             ...values
           });
@@ -794,7 +803,7 @@ class LoginScreen extends React.Component {
           }
         ]}
         onSubmit={async data => {
-          await Store.login(data);
+          await AppStore.login(data);
           this.props.navigation.goBack();
         }}
       />
