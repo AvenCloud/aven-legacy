@@ -25,22 +25,37 @@
       "bundleIdentifier": "io.aven.iosapp",
       "buildNumber": "1.0.0",
       "icon": "./assets/iPhoneIcon.png",
-      "associatedDomains": ["applinks:aven.io","applinks:to.aven.io"],
+      "associatedDomains": [
+        "applinks:aven.io",
+        "applinks:to.aven.io"
+      ],
       "config": {
-      	"branch": {
-      	  "apiKey": "key_live_mjwSvsNRaU2BgRRteDiPHdckErd9AVd7",
-      	}
+        "branch": {
+          "apiKey": "key_live_mjwSvsNRaU2BgRRteDiPHdckErd9AVd7",
+        }
       }
-     },
+    },
     "android": {
       "package": "io.aven.androidapp",
       "icon": "./assets/AndroidIcon.png",
       "versionCode": 1,
       "config": {
-      	"branch": {
-      	  "apiKey": "key_live_mjwSvsNRaU2BgRRteDiPHdckErd9AVd7"
-      	}
+        "branch": {
+          "apiKey": "key_live_mjwSvsNRaU2BgRRteDiPHdckErd9AVd7"
+        }
       }
+    },
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "aven",
+            "project": "avenapp",
+            "authToken": "81b067e9c71f4d1ead7f3fba06d24d866a23a1b1a714402da5c2eb0db0cf0d1f"
+          }
+        }
+      ]
     }
-  }
+  },
 }
