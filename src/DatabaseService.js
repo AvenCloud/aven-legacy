@@ -4,7 +4,7 @@ const url = require("url");
 const denodeify = require("denodeify");
 import Configuration from "./Configuration";
 
-const params = url.parse(Configuration.postgresURL);
+const params = url.parse(Configuration.DATABASE_URL);
 const auth = params.auth.split(":");
 
 const shouldUseSSL = Configuration.POSTGRES_DANGER_DISABLE_SSL ? false : true;

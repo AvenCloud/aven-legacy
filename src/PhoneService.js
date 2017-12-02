@@ -3,15 +3,13 @@ import Configuration from "./Configuration";
 
 const AuthHeader =
   "Basic " +
-  new Buffer(
-    Configuration.secrets.plivo_id + ":" + Configuration.secrets.plivo_key
-  ).toString("base64");
+  new Buffer(Configuration.PLIVO_ID + ":" + Configuration.PLIVO_KEY).toString(
+    "base64"
+  );
 
 export async function sendSMS(destNumber, textBody) {
   const res = await fetch(
-    "https://api.plivo.com/v1/Account/" +
-      Configuration.secrets.plivo_id +
-      "/Message/",
+    "https://api.plivo.com/v1/Account/" + Configuration.PLIVO_ID + "/Message/",
     {
       method: "post",
       headers: {
@@ -19,7 +17,7 @@ export async function sendSMS(destNumber, textBody) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        src: Configuration.secrets.from_phone,
+        src: Configuration.PLIVO_FROM_PHONE,
         dst: destNumber,
         text: textBody
       })

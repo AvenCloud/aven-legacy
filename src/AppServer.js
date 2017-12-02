@@ -23,7 +23,6 @@ import HandleLogout from "./HandleLogout";
 const app = express();
 
 const { CommonTest } = require("./common");
-console.log("zey, 2222!", CommonTest("evv"));
 
 app.use((req, res, next) => {
   const proto = req.headers["x-forwarded-proto"] || req.protocol;
@@ -57,93 +56,9 @@ app.use((req, res, next) => {
   res.redirect("https://aven.io" + req.path);
 });
 
-app.get("/wstest", (req, res) => {
-  res.send(
-    `
-<html>
-  <body>
-    <p id='server-time'></p>
-    <script>
-      var HOST = location.origin.replace(/^http/, 'ws')
-      var ws = new WebSocket(HOST);
-      var el = document.getElementById('server-time');
-      ws.onmessage = function (event) {
-        el.innerHTML = 'Server time: ' + event.data;
-      };
-    </script>
-  </body>
-</html>
-`
-  );
-});
-
 app.get("/debug", function(req, res) {
   res.send(JSON.stringify(Configuration.publicInfo));
 });
-
-app.post("/_inbound_mail", multer.single(), async (req, res) => {
-  if (req.query.key !== Configuration.secrets.inbound_mail_key) {
-    res.setStatus(400).send("Wrong inbound mail key");
-    return;
-  }
-  const result = await DispatchAction({
-    type: "EmailRecieveAction",
-    data: req.body
-  });
-  res.send("ok");
-});
-
-const checkPlivoKey = (req, res, next) => {
-  if (req.query.key !== Configuration.secrets.inbound_plivo_key) {
-    res.setStatus(400).send("Wrong inbound plivo key");
-    return;
-  }
-  next();
-};
-
-app.post("/_handle_call", [
-  checkPlivoKey,
-  async (req, res) => {
-    if (req.query.key !== Configuration.secrets.inbound_plivo_key) {
-      res.setStatus(400).send("Wrong inbound plivo key");
-      return;
-    }
-    const result = await DispatchAction({
-      type: "CallHandleAction",
-      data: req.body
-    });
-    const callHandler = `
-    <Response>
-      <Dial callerId="none">
-        <Number>16502239482</Number>
-      </Dial>
-    </Response>`;
-    res.header("Content-Type", "text/xml");
-    res.send(callHandler);
-  }
-]);
-
-app.post("/_handle_call_end", [
-  checkPlivoKey,
-  async (req, res) => {
-    const result = await DispatchAction({
-      type: "CallEndAction",
-      data: req.body
-    });
-    res.send("ok");
-  }
-]);
-
-app.post("/_inbound_sms", [
-  checkPlivoKey,
-  async (req, res) => {
-    const result = await DispatchAction({
-      type: "CallEndAction",
-      data: req.body
-    });
-    res.send("ok");
-  }
-]);
 
 app.use("/assets", express.static(path.join(__dirname, "../lib/static")));
 

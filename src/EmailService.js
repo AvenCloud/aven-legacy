@@ -4,7 +4,7 @@ import Configuration from "./Configuration";
 export async function sendEmail(destEmail, subject, textBody) {
   const sendData = {
     personalizations: [{ to: [{ email: destEmail }] }],
-    from: { email: Configuration.secrets.from_email },
+    from: { email: "Aven Support <support@aven.io>" },
     subject: subject,
     content: [{ type: "text/plain", value: textBody }]
   };
@@ -12,7 +12,7 @@ export async function sendEmail(destEmail, subject, textBody) {
   const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
     method: "post",
     headers: {
-      Authorization: "Bearer " + Configuration.secrets.sendgrid_key,
+      Authorization: "Bearer " + Configuration.SENDGRID_KEY,
       "Content-Type": "application/json"
     },
     body

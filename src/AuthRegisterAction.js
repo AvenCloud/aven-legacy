@@ -20,18 +20,6 @@ const looksLikeAPhoneNumber = str => {
   return validator.isNumeric(cleanPhoneString(str));
 };
 
-// if (  Configuration.secrets.alpha_pass_names ) {
-//   const passes = Configuration.secrets.alpha_pass_names.map(name => action.name.search(name) === -1);
-//   const passes = Configuration.secrets.alpha_pass_names.map(name => action.name.search(name) === -1);
-// }
-//   !(
-//     action.name.search() !== -1 ||
-//     asdf
-//   )
-// ) {
-//   return 'You have not been invited to this alpha yet. Try asking around?';
-// }
-
 export default async function AuthRegisterAction(action) {
   const user = {
     emailVerification: null,
@@ -48,8 +36,8 @@ export default async function AuthRegisterAction(action) {
   const phone = looksLikeAPhoneNumber(action.phone)
     ? action.phone
     : looksLikeAPhoneNumber(action.email_or_phone)
-      ? action.email_or_phone
-      : null;
+        ? action.email_or_phone
+        : null;
   if (email) {
     user.emailVerification = {
       verificationTime: Date.now() / 1000,
@@ -83,8 +71,7 @@ export default async function AuthRegisterAction(action) {
       `Hello, ${validatedName}! Your auth code is ${user.emailVerification.code}
 Or, click here:
 
-https://aven.io/auth/verify?username=${validatedName}&code=${user
-        .emailVerification.code}
+https://aven.io/auth/verify?username=${validatedName}&code=${user.emailVerification.code}
       `
     );
   }
