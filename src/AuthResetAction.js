@@ -1,4 +1,4 @@
-import DatabaseService from "./DatabaseService";
+import DB from "./DB";
 import { sendSMS } from "./PhoneService";
 import { sendEmail } from "./EmailService";
 import Utilities from "./Utilities";
@@ -6,7 +6,7 @@ import Utilities from "./Utilities";
 const validator = require("validator");
 
 export default async function AuthResetAction(action, dispatch) {
-  const userData = await DatabaseService.getDoc(action.username_email_or_phone);
+  const userData = await DB.getDoc(action.username_email_or_phone);
 
   if (userData && userData.verifiedEmail) {
     const name = action.username_email_or_phone;

@@ -1,4 +1,4 @@
-import DatabaseService from "./DatabaseService";
+import DB from "./DB";
 import { getAuth } from "./AuthUtilities";
 import Utilities from "./Utilities";
 import SocketConnection from "./SocketConnection";
@@ -9,7 +9,7 @@ export default async function CreateProjectAction(action) {
     throw "User is not authenticated";
   }
   //todo: verify project name, no slashes
-  const userDoc = await DatabaseService.getDoc(action.viewerUser);
+  const userDoc = await DB.getDoc(action.viewerUser);
   const projects = userDoc.projects || {};
 
   const projectName = action.projectName
@@ -26,7 +26,7 @@ export default async function CreateProjectAction(action) {
     updateTime: creationTime,
     isPublic: action.isPublic
   };
-  await DatabaseService.writeDoc(action.viewerUser, {
+  await DB.writeDoc(action.viewerUser, {
     ...userDoc,
     projects: {
       ...projects,

@@ -1,18 +1,18 @@
-import DatabaseService from "./DatabaseService";
-import { getAuth } from "./AuthUtilities";
+import DB from "./DB";
 import Utilities from "./Utilities";
 
 export default async function GetAccountAction(action) {
-	const auth = await getAuth(action.viewerUser, action.viewerSession);
-	if (!auth) {
-		throw "User is not authenticated";
-	}
-	const userDoc = await DatabaseService.getDoc(action.viewerUser);
-	return {
-		...userDoc,
-		password: undefined,
-		phoneVerification: undefined,
-		emailVerification: undefined,
-		sessions: undefined
-	};
+  const user = await DB.Model.User.findOne({
+    where: {
+      id: action.user
+    }
+  });
+  if (!user) {
+    throw 'Could not find user';
+  }
+  // something about listing records..
+  return {
+    id: user.id,
+    displayName: user.displayName,
+  };
 }

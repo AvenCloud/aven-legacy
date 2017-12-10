@@ -4,7 +4,6 @@ import AuthResetAction from "./AuthResetAction";
 import AuthVerifyAction from "./AuthVerifyAction";
 import AuthLoginAction from "./AuthLoginAction";
 import CreateProjectAction from "./CreateProjectAction";
-import EmailRecieveAction from "./EmailRecieveAction";
 import GetProfileAction from "./GetProfileAction";
 import GetProjectAction from "./GetProjectAction";
 import GetDocAction from "./GetDocAction";
@@ -15,19 +14,19 @@ import LogProjectAction from "./LogProjectAction";
 import SetProjectAction from "./SetProjectAction";
 
 const Actions = {
+  PluralAction,
+  AuthRegisterAction,
+  AuthVerifyAction,
+  AuthLoginAction,
+  GetAccountAction,
+
   CreateDocAction,
   GetProfileAction,
   GetProjectAction,
   GetDocAction,
   CreateProjectAction,
-  EmailRecieveAction,
-  AuthRegisterAction,
   AuthResetAction,
-  AuthLoginAction,
   AuthLogoutAction,
-  GetAccountAction,
-  PluralAction,
-  AuthVerifyAction,
   LogProjectAction,
   SetProjectAction
 };

@@ -1,8 +1,8 @@
-import DatabaseService from "./DatabaseService";
+import DB from "./DB";
 import Utilities from "./Utilities";
 
 export default async function GetProjectAction(action) {
-  const profile = await DatabaseService.getDoc(action.user);
+  const profile = await DB.getDoc(action.user);
   if (!profile || !profile.projects) {
     throw "Not found!";
   }

@@ -1,33 +1,28 @@
-import DatabaseService from "./DatabaseService";
+import DB from "./DB";
 import Utilities from "./Utilities";
 
 export default async function AuthVerifyAction(action) {
-  const userData = await DatabaseService.getDoc(action.username);
-  if (
-    userData.emailVerification &&
-    "" + userData.emailVerification.code === action.code
-  ) {
-    // todo: check emailVerification.verificationTime to make sure the code is still valid
-    const sessionId = await Utilities.genSessionId();
-    const { emailVerification } = userData;
-    await DatabaseService.writeDoc(action.username, {
-      ...userData,
-      password: await Utilities.genHash(action.password),
-      emailVerification: null,
-      sessions: [sessionId],
-      verifiedEmail: emailVerification.email
-    });
-    return {
-      email: emailVerification.email,
-      session: sessionId,
-      username: action.username
-    };
+  const authMethod = await DB.Model.AuthenticationMethod.findOne({
+    where: {
+      id: action.id,
+      verificationKey: action.code,
+      owner: action.user,
+    }
+  });
+  if (!authMethod) {
+    throw 'Could not be verified';
   }
-  if (
-    userData.phoneVerification &&
-    "" + userData.phoneVerification.code === action.code
-  ) {
-    throw "Phone verification is not supported yet!";
+  if (authMethod.verificationExpiration) {
+    console.log('yo!', authMethod.verificationExpiration, typeof authMethod.verificationExpiration);
+    const daye = new Date(authMethod.verificationExpiration);
+    // todo check time to verify late verification
   }
+  await authMethod.update({
+    verificationExpiration: null,
+    verificationKey: null,
+  });
+  return {
+    good: 'news, everyone!'
+  };
   throw "Verification code does not match!";
 }

@@ -1,9 +1,9 @@
-import DatabaseService from "./DatabaseService";
+import DB from "./DB";
 import Utilities from "./Utilities";
 import { getAuth } from "./AuthUtilities";
 
 export default async function GetProfileAction(action) {
-  const userData = await DatabaseService.getDoc(action.user);
+  const userData = await DB.getDoc(action.user);
   if (!userData) {
     throw "Not found!";
   }

@@ -1,4 +1,4 @@
-import DatabaseService from "./DatabaseService";
+import DB from "./DB";
 import SocketConnection from "./SocketConnection";
 import { getAuth } from "./AuthUtilities";
 import Utilities from "./Utilities";
@@ -8,7 +8,7 @@ export default async function SetProjectAction(action) {
   if (!auth) {
     throw "User is not authenticated";
   }
-  const userDoc = await DatabaseService.getDoc(action.viewerUser);
+  const userDoc = await DB.getDoc(action.viewerUser);
   const projects = userDoc.projects || {};
   if (!projects[action.projectName]) {
     throw "Project with this name does not exist!";
@@ -24,7 +24,7 @@ export default async function SetProjectAction(action) {
   if (action.isPublic != null) {
     newProject.isPublic = action.isPublic;
   }
-  await DatabaseService.writeDoc(action.viewerUser, {
+  await DB.writeDoc(action.viewerUser, {
     ...userDoc,
     projects: {
       ...projects,
