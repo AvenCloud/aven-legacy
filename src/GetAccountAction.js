@@ -1,7 +1,11 @@
 import DB from "./DB";
 import Utilities from "./Utilities";
+import {
+  verifyIdentity
+} from './AuthUtilities';
 
-export default async function GetAccountAction(action) {
+export default async function GetAccountAction(unverifiedAction) {
+  let action = await verifyIdentity(unverifiedAction);
   const user = await DB.Model.User.findOne({
     where: {
       id: action.user
@@ -13,6 +17,7 @@ export default async function GetAccountAction(action) {
   // something about listing records..
   return {
     id: user.id,
+    isItYou: action.user === action.verifiedUser,
     displayName: user.displayName,
   };
 }

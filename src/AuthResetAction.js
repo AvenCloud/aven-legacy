@@ -1,13 +1,16 @@
 import DB from "./DB";
-import { sendSMS } from "./PhoneService";
-import { sendEmail } from "./EmailService";
+import {
+  sendSMS
+} from "./PhoneService";
+import {
+  sendEmail
+} from "./EmailService";
 import Utilities from "./Utilities";
 
 const validator = require("validator");
 
 export default async function AuthResetAction(action, dispatch) {
-  const userData = await DB.getDoc(action.username_email_or_phone);
-
+  // todo..... this whole action
   if (userData && userData.verifiedEmail) {
     const name = action.username_email_or_phone;
     const resetCode = await Utilities.genAuthCode();
@@ -21,6 +24,7 @@ export default async function AuthResetAction(action, dispatch) {
   https://aven.io/auth/verify_reset?username=${name}&code=${resetCode}
         `
     );
+    // todoo... modify AuthenticationMethod with reset info
   } else if (userData && userData.verifiedPhone) {
     // reset with phone info
     throw "coming soon";

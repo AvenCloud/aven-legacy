@@ -12,7 +12,12 @@ const {
 require("babel-core/register");
 require("babel-polyfill");
 
-async function init({ server, username, password, projectId }) {
+async function init({
+  server,
+  username,
+  password,
+  projectId
+}) {
   const projectUser = projectId.split("/")[0];
   const projectName = projectId.split("/")[1];
   const destFolder = join(process.cwd(), projectName);
@@ -22,8 +27,7 @@ async function init({ server, username, password, projectId }) {
   const auth = {
     server
   };
-  const loginResult = await dispatch(
-    {
+  const loginResult = await dispatch({
       type: "AuthLoginAction",
       username,
       password
@@ -37,9 +41,8 @@ async function init({ server, username, password, projectId }) {
   auth.session = loginResult.session;
   auth.projectUser = projectUser;
   auth.projectName = projectName;
-  const project = await dispatch(
-    {
-      type: "GetProjectAction",
+  const project = await dispatch({
+      type: "GetRecordAction",
       user: projectUser,
       project: projectName
     },
@@ -95,7 +98,7 @@ commander
     "INSECURE! FOR TESTING ONLY: provide your password in PLAINTEXT to log in",
     a => a
   )
-  .action(function(projectId) {
+  .action(function (projectId) {
     const initData = {
       projectId,
       server: commander.server,
@@ -113,8 +116,7 @@ commander
         });
       return;
     }
-    prompt.get(
-      {
+    prompt.get({
         properties: {
           username: {
             description: "Registered Aven Username",

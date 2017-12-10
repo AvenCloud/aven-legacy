@@ -168,6 +168,7 @@ async function init() {
       primaryKey: true
     },
     doc: {
+      allowNull: true,
       type: Sequelize.STRING,
       references: {
         model: Model.Doc,

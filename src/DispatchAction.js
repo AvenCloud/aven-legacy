@@ -3,15 +3,14 @@ import AuthRegisterAction from "./AuthRegisterAction";
 import AuthResetAction from "./AuthResetAction";
 import AuthVerifyAction from "./AuthVerifyAction";
 import AuthLoginAction from "./AuthLoginAction";
-import CreateProjectAction from "./CreateProjectAction";
+import CreateRecordAction from "./CreateRecordAction";
 import GetProfileAction from "./GetProfileAction";
-import GetProjectAction from "./GetProjectAction";
+import GetRecordAction from "./GetRecordAction";
 import GetDocAction from "./GetDocAction";
 import GetAccountAction from "./GetAccountAction";
 import PluralAction from "./PluralAction";
 import CreateDocAction from "./CreateDocAction";
-import LogProjectAction from "./LogProjectAction";
-import SetProjectAction from "./SetProjectAction";
+import SetRecordAction from "./SetRecordAction";
 
 const Actions = {
   PluralAction,
@@ -19,16 +18,15 @@ const Actions = {
   AuthVerifyAction,
   AuthLoginAction,
   GetAccountAction,
+  CreateRecordAction,
+  AuthLogoutAction,
+  SetRecordAction,
+  GetDocAction,
+  GetRecordAction,
 
   CreateDocAction,
   GetProfileAction,
-  GetProjectAction,
-  GetDocAction,
-  CreateProjectAction,
   AuthResetAction,
-  AuthLogoutAction,
-  LogProjectAction,
-  SetProjectAction
 };
 
 async function Dispatcher(action) {

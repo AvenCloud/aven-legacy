@@ -11,7 +11,10 @@ class Store {
   _publishedDocuments = [];
   _optimisticProjectRoots = {};
 
-  init = ({ localStorage, platformDeps }) => {
+  init = ({
+    localStorage,
+    platformDeps
+  }) => {
     this._localStorage = localStorage;
     this.attachWebsocket();
     this._platformDeps = platformDeps;
@@ -58,13 +61,16 @@ class Store {
     }, 10000);
   };
 
-  attachWebsocket = async () => {
+  attachWebsocket = async() => {
     await this.detachWebsocket();
     const session = await this.getLocal("Session");
     if (!session) {
       return;
     }
-    const { isSecure, host } = session;
+    const {
+      isSecure,
+      host
+    } = session;
     const protocolAndHost = `ws${isSecure ? "s" : ""}://${host}`;
     console.log("Connecting to ", protocolAndHost, session);
     this._ws = new WebSocket(protocolAndHost);
@@ -74,7 +80,7 @@ class Store {
     this._ws.onmessage = this._onWebsocketMessage;
   };
 
-  detachWebsocket = async () => {
+  detachWebsocket = async() => {
     if (this._ws) {
       this._ws.close();
     }
@@ -103,7 +109,9 @@ class Store {
 
   async writeProjectFile(data, projectId, path) {
     const project = await this.getProject(projectId);
-    const { docId } = await this.writeDocument(data, projectId);
+    const {
+      docId
+    } = await this.writeDocument(data, projectId);
     const newRootDoc = await this.writeInFolder(
       projectId,
       project.rootDoc,
@@ -115,10 +123,13 @@ class Store {
 
   async writeInFolder(projectId, lastId, path, newFileValue) {
     const lastFolder = lastId && (await this.getDocument(projectId, lastId));
-    const folder = lastFolder
-      ? { ...lastFolder }
-      : { type: "Folder", files: {} };
-    const files = folder.files ? { ...folder.files } : {};
+    const folder = lastFolder ? { ...lastFolder
+    } : {
+      type: "Folder",
+      files: {}
+    };
+    const files = folder.files ? { ...folder.files
+    } : {};
     if (path.length === 1) {
       const fileName = path[0];
       files[fileName] = {
@@ -141,7 +152,11 @@ class Store {
     } else {
       return null;
     }
-    const { docId } = await this.writeDocument({ ...folder, files }, projectId);
+    const {
+      docId
+    } = await this.writeDocument({ ...folder,
+      files
+    }, projectId);
     return docId;
   }
 
@@ -166,7 +181,7 @@ class Store {
     this._optimisticProjectRoots[projectId] = rootDoc;
     try {
       await this.dispatchRemote({
-        type: "SetProjectAction",
+        type: "SetRecordAction",
         rootDoc,
         projectName
       });
@@ -265,7 +280,7 @@ class Store {
         });
       case "Project":
         const projectData = await this._handleRemoteGet(localId, {
-          type: "GetProjectAction",
+          type: "GetRecordAction",
           user,
           project
         });
@@ -418,7 +433,10 @@ class Store {
   }
 
   async dispatchRemoteWithSession(action, session) {
-    const { isSecure, host } = session;
+    const {
+      isSecure,
+      host
+    } = session;
     const protocolAndHost = `http${isSecure ? "s" : ""}://${host}`;
     const res = await fetch(`${protocolAndHost}/api/dispatch`, {
       method: "post",
@@ -440,17 +458,14 @@ class Store {
   }
 
   async login(data) {
-    const body = await this.dispatchRemoteWithSession(
-      {
-        type: "AuthLoginAction",
-        username: data.username,
-        password: data.password
-      },
-      {
-        host: data.host,
-        isSecure: data.isSecure
-      }
-    );
+    const body = await this.dispatchRemoteWithSession({
+      type: "AuthLoginAction",
+      username: data.username,
+      password: data.password
+    }, {
+      host: data.host,
+      isSecure: data.isSecure
+    });
     if (body && body.session) {
       await this.setLocal("Session", {
         session: body.session,

@@ -12,7 +12,7 @@ const fsReadFile = denodeify(fs.readFile);
 
 const join = require("path").join;
 
-const dispatch = async (action, auth) => {
+const dispatch = async(action, auth) => {
   const cookies = auth.username &&
     auth.session && {
       user: auth.username,
@@ -21,8 +21,8 @@ const dispatch = async (action, auth) => {
   const cookieHeader =
     cookies &&
     Object.keys(cookies)
-      .map(c => cookie.serialize(c, cookies[c]))
-      .join("; ");
+    .map(c => cookie.serialize(c, cookies[c]))
+    .join("; ");
 
   const result = await fetch(auth.server + "/api/dispatch", {
     method: "POST",
@@ -50,7 +50,7 @@ const dispatch = async (action, auth) => {
   }
 };
 
-const downloadFile = async (auth, projectUser, projectName, id, destPath) => {
+const downloadFile = async(auth, projectUser, projectName, id, destPath) => {
   console.log(`Downloading ${id} to ${destPath}`);
   let stat = null;
   if (await fsExists(destPath)) {
@@ -58,8 +58,7 @@ const downloadFile = async (auth, projectUser, projectName, id, destPath) => {
   }
   let doc = null;
   try {
-    doc = await dispatch(
-      {
+    doc = await dispatch({
         type: "GetDocAction",
         user: projectUser,
         project: projectName,
@@ -96,10 +95,9 @@ const downloadFile = async (auth, projectUser, projectName, id, destPath) => {
   await fsWriteFile(destPath, doc);
 };
 
-const download = async (auth, path) => {
-  const project = await dispatch(
-    {
-      type: "GetProjectAction",
+const download = async(auth, path) => {
+  const project = await dispatch({
+      type: "GetRecordAction",
       user: auth.projectUser,
       project: auth.projectName
     },
@@ -125,10 +123,11 @@ const presetStage0 = require("babel-preset-stage-0");
 const presetReact = require("babel-preset-react");
 
 async function putFileObject(auth, path) {
-  let fileData = await fsReadFile(path, { encoding: "utf8" }); // uh no bin support yet
+  let fileData = await fsReadFile(path, {
+    encoding: "utf8"
+  }); // uh no bin support yet
 
-  const uploadResult = await dispatch(
-    {
+  const uploadResult = await dispatch({
       type: "CreateDocAction",
       project: auth.projectName,
       user: auth.projectUser,
@@ -140,13 +139,18 @@ async function putFileObject(auth, path) {
 }
 
 async function putJSModule(auth, sourcePath) {
-  const source = await fsReadFile(sourcePath, { encoding: "utf8" });
+  const source = await fsReadFile(sourcePath, {
+    encoding: "utf8"
+  });
   let dependencies = null;
   const parsedBabel = babel.transform(source, {
     sourceMaps: true,
     presets: [presetEs2015, presetStage0, presetReact],
     plugins: [
-      ({ parse, traverse }) => ({
+      ({
+        parse,
+        traverse
+      }) => ({
         visitor: {
           ArrowFunctionExpression(path) {
             if (!dependencies) {
@@ -167,8 +171,7 @@ async function putJSModule(auth, sourcePath) {
     map: parsedBabel.map,
     source
   });
-  const uploadResult = await dispatch(
-    {
+  const uploadResult = await dispatch({
       type: "CreateDocAction",
       project: auth.projectName,
       user: auth.projectUser,
@@ -196,7 +199,7 @@ async function putFolderObject(auth, path) {
   );
   const files = {};
   await Promise.all(
-    uploadableFiles.map(async (fileName, index) => {
+    uploadableFiles.map(async(fileName, index) => {
       files[fileName] = {
         name: fileName,
         value: allIDs[index]
@@ -212,8 +215,7 @@ async function putFolderObject(auth, path) {
       }
     })
   );
-  const uploadResult = await dispatch(
-    {
+  const uploadResult = await dispatch({
       type: "CreateDocAction",
       project: auth.projectName,
       user: auth.projectUser,
@@ -232,9 +234,8 @@ async function upload(auth, path) {
     throw "Cannot upload a project that is not yours";
   }
   const rootDoc = await putFolderObject(auth, path);
-  const uploadResult = await dispatch(
-    {
-      type: "SetProjectAction",
+  const uploadResult = await dispatch({
+      type: "SetRecordAction",
       projectName: auth.projectName,
       rootDoc
     },

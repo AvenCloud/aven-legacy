@@ -35,6 +35,6 @@ export default async function AuthLoginAction(action) {
   return {
     username: action.username,
     session: sessionId + '-' + sessionSecret,
-    logoutToken,
+    logoutToken: sessionId + '-' + sessionSecret,
   };
 }

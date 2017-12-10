@@ -3,21 +3,19 @@ import Utilities from "./Utilities";
 import DispatchAction from "./DispatchAction";
 
 export default async function AuthLogoutAction(action) {
-  if (!action.viewerUser || !action.viewerSession) {
-    throw "Invalid session";
-  }
-  const userData = await DB.getDoc(action.viewerUser);
-  if (!userData) {
-    throw "Invalid User";
-  }
-  if (!userData.password) {
-    throw "User is not set up yet";
-  }
-  await DB.writeDoc(action.viewerUser, {
-    ...userData,
-    sessions: userData.sessions.filter(s => s !== action.viewerSession)
+  const sessionID = action.session.split('-')[0];
+  const token = action.session.split('-')[1];
+  const session = await DB.Model.UserSession.findOne({
+    where: {
+      id: sessionID
+    }
   });
-  return {
-    username: action.viewerUser
-  };
+  if (await Utilities.compareHash(token, session.secret)) {
+    await session.destroy();
+  } else if (await Utilities.compareHash(token, session.logoutToken)) {
+    await session.destroy();
+  } else {
+    throw 'Invalid session secret or logout token!'
+  }
+  return {};
 }

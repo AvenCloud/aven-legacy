@@ -5,11 +5,14 @@ const CreateFormPage = CreateSmallFormPage({
   submitButtonLabel: "Create",
   title: "Create",
   heading: "New Project",
-  successNavigationAction: ({ input, auth, result }) => ({
+  successNavigationAction: ({
+    input,
+    auth,
+    result
+  }) => ({
     uri: "/" + auth.user + "/" + result.projectName
   }),
-  inputs: [
-    {
+  inputs: [{
       type: "text",
       name: "projectName",
       placeholder: "Project Name"
@@ -21,7 +24,10 @@ const CreateFormPage = CreateSmallFormPage({
       default: false
     }
   ],
-  getActionForInput: state => ({ type: "CreateProjectAction", ...state }),
+  getActionForInput: state => ({
+    type: "CreateRecordAction",
+    ...state
+  }),
   validate: state => {
     if (!state.projectName) {
       return "Must provide a project name";

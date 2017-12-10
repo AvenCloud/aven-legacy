@@ -1,7 +1,8 @@
-import DB from "./DB";
+import DB
+from "./DB";
 import Utilities from "./Utilities";
 
-export default async function GetProjectAction(action) {
+export default async function GetRecordAction(action) {
   const profile = await DB.getDoc(action.user);
   if (!profile || !profile.projects) {
     throw "Not found!";

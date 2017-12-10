@@ -9,9 +9,6 @@ const path = require("path");
 const WSServer = require("ws").Server;
 const cookieParser = require("cookie-parser");
 
-import {
-  getAuth
-} from "./AuthUtilities";
 import SocketConnection from "./SocketConnection";
 import Configuration from "./Configuration";
 import DB from "./DB";
