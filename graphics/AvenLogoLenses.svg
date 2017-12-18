@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="4520px" height="1000px" viewBox="0 0 4520 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 42 (36781) - http://www.bohemiancoding.com/sketch -->
-    <title>AvenLogoPlain</title>
+    <title>AvenLogoLenses</title>
     <desc>Created with Sketch.</desc>
-    <defs>
-        <linearGradient x1="50%" y1="3.2425861%" x2="50%" y2="100%" id="linearGradient-1">
-            <stop stop-color="#555555" offset="0%"></stop>
-            <stop stop-color="#444444" offset="100%"></stop>
-        </linearGradient>
-    </defs>
+    <defs></defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="AvenLogoPlain" fill="url(#linearGradient-1)">
+        <g id="AvenLogoLenses" fill="#FFFFFF">
             <polygon id="Combined-Shape-path" points="3520 0 3220 0 3120 200 2730 200 2630 400 3020 400 2920.23901 599.998905 2530 600 2430 800 2820 800 2720 1000 3020 1000"></polygon>
             <polygon id="Combined-Shape-path" points="2180 0 1680 1000 1980 1000 2480 0"></polygon>
             <polygon id="Combined-Shape-path" points="1000 0 700 0 1200 1000 1500 1000"></polygon>
@@ -19,7 +14,7 @@
             <polygon id="Combined-Shape-path" points="3620 500 3420 900 3820 900"></polygon>
             <polygon id="Combined-Shape-path" points="600 500 400 900 800 900"></polygon>
             <polygon id="Combined-Shape-path" points="0.0703574471 0 0.0703574471 1000 500.070357 0"></polygon>
-            <polygon id="Combined-Shape-path" transform="translate(4270.000000, 500.000000) scale(-1, -1) translate(-4270.000000, -500.000000) " points="4020 6.82121026e-13 4020 1000 4520 6.95998814e-13"></polygon>
+            <polygon id="Combined-Shape-path" transform="translate(4270.000000, 500.000000) scale(-1, -1) translate(-4270.000000, -500.000000) " points="4020 9.09494702e-13 4020 1000 4520 9.2337249e-13"></polygon>
         </g>
     </g>
 </svg>
