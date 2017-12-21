@@ -19,7 +19,6 @@
     "node-fetch": "^1.7.3"
   },
   "dependencies": {
-    "babel": "^6.23.0",
     "bcrypt-nodejs": "^0.0.3",
     "bluebird": "^3.5.1",
     "express": "^4.16.2",
