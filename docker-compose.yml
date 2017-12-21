@@ -1,25 +1,12 @@
 version: '2'
 services:
-  db:
-    image: "postgres:10.0"
-    ports:
-     - "5432:5432"
+  postgres:
+    image: postgres
     environment:
-     POSTGRES_PASSWORD: aven-pass
-     POSTGRES_USER: aven
+      POSTGRES_PASSWORD: aven-test-password
+    ports:
+      - 5432:5432
   redis:
-    image: "redis"
-  web:
-    build: .
+    image: redis
     ports:
-     - "5000:5000"
-    volumes:
-     - .:/usr/src/app
-    environment:
-     DATABASE_URL: postgres://aven:aven-pass@db:5432/aven
-     REDIS_URL: "//redis:6379"
-     POSTGRES_DANGER_DISABLE_SSL: "true"
-    links:
-      - db
-      - redis
-    command: ["yarn", "run-test-env"]
+      - 6379:6379

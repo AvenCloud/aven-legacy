@@ -1,8 +1,0 @@
-{
-  "uid": "main",
-  "append": true,
-  "script": "src/AppServer.js",
-  "watch": true,
-  "watchDirectory": "src",
-  "sourceDir": "."
-}

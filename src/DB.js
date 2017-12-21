@@ -1,41 +1,17 @@
-const pg = require("pg");
-
-const url = require("url");
-const denodeify = require("denodeify");
 const Sequelize = require("sequelize");
-import Configuration from "./Configuration";
 
-let sequelize = null;
+function createModel(infra) {
+  const { sequelize } = infra;
+  const model = {};
 
-const params = url.parse(Configuration.DATABASE_URL);
-const auth = params.auth.split(":");
-const database = params.pathname.split("/")[1];
-
-const shouldUseSSL = Configuration.POSTGRES_DANGER_DISABLE_SSL ? false : true;
-
-const Model = {};
-
-async function init() {
-  sequelize = new Sequelize(
-    database,
-    auth[0],
-    auth[1], {
-      dialect: "postgres",
-      host: params.hostname,
-      port: params.port,
-      dialectOptions: {
-        ssl: shouldUseSSL
-      }
-    }
-  );
-  Model.User = sequelize.define("user", {
+  model.user = sequelize.define("User", {
     id: {
       type: Sequelize.STRING,
-      primaryKey: true,
+      primaryKey: true
     },
     displayName: {
       type: Sequelize.STRING,
-      allowNull: false,
+      allowNull: false
     },
     password: {
       // checksum
@@ -43,44 +19,47 @@ async function init() {
       type: Sequelize.STRING
     }
   });
-  Model.AuthenticationMethod = sequelize.define('authenticationmethod', {
+
+  model.authMethod = sequelize.define("AuthMethod", {
     id: {
       type: Sequelize.STRING,
       primaryKey: true
     },
     type: {
-      type: Sequelize.ENUM('PHONE', 'EMAIL'),
-      allowNull: false,
+      type: Sequelize.ENUM("PHONE", "EMAIL"),
+      allowNull: false
     },
     owner: {
       allowNull: false,
       type: Sequelize.STRING,
       references: {
-        model: Model.User,
-        key: 'id'
+        model: model.user,
+        key: "id"
       }
     },
     primaryOwner: {
       unique: true,
       type: Sequelize.STRING,
       references: {
-        model: Model.User,
-        key: 'id'
+        model: model.user,
+        key: "id"
       }
     },
-    verificationKey: { // verification is incomplete unless this is empty!
-      type: Sequelize.STRING,
+    verificationKey: {
+      // verification is incomplete unless this is empty!
+      type: Sequelize.STRING
     },
     verificationExpiration: {
-      type: Sequelize.TIME,
+      type: Sequelize.TIME
     }
   });
-  Model.UserToken = sequelize.define("usertoken", {
+
+  model.userToken = sequelize.define("UserToken", {
     user: {
       type: Sequelize.STRING,
       allowNull: false,
       references: {
-        model: Model.User,
+        model: model.user,
         key: "id"
       }
     },
@@ -92,17 +71,18 @@ async function init() {
       type: Sequelize.ENUM("WRITE", "READ", "NONE")
     }
   });
-  Model.UserSession = sequelize.define("usersession", {
+
+  model.userSession = sequelize.define("UserSession", {
     id: {
       type: Sequelize.STRING,
       allowNull: false,
-      primaryKey: true,
+      primaryKey: true
     },
     user: {
       allowNull: false,
       type: Sequelize.STRING,
       references: {
-        model: Model.User,
+        model: model.user,
         key: "id"
       }
     },
@@ -124,44 +104,51 @@ async function init() {
       allowNull: false,
       type: Sequelize.STRING,
       references: {
-        model: Model.AuthenticationMethod,
-        key: 'id'
+        model: model.authenticationMethod,
+        key: "id"
       }
     }
-  });
-  Model.Doc = sequelize.define("doc", {
-    id: {
-      type: Sequelize.STRING(40),
-      allowNull: false,
-      primaryKey: true
-    },
-    value: {
-      allowNull: false,
-      type: Sequelize.JSONB
-    },
-    associatedRecord: {
-      allowNull: false,
-      type: Sequelize.STRING,
-    },
-    size: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-    },
-    uploader: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      references: {
-        model: Model.User,
-        key: 'id'
-      }
-    }
-  }, {
-    indexes: [{
-      fields: ['associatedRecord'],
-    }]
   });
 
-  Model.Record = sequelize.define("record", {
+  model.doc = sequelize.define(
+    "Doc",
+    {
+      id: {
+        type: Sequelize.STRING(40),
+        allowNull: false,
+        primaryKey: true
+      },
+      value: {
+        allowNull: false,
+        type: Sequelize.JSONB
+      },
+      associatedRecord: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      size: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      uploader: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        references: {
+          model: model.user,
+          key: "id"
+        }
+      }
+    },
+    {
+      indexes: [
+        {
+          fields: ["associatedRecord"]
+        }
+      ]
+    }
+  );
+
+  model.record = sequelize.define("Record", {
     id: {
       allowNull: false,
       type: Sequelize.STRING,
@@ -171,7 +158,7 @@ async function init() {
       allowNull: true,
       type: Sequelize.STRING,
       references: {
-        model: Model.Doc,
+        model: model.doc,
         key: "id"
       }
     },
@@ -179,43 +166,45 @@ async function init() {
       allowNull: false,
       type: Sequelize.STRING,
       references: {
-        model: Model.User,
+        model: model.user,
         key: "id"
       }
     },
     permission: {
       allowNull: false,
-      type: Sequelize.ENUM('PUBLIC', 'PRIVATE'),
+      type: Sequelize.ENUM("PUBLIC", "PRIVATE")
     }
   });
-  Model.RecordPermission = sequelize.define('recordpermission', {
+
+  model.recordPermission = sequelize.define("RecordPermission", {
     record: {
       allowNull: false,
       type: Sequelize.STRING,
       references: {
-        model: Model.Record,
-        key: 'id'
+        model: model.record,
+        key: "id"
       }
     },
     user: {
       allowNull: false,
       type: Sequelize.STRING,
       references: {
-        model: Model.User,
-        key: 'id'
+        model: model.user,
+        key: "id"
       }
     },
     permission: {
       allowNull: false,
-      type: Sequelize.ENUM('ADMIN', 'WRITE', 'READ', 'DENY'),
+      type: Sequelize.ENUM("ADMIN", "WRITE", "READ", "DENY")
     }
   });
-  Model.RecordToken = sequelize.define("recordtoken", {
+
+  model.recordToken = sequelize.define("RecordToken", {
     record: {
       allowNull: false,
       type: Sequelize.STRING,
       references: {
-        model: Model.Record,
+        model: model.record,
         key: "id"
       }
     },
@@ -234,43 +223,9 @@ async function init() {
     }
   });
 
-  await sequelize.authenticate();
-  console.log("Sequelize has been established successfully.");
-
-
-
-  // uncomment to DROP ALL TABLES AND RE_CREATE THEM!!! TODO: use migrations
-  // let sequence = null;
-  // Object.keys(Model).forEach(modelName => {
-  //   const doSync = () => {
-  //     console.log('Syncing ' + modelName);
-  //     return Model[modelName].sync({
-  //       force: true
-  //     });
-  //   }
-  //   sequence = sequence ? sequence.then(doSync) : doSync();
-  // });
-  // await sequence;
-
-
-
-  // await Model.User.create({
-  //   id: "evv",
-  //   password: 'foo',
-  //   email: 'eric@aven.io',
-  //   displayName: "Eric Vicenti"
-  // });
-  // const doc = await Model.User.findOne({
-  //   where: {
-  //     id: "evv"
-  //   }
-  // });
-  // console.log("ok!!", doc.email);
+  return model;
 }
 
-const DB = {
-  Model,
-  init
+module.exports = {
+  create: createModel
 };
-
-export default DB;

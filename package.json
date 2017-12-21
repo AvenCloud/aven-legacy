@@ -2,71 +2,41 @@
   "name": "aven",
   "version": "0.0.0",
   "scripts": {
-    "start": "NODE_ENV=development forever -c 'node -r babel-register' ./forever-config.json",
-    "run-prod": "NODE_ENV=production node lib/AppServer.js",
-    "run-test-env": "NODE_ENV=test node lib/AppServer.js",
-    "build-web-main": "node node_modules/babel-cli/bin/babel.js src/ --out-dir lib/",
-    "build-web-common": "rm lib/common.js && mkdir -p lib/common && cp -rf mobile/common .build-common && node_modules/babel-cli/bin/babel.js .build-common/ --out-dir lib/common/ && rm -rf .build-common",
-    "build-web-static": "rm -rf lib/static && cp -r src/static lib/static",
-    "build-web": "npm run build-web-main && npm run build-web-common && npm run build-web-static",
-    "build-client": "node node_modules/browserify/bin/cmd.js lib/ProjectIndex.js -o lib/static/ProjectIndex.js",
-    "build": "npm run build-web && npm run build-client",
-    "upload-secrets": "node lib/upload_secrets.js",
-    "postinstall": "npm run build",
-    "prepublish": "npm run build",
-    "test": "jest"
-  },
-  "jest": {
-    "transform": {},
-    "rootDir": "src"
-  },
-  "bin": {
-    "aven": "./lib/CLI.js"
-  },
-  "files": [
-    "lib"
-  ],
-  "dependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-core": "^6.24.1",
-    "babel-polyfill": "^6.23.0",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-react": "^6.24.1",
-    "babel-preset-react-native": "^1.9.2",
-    "babel-preset-stage-0": "^6.24.1",
-    "bcrypt-nodejs": "^0.0.3",
-    "body-parser": "^1.17.2",
-    "browserify": "^14.4.0",
-    "bufferutil": "3.0.1",
-    "commander": "^2.11.0",
-    "cookie": "^0.3.1",
-    "cookie-parser": "^1.4.3",
-    "crypto-js": "^3.1.9-1",
-    "denodeify": "^1.2.1",
-    "dotenv": "^4.0.0",
-    "express": "^4.15.3",
-    "file-type": "^7.2.0",
-    "forever": "^0.15.3",
-    "js-cookie": "^2.2.0",
-    "moment": "^2.19.3",
-    "multer": "^1.3.0",
-    "node-fetch": "^1.7.0",
-    "pg": "^6.2.3",
-    "pg-hstore": "^2.3.2",
-    "prompt": "^1.0.0",
-    "prop-types": "^15.5.10",
-    "react": "^15.5.4",
-    "react-dom": "^15.5.4",
-    "redis": "^2.8.0",
-    "sequelize": "^4.24.0",
-    "utf-8-validate": "3.0.2",
-    "validator": "^7.0.0",
-    "watchr": "^3.0.1",
-    "ws": "^3.2.0"
+    "start": "NODE_ENV=production scripts/start.sh",
+    "test": "NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/test.sh",
+    "test-debug": "NODE_ARGS='--inspect-brk' yarn test",
+    "dev": "NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/dev.sh",
+    "build": "scripts/build.sh",
+    "postinstall": "yarn build"
   },
   "devDependencies": {
-    "babel-jest": "^20.0.3",
-    "jest": "^20.0.4",
-    "regenerator-runtime": "^0.10.5"
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-watch": "^2.0.7",
+    "jest": "^21.2.1",
+    "node-fetch": "^1.7.3"
+  },
+  "dependencies": {
+    "bcrypt-nodejs": "^0.0.3",
+    "bluebird": "^3.5.1",
+    "express": "^4.16.2",
+    "fqdn": "0.0.3",
+    "global": "^4.3.2",
+    "node-dev": "^3.1.3",
+    "npx": "^9.7.1",
+    "pg": "^7.4.0",
+    "pg-hstore": "^2.3.2",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "redis": "^2.8.0",
+    "sequelize": "^4.27.0",
+    "sequelize-cli": "^3.2.0",
+    "supertest": "^3.0.0",
+    "validator": "^9.2.0"
+  },
+  "engines": {
+    "node": "8.x.x"
   }
 }

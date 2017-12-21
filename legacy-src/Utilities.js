@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const bcrypt = require("bcrypt-nodejs");
-const {promisify} = require("bluebird");
-const randomBytes = promisify(crypto.randomBytes);
+const denodeify = require("denodeify");
+const randomBytes = denodeify(crypto.randomBytes);
 
 function digest(input) {
   const shasum = crypto.createHash("sha1");
@@ -51,8 +51,7 @@ async function compareHash(input, hash) {
     });
   });
 }
-
-module.exports = {
+export default {
   genSessionId,
   digest,
   genHash,
