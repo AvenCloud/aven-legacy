@@ -1,58 +1,58 @@
-const Sequelize = require("sequelize");
+const Sequelize = require("sequelize")
 
 function createModel(infra) {
-  const { sequelize } = infra;
-  const model = {};
+  const { sequelize } = infra
+  const model = {}
 
   model.user = sequelize.define("User", {
     id: {
       type: Sequelize.STRING,
-      primaryKey: true
+      primaryKey: true,
     },
     displayName: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
     password: {
       // checksum
       allowNull: false,
-      type: Sequelize.STRING
-    }
-  });
+      type: Sequelize.STRING,
+    },
+  })
 
   model.authMethod = sequelize.define("AuthMethod", {
     id: {
       type: Sequelize.STRING,
-      primaryKey: true
+      primaryKey: true,
     },
     type: {
       type: Sequelize.ENUM("PHONE", "EMAIL"),
-      allowNull: false
+      allowNull: false,
     },
     owner: {
       allowNull: false,
       type: Sequelize.STRING,
       references: {
         model: model.user,
-        key: "id"
-      }
+        key: "id",
+      },
     },
     primaryOwner: {
       unique: true,
       type: Sequelize.STRING,
       references: {
         model: model.user,
-        key: "id"
-      }
+        key: "id",
+      },
     },
     verificationKey: {
       // verification is incomplete unless this is empty!
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     verificationExpiration: {
-      type: Sequelize.TIME
-    }
-  });
+      type: Sequelize.TIME,
+    },
+  })
 
   model.userToken = sequelize.define("UserToken", {
     user: {
@@ -60,55 +60,55 @@ function createModel(infra) {
       allowNull: false,
       references: {
         model: model.user,
-        key: "id"
-      }
+        key: "id",
+      },
     },
     expiryTime: {
-      type: Sequelize.TIME
+      type: Sequelize.TIME,
     },
     permission: {
       allowNull: false,
-      type: Sequelize.ENUM("WRITE", "READ", "NONE")
-    }
-  });
+      type: Sequelize.ENUM("WRITE", "READ", "NONE"),
+    },
+  })
 
   model.userSession = sequelize.define("UserSession", {
     id: {
       type: Sequelize.STRING,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
     },
     user: {
       allowNull: false,
       type: Sequelize.STRING,
       references: {
         model: model.user,
-        key: "id"
-      }
+        key: "id",
+      },
     },
     secret: {
       // checksum
       allowNull: false,
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     logoutToken: {
       // checksum
       allowNull: false,
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     ip: {
       allowNull: false,
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     authMethod: {
       allowNull: false,
       type: Sequelize.STRING,
       references: {
         model: model.authenticationMethod,
-        key: "id"
-      }
-    }
-  });
+        key: "id",
+      },
+    },
+  })
 
   model.doc = sequelize.define(
     "Doc",
@@ -116,65 +116,65 @@ function createModel(infra) {
       id: {
         type: Sequelize.STRING(40),
         allowNull: false,
-        primaryKey: true
+        primaryKey: true,
       },
       value: {
         allowNull: false,
-        type: Sequelize.JSONB
+        type: Sequelize.JSONB,
       },
       associatedRecord: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       size: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
       },
       uploader: {
         type: Sequelize.STRING,
         allowNull: false,
         references: {
           model: model.user,
-          key: "id"
-        }
-      }
+          key: "id",
+        },
+      },
     },
     {
       indexes: [
         {
-          fields: ["associatedRecord"]
-        }
-      ]
-    }
-  );
+          fields: ["associatedRecord"],
+        },
+      ],
+    },
+  )
 
   model.record = sequelize.define("Record", {
     id: {
       allowNull: false,
       type: Sequelize.STRING,
-      primaryKey: true
+      primaryKey: true,
     },
     doc: {
       allowNull: true,
       type: Sequelize.STRING,
       references: {
         model: model.doc,
-        key: "id"
-      }
+        key: "id",
+      },
     },
     owner: {
       allowNull: false,
       type: Sequelize.STRING,
       references: {
         model: model.user,
-        key: "id"
-      }
+        key: "id",
+      },
     },
     permission: {
       allowNull: false,
-      type: Sequelize.ENUM("PUBLIC", "PRIVATE")
-    }
-  });
+      type: Sequelize.ENUM("PUBLIC", "PRIVATE"),
+    },
+  })
 
   model.recordPermission = sequelize.define("RecordPermission", {
     record: {
@@ -182,22 +182,22 @@ function createModel(infra) {
       type: Sequelize.STRING,
       references: {
         model: model.record,
-        key: "id"
-      }
+        key: "id",
+      },
     },
     user: {
       allowNull: false,
       type: Sequelize.STRING,
       references: {
         model: model.user,
-        key: "id"
-      }
+        key: "id",
+      },
     },
     permission: {
       allowNull: false,
-      type: Sequelize.ENUM("ADMIN", "WRITE", "READ", "DENY")
-    }
-  });
+      type: Sequelize.ENUM("ADMIN", "WRITE", "READ", "DENY"),
+    },
+  })
 
   model.recordToken = sequelize.define("RecordToken", {
     record: {
@@ -205,27 +205,27 @@ function createModel(infra) {
       type: Sequelize.STRING,
       references: {
         model: model.record,
-        key: "id"
-      }
+        key: "id",
+      },
     },
     secret: {
       // checksum
       allowNull: false,
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     expiryTime: {
       allowNull: false,
-      type: Sequelize.TIME
+      type: Sequelize.TIME,
     },
     permission: {
       allowNull: false,
-      type: Sequelize.ENUM("WRITE", "READ", "NONE")
-    }
-  });
+      type: Sequelize.ENUM("WRITE", "READ", "NONE"),
+    },
+  })
 
-  return model;
+  return model
 }
 
 module.exports = {
-  create: createModel
-};
+  create: createModel,
+}

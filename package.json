@@ -3,10 +3,13 @@
   "version": "0.0.0",
   "scripts": {
     "start": "NODE_ENV=production scripts/start.sh",
-    "test": "NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/test.sh",
+    "test":
+      "NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/test.sh",
     "test-debug": "NODE_ARGS='--inspect-brk' yarn test",
-    "dev": "NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/dev.sh",
+    "dev":
+      "NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/dev.sh",
     "build": "scripts/build.sh",
+    "check-prettier": "node tests/PrettierCheck.js",
     "postinstall": "yarn build"
   },
   "devDependencies": {
@@ -16,7 +19,8 @@
     "babel-preset-react": "^6.24.1",
     "babel-watch": "^2.0.7",
     "jest": "^21.2.1",
-    "node-fetch": "^1.7.3"
+    "node-fetch": "^1.7.3",
+    "prettier": "^1.9.2"
   },
   "dependencies": {
     "bcrypt-nodejs": "^0.0.3",

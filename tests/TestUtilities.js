@@ -1,10 +1,4 @@
-
-
-module.exports = dispatch => {
-	registerAndAuthenticateTestUser: async () {
-
-	},
-	registerAndLoginTestUser: async () {
-
-	},
-}
+module.exports = dispatch => ({
+  registerAndAuthenticateTestUser: async () => {},
+  registerAndLoginTestUser: async () => {},
+})

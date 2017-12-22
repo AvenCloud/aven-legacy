@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 echo  "Initiate the test sequence!"
 echo  "---------------------------"
 
@@ -16,8 +18,11 @@ run_jest() {
   if [[ -n "$NODE_ARGS" ]]; then
     NODE_EXECUTABLE="$NODE_EXECUTABLE $NODE_ARGS"
   fi
-  $NODE_EXECUTABLE ./node_modules/.bin/jest --testPathIgnorePatterns=/dist "$@"
+  $NODE_EXECUTABLE ./node_modules/.bin/jest "$@" --runInBand --testPathIgnorePatterns=/dist
 }
+
+echo "Verifying code format"
+node tests/PrettierCheck.js
 
 echo  "Initializing Docker containers.."
 
