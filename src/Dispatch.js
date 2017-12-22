@@ -3,6 +3,8 @@ const Actions = {
   AuthVerifyAction: require("./actions/AuthVerifyAction"),
   AuthLoginAction: require("./actions/AuthLoginAction"),
   AuthLogoutAction: require("./actions/AuthLogoutAction"),
+  SetRecordAction: require("./actions/SetRecordAction"),
+  GetRecordAction: require("./actions/GetRecordAction"),
 }
 
 async function Dispatch(action, app) {

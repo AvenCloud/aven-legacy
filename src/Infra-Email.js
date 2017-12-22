@@ -1,4 +1,4 @@
-module.exports = async () => {
+async function Email() {
   const _testSentEmails = []
   return {
     type: "test",
@@ -8,3 +8,5 @@ module.exports = async () => {
     },
   }
 }
+
+module.exports = Email
