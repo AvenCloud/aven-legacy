@@ -1,6 +1,6 @@
-const { genAuthCode } = require("../Utilities");
+const { genAuthCode, genHash } = require("../Utilities");
 
-async function AuthRegisterAction(action, app, dispatch) {
+async function AuthRegisterAction(action, app) {
 	// this is where all the validation logic will go
 
 	const userID = action.id;
@@ -8,7 +8,7 @@ async function AuthRegisterAction(action, app, dispatch) {
 	try {
 		await app.model.user.create({
 			displayName: action.displayName,
-			password: action.password,
+			password: await genHash(action.password),
 			id: userID
 		});
 	} catch (e) {

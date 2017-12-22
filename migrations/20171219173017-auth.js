@@ -65,14 +65,14 @@ module.exports = {
         updatedAt: {
           type: Sequelize.DATE
         }
-      })
+      }),  
     ];
   },
 
   down: (queryInterface, Sequelize) => {
     return [
-      queryInterface.dropTable("AuthenticationMethods"),
-      queryInterface.dropTable("UserTokens")
+      queryInterface.dropTable("AuthMethods"),
+      queryInterface.dropTable("UserTokens"),
     ];
   }
 };

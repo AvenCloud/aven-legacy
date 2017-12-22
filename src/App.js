@@ -29,7 +29,7 @@ module.exports = async (infra) => {
       res.json(result);
     } catch (e) {
       // log errors in development and prod, but not tests because sometimes errors are expected
-      if (true||infra.env !== "testing") {
+      if (infra.env !== "testing") {
         console.error(e);
       }
       res.status(e.statusCode || 500).json(e);
