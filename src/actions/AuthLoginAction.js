@@ -1,14 +1,19 @@
+const { Op } = require("sequelize")
 const { genHash, genSessionId, compareHash } = require("../Utilities")
 
 async function AuthLoginAction(action, app) {
   const user = await app.model.user.findOne({
     where: {
-      id: action.user,
+      id: {
+        [Op.eq]: action.user,
+      },
     },
   })
   const authMethod = await app.model.authMethod.findOne({
     where: {
-      primaryOwner: action.user,
+      primaryOwner: {
+        [Op.eq]: action.user,
+      },
     },
   })
   if (!user || !authMethod) {

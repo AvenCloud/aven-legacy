@@ -1,3 +1,4 @@
+const { Op } = require("sequelize")
 const { compareHash } = require("../Utilities")
 
 async function AuthLogoutAction(action, app) {
@@ -5,7 +6,9 @@ async function AuthLogoutAction(action, app) {
   const token = action.session.split("-")[1]
   const session = await app.model.userSession.findOne({
     where: {
-      id: sessionID,
+      id: {
+        [Op.eq]: sessionID,
+      },
     },
   })
   if (await compareHash(token, session.secret)) {

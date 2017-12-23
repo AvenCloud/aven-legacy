@@ -1,3 +1,4 @@
+const { Op } = require("sequelize")
 const { compareHash } = require("../Utilities")
 
 async function GetAuth(action, app, record) {
@@ -15,7 +16,7 @@ async function GetAuth(action, app, record) {
   const sessionID = authSession.split("-")[0]
   const sessionToken = authSession.split("-")[1]
   const session = await app.model.userSession.findOne({
-    where: { id: sessionID },
+    where: { id: { [Op.eq]: sessionID } },
   })
   if (
     !await compareHash(sessionToken, session.secret) ||

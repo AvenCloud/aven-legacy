@@ -28,6 +28,7 @@ module.exports = async options => {
 
   const sequelize = new Sequelize(process.env.DATABASE_URL, {
     logging: false,
+    operatorsAliases: false,
   })
 
   const email = await Email()

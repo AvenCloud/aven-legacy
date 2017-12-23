@@ -1,3 +1,4 @@
+const { Op } = require("sequelize")
 const { genAuthCode, genHash } = require("../Utilities")
 
 async function AuthRegisterAction(action, app) {
@@ -43,7 +44,9 @@ async function AuthRegisterAction(action, app) {
     if (e.name === "SequelizeUniqueConstraintError") {
       await app.model.user.destroy({
         where: {
-          id: userID,
+          id: {
+            [Op.eq]: userID,
+          },
         },
       })
       throw {

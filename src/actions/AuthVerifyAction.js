@@ -1,9 +1,17 @@
+const { Op } = require("sequelize")
+
 async function AuthVerifyAction(action, app, dispatch) {
   const authMethod = await app.model.authMethod.findOne({
     where: {
-      id: action.id,
-      verificationKey: action.code,
-      owner: action.user,
+      id: {
+        [Op.eq]: action.id,
+      },
+      verificationKey: {
+        [Op.eq]: action.code,
+      },
+      owner: {
+        [Op.eq]: action.user,
+      },
     },
   })
   if (!authMethod) {

@@ -1,8 +1,11 @@
 const GetAuth = require("./GetAuth")
+const { Op } = require("sequelize")
 
 async function SetRecordAction(action, app) {
   const recordID = action.id
-  const lastRecord = await app.model.record.findOne({ where: { id: recordID } })
+  const lastRecord = await app.model.record.findOne({
+    where: { id: { [Op.eq]: recordID } },
+  })
   const permission = await GetAuth(action, app, lastRecord)
   if (permission === "WRITE" && lastRecord) {
     await lastRecord.update({

@@ -1,7 +1,9 @@
+const { Op } = require("sequelize")
+
 async function GetRecordAction(action, app) {
   // todo, authentication here
   const record = await app.model.record.findOne({
-    where: { id: action.id },
+    where: { id: { [Op.eq]: action.id } },
   })
   return {
     id: action.id,

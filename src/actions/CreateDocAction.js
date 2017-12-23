@@ -1,3 +1,4 @@
+const { Op } = require("sequelize")
 const GetAuth = require("./GetAuth")
 const { digest } = require("../Utilities")
 const stringify = require("json-stable-stringify")
@@ -5,7 +6,9 @@ const stringify = require("json-stable-stringify")
 async function CreateDocAction(action, app) {
   const lastRecord =
     action.recordID &&
-    (await app.model.record.findOne({ where: { id: action.recordID } }))
+    (await app.model.record.findOne({
+      where: { id: { [Op.eq]: action.recordID } },
+    }))
   if (!lastRecord) {
     throw {
       statusCode: 400,
