@@ -3,11 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "start": "NODE_ENV=production scripts/start.sh",
-    "test":
-      "NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/test.sh",
+    "test": "NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/test.sh",
     "test-debug": "NODE_ARGS='--inspect-brk' yarn test",
-    "dev":
-      "NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/dev.sh",
+    "dev": "NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/dev.sh",
     "build": "scripts/build.sh",
     "check-prettier": "node tests/PrettierCheck.js",
     "postinstall": "yarn build"
@@ -28,6 +26,7 @@
     "express": "^4.16.2",
     "fqdn": "0.0.3",
     "global": "^4.3.2",
+    "json-stable-stringify": "^1.0.1",
     "node-dev": "^3.1.3",
     "npx": "^9.7.1",
     "pg": "^7.4.0",

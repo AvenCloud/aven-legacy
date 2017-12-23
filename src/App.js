@@ -25,8 +25,11 @@ module.exports = async infra => {
       result = await Dispatch(action, app)
       res.json(result)
     } catch (e) {
-      // log errors in development and prod, but not tests because sometimes errors are expected
-      if (infra.env !== "testing") {
+      // avoid logging expected errors during test runs:
+      if (
+        infra.env !== "testing" ||
+        req.headers["x-aven-test"] !== "expect-errors"
+      ) {
         console.error(e)
       }
       res.status(e.statusCode || 500).json(e)

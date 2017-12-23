@@ -5,6 +5,8 @@ const Actions = {
   AuthLogoutAction: require("./actions/AuthLogoutAction"),
   SetRecordAction: require("./actions/SetRecordAction"),
   GetRecordAction: require("./actions/GetRecordAction"),
+  CreateDocAction: require("./actions/CreateDocAction"),
+  GetDocAction: require("./actions/GetDocAction"),
 }
 
 async function Dispatch(action, app) {
