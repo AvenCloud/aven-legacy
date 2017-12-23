@@ -1,7 +1,7 @@
+const request = require("supertest")
+
 const App = require("../src/App")
 const Infra = require("../src/Infra")
-
-const request = require("supertest")
 
 async function initTestApp() {
   const infra = await Infra({ port: 6995, env: "testing" })
@@ -59,6 +59,7 @@ async function setupTestUserSession(app) {
   })
   app.testAuthSession = loginResult.session
 }
+
 module.exports = {
   initTestApp,
   setupTestUserSession,

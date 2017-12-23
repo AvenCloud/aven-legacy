@@ -1,29 +1,21 @@
-jest.disableAutomock()
+const { initTestApp } = require("./TestUtilities")
 
-const { Client } = require("pg")
+let app = null
 
-let db = null
-
-beforeAll(async () => {
-  const pgConfig = {
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.PG_NO_SSL ? false : true,
-  }
-  pg = new Client(pgConfig)
-  await pg.connect()
+beforeEach(async () => {
+  app = await initTestApp()
 })
 
-afterAll(async () => {
-  await pg.close()
+afterEach(async () => {
+  await app.closeTest()
 })
 
 test("Initial migration has run", async () => {
-  const response = await pg.query(`
+  const response = await app.infra.pg.query(`
         SELECT column_name
             FROM information_schema.columns
             WHERE table_name='Users' and column_name='displayName';
     `)
 
-  await pg.end()
   expect(response.rows.length).toBe(1)
 })

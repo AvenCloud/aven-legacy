@@ -1,18 +1,14 @@
-jest.disableAutomock()
-
-const App = require("../src/App")
 const request = require("supertest")
-const Infra = require("../src/Infra")
+const { initTestApp } = require("./TestUtilities")
 
 let app = null
 
 beforeEach(async () => {
-  const infra = await Infra({ port: 6998, env: "testing" })
-  app = await App(infra)
+  app = await initTestApp()
 })
 
 afterEach(async () => {
-  await app.close()
+  await app.closeTest()
 })
 
 test("Postgres and Redis are online according to service", async () => {
@@ -25,9 +21,6 @@ test("Postgres and Redis are online according to service", async () => {
 })
 
 test("Dispatched action with invalid type results in 400 error", async () => {
-  const result = await request(app)
-    .post("/api/dispatch")
-    .send({ action: "BadActionType" })
-    .set("Accept", "application/json")
-    .expect(400)
+  const result = await app.testDispatchError({ type: "BadAction" })
+  expect(result.code).toBe("UNKNOWN_ACTION")
 })

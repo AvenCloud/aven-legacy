@@ -1,49 +1,24 @@
-jest.disableAutomock()
-
-const App = require("../src/App")
-const request = require("supertest")
-const Infra = require("../src/Infra")
+const { initTestApp } = require("./TestUtilities")
 
 let app = null
 
 beforeEach(async () => {
-  const infra = await Infra({ port: 6996, env: "testing" })
-  app = await App(infra)
+  app = await initTestApp()
 })
 
 afterEach(async () => {
-  await app.model.user.truncate({ cascade: true })
-  await app.model.userSession.truncate({ cascade: true })
-  await app.close()
+  await app.closeTest()
 })
 
-const dispatch = async action => {
-  const result = await request(app)
-    .post("/api/dispatch")
-    .send(action)
-    .set("Accept", "application/json")
-    .expect(200)
-  return result.body
-}
-
-const dispatchError = async action => {
-  const result = await request(app)
-    .post("/api/dispatch")
-    .send(action)
-    .set("Accept", "application/json")
-    .expect(400)
-  return result.body
-}
-
 test("Duplicate username handling", async () => {
-  await dispatch({
+  await app.testDispatch({
     type: "AuthRegisterAction",
     displayName: "Foo Bar",
     id: "foo",
     password: "foobar",
     email: "foo1@bar.com",
   })
-  const result = await dispatchError({
+  const result = await app.testDispatchError({
     type: "AuthRegisterAction",
     displayName: "Foo Bar",
     id: "foo",
@@ -54,14 +29,14 @@ test("Duplicate username handling", async () => {
 })
 
 test("Duplicate email prevention", async () => {
-  await dispatch({
+  await app.testDispatch({
     type: "AuthRegisterAction",
     displayName: "Foo Bar",
     id: "foo",
     password: "foobar",
     email: "foo@bar.com",
   })
-  const result = await dispatchError({
+  const result = await app.testDispatchError({
     type: "AuthRegisterAction",
     displayName: "Foo Bar",
     id: "bar",
@@ -74,7 +49,7 @@ test("Duplicate email prevention", async () => {
 test("Email verification works", async () => {
   const userID = "lucy"
   const email = `${userID}@bar.com`
-  const reg = await dispatch({
+  const reg = await app.testDispatch({
     type: "AuthRegisterAction",
     displayName: "Foo Bar",
     id: userID,
@@ -87,7 +62,7 @@ test("Email verification works", async () => {
   const codeMatches = emailContent.match(/code=([a-zA-Z0-9]*)/)
   const verificationCode = codeMatches && codeMatches[1]
 
-  await dispatch({
+  await app.testDispatch({
     type: "AuthVerifyAction",
     code: verificationCode,
     id: reg.authID,

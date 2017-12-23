@@ -28,7 +28,7 @@ module.exports = async infra => {
       // avoid logging expected errors during test runs:
       if (
         infra.env !== "testing" ||
-        req.headers["x-aven-test"] !== "expect-errors"
+        req.headers["x-aven-test"] !== "expect-error"
       ) {
         console.error(e)
       }

@@ -1,5 +1,3 @@
-jest.disableAutomock()
-
 const { initTestApp, setupTestUserSession } = require("./TestUtilities")
 
 let app = null

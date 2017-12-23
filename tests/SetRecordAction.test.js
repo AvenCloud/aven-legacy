@@ -1,85 +1,34 @@
-jest.disableAutomock()
-
-const App = require("../src/App")
-const request = require("supertest")
-const Infra = require("../src/Infra")
+const { initTestApp, setupTestUserSession } = require("./TestUtilities")
 
 let app = null
-const authUser = "foo"
-let authSession = null
-
-const dispatch = async action => {
-  const result = await request(app)
-    .post("/api/dispatch")
-    .send(action)
-    .set("Accept", "application/json")
-    .expect(200)
-  return result.body
-}
-
-const dispatchError = async action => {
-  const result = await request(app)
-    .post("/api/dispatch")
-    .send(action)
-    .set("Accept", "application/json")
-    .expect(400)
-  return result.body
-}
 
 beforeEach(async () => {
-  const infra = await Infra({ port: 6997, env: "testing" })
-  app = await App(infra)
-
-  const reg = await dispatch({
-    type: "AuthRegisterAction",
-    displayName: "Foo Bar",
-    id: authUser,
-    password: "foobar",
-    email: "foo1@bar.com",
-  })
-
-  const emailContent = app.infra.email._testSentEmails[0].content
-  const codeMatches = emailContent.match(/code=([a-zA-Z0-9]*)/)
-  const verificationCode = codeMatches && codeMatches[1]
-
-  await dispatch({
-    type: "AuthVerifyAction",
-    code: verificationCode,
-    id: reg.authID,
-    user: authUser,
-  })
-
-  const loginResult = await dispatch({
-    type: "AuthLoginAction",
-    user: authUser,
-    password: "foobar",
-  })
-  authSession = loginResult.session
+  app = await initTestApp()
+  await setupTestUserSession(app)
 })
 
 afterEach(async () => {
-  await app.model.user.truncate({ cascade: true })
-  await app.close()
+  await app.closeTest()
 })
 
 test("Set record works", async () => {
-  await dispatch({
+  await app.testDispatch({
     type: "SetRecordAction",
-    authUser,
-    authSession,
+    authUser: app.testAuthUser,
+    authSession: app.testAuthSession,
     id: "asdf",
-    owner: authUser,
+    owner: app.testAuthUser,
     doc: null,
     permission: "PUBLIC",
   })
 
-  const resultingRecord = await dispatch({
+  const resultingRecord = await app.testDispatch({
     type: "GetRecordAction",
-    authUser,
-    authSession,
+    authUser: app.testAuthUser,
+    authSession: app.testAuthSession,
     id: "asdf",
   })
 
   expect(resultingRecord.permission).toBe("PUBLIC")
-  expect(resultingRecord.owner).toBe("foo")
+  expect(resultingRecord.owner).toBe(app.testAuthUser)
 })

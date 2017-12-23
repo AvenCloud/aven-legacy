@@ -1,42 +1,18 @@
-jest.disableAutomock()
-
-const App = require("../src/App")
-const request = require("supertest")
-const Infra = require("../src/Infra")
+const { initTestApp } = require("./TestUtilities")
 
 let app = null
 
 beforeEach(async () => {
-  const infra = await Infra({ port: 6997, env: "testing" })
-  app = await App(infra)
+  app = await initTestApp()
 })
 
 afterEach(async () => {
-  await app.model.user.truncate({ cascade: true })
-  await app.close()
+  await app.closeTest()
 })
-
-const dispatch = async action => {
-  const result = await request(app)
-    .post("/api/dispatch")
-    .send(action)
-    .set("Accept", "application/json")
-    .expect(200)
-  return result.body
-}
-
-const dispatchError = async action => {
-  const result = await request(app)
-    .post("/api/dispatch")
-    .send(action)
-    .set("Accept", "application/json")
-    .expect(400)
-  return result.body
-}
 
 test("Logout works with session token", async () => {
   const userID = "foo"
-  const reg = await dispatch({
+  const reg = await app.testDispatch({
     type: "AuthRegisterAction",
     displayName: "Foo Bar",
     id: userID,
@@ -48,21 +24,21 @@ test("Logout works with session token", async () => {
   const codeMatches = emailContent.match(/code=([a-zA-Z0-9]*)/)
   const verificationCode = codeMatches && codeMatches[1]
 
-  await dispatch({
+  await app.testDispatch({
     type: "AuthVerifyAction",
     code: verificationCode,
     id: reg.authID,
     user: userID,
   })
 
-  const loginResult = await dispatch({
+  const loginResult = await app.testDispatch({
     type: "AuthLoginAction",
     user: userID,
     password: "foobar",
   })
   const sessionToken = loginResult.session
 
-  const logoutResult = await dispatch({
+  const logoutResult = await app.testDispatch({
     type: "AuthLogoutAction",
     session: sessionToken,
   })
@@ -70,7 +46,7 @@ test("Logout works with session token", async () => {
 
 test("Logout works with logout token", async () => {
   const userID = "foo"
-  const reg = await dispatch({
+  const reg = await app.testDispatch({
     type: "AuthRegisterAction",
     displayName: "Foo Bar",
     id: userID,
@@ -82,21 +58,21 @@ test("Logout works with logout token", async () => {
   const codeMatches = emailContent.match(/code=([a-zA-Z0-9]*)/)
   const verificationCode = codeMatches && codeMatches[1]
 
-  await dispatch({
+  await app.testDispatch({
     type: "AuthVerifyAction",
     code: verificationCode,
     id: reg.authID,
     user: userID,
   })
 
-  const loginResult = await dispatch({
+  const loginResult = await app.testDispatch({
     type: "AuthLoginAction",
     user: userID,
     password: "foobar",
   })
   const logoutToken = loginResult.logoutToken
 
-  const logoutResult = await dispatch({
+  const logoutResult = await app.testDispatch({
     type: "AuthLogoutAction",
     session: logoutToken,
   })

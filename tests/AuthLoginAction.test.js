@@ -1,48 +1,24 @@
-jest.disableAutomock()
-
-const App = require("../src/App")
-const request = require("supertest")
-const Infra = require("../src/Infra")
+const { initTestApp } = require("./TestUtilities")
 
 let app = null
 
 beforeEach(async () => {
-  const infra = await Infra({ port: 6997, env: "testing" })
-  app = await App(infra)
+  app = await initTestApp()
 })
 
 afterEach(async () => {
-  await app.model.user.truncate({ cascade: true })
-  await app.close()
+  await app.closeTest()
 })
 
-const dispatch = async action => {
-  const result = await request(app)
-    .post("/api/dispatch")
-    .send(action)
-    .set("Accept", "application/json")
-    .expect(200)
-  return result.body
-}
-
-const dispatchError = async action => {
-  const result = await request(app)
-    .post("/api/dispatch")
-    .send(action)
-    .set("Accept", "application/json")
-    .expect(400)
-  return result.body
-}
-
 test("Login doesn't work without verification", async () => {
-  await dispatch({
+  await app.testDispatch({
     type: "AuthRegisterAction",
     displayName: "Foo Bar",
     id: "foo",
     password: "foobar",
     email: "foo1@bar.com",
   })
-  const result = await dispatchError({
+  const result = await app.testDispatchError({
     type: "AuthLoginAction",
     user: "foo",
     password: "foobar",
@@ -52,7 +28,7 @@ test("Login doesn't work without verification", async () => {
 
 test("Login works", async () => {
   const userID = "foo"
-  const reg = await dispatch({
+  const reg = await app.testDispatch({
     type: "AuthRegisterAction",
     displayName: "Foo Bar",
     id: userID,
@@ -64,13 +40,13 @@ test("Login works", async () => {
   const codeMatches = emailContent.match(/code=([a-zA-Z0-9]*)/)
   const verificationCode = codeMatches && codeMatches[1]
 
-  await dispatch({
+  await app.testDispatch({
     type: "AuthVerifyAction",
     code: verificationCode,
     id: reg.authID,
     user: userID,
   })
-  const loginResult = await dispatch({
+  const loginResult = await app.testDispatch({
     type: "AuthLoginAction",
     user: userID,
     password: "foobar",
@@ -78,14 +54,14 @@ test("Login works", async () => {
 })
 
 test("Bad secret fails", async () => {
-  const invalidUserLoginResult = await dispatchError({
+  const invalidUserLoginResult = await app.testDispatchError({
     type: "AuthLoginAction",
     user: "rando",
     password: "fail",
   })
   expect(invalidUserLoginResult.code).toBe("INVALID_LOGIN")
   const userID = "foo"
-  const reg = await dispatch({
+  const reg = await app.testDispatch({
     type: "AuthRegisterAction",
     displayName: "Foo Bar",
     id: userID,
@@ -97,14 +73,14 @@ test("Bad secret fails", async () => {
   const codeMatches = emailContent.match(/code=([a-zA-Z0-9]*)/)
   const verificationCode = codeMatches && codeMatches[1]
 
-  await dispatch({
+  await app.testDispatch({
     type: "AuthVerifyAction",
     code: verificationCode,
     id: reg.authID,
     user: userID,
   })
 
-  const loginResult = await dispatchError({
+  const loginResult = await app.testDispatchError({
     type: "AuthLoginAction",
     user: "foo",
     password: "fail",
