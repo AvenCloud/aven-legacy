@@ -21,9 +21,6 @@ run_jest() {
   $NODE_EXECUTABLE ./node_modules/.bin/jest "$@" --runInBand --testPathIgnorePatterns=/dist
 }
 
-echo "Verifying code format"
-node tests/PrettierCheck.js
-
 echo  "Initializing Docker containers.."
 
 # Silently close existing docker containers
