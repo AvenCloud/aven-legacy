@@ -4,10 +4,11 @@ const { digest } = require("../Utilities")
 const stringify = require("json-stable-stringify")
 
 async function CreateDocAction(action, app) {
+  const { recordID } = action
   const lastRecord =
-    action.recordID &&
+    recordID &&
     (await app.model.record.findOne({
-      where: { id: { [Op.eq]: action.recordID } },
+      where: { id: { [Op.eq]: recordID } },
     }))
   if (!lastRecord) {
     throw {
@@ -38,11 +39,11 @@ async function CreateDocAction(action, app) {
   await app.model.doc.create({
     id: docID,
     value: action.value,
-    associatedRecord: action.recordID,
+    associatedRecord: recordID,
     size: Buffer.byteLength(docContent, "utf8"),
     uploader: action.authUser,
   })
-  return { docID, authPermission: permission }
+  return { docID, recordID, authPermission: permission }
 }
 
 module.exports = CreateDocAction

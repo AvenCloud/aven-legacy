@@ -2,7 +2,7 @@ const GetAuth = require("./GetAuth")
 const { Op } = require("sequelize")
 
 async function SetRecordAction(action, app) {
-  const recordID = action.id
+  const recordID = action.recordID
   const lastRecord = await app.model.record.findOne({
     where: { id: { [Op.eq]: recordID } },
   })

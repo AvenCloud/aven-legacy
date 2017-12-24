@@ -27,7 +27,7 @@ test("Create doc works with owned record", async () => {
     type: "SetRecordAction",
     authUser: app.testAuthUser,
     authSession: app.testAuthSession,
-    id: "asdf",
+    recordID: "asdf",
     owner: app.testAuthUser,
     doc: null,
     permission: "PUBLIC",

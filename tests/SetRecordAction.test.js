@@ -16,7 +16,7 @@ test("Set record works", async () => {
     type: "SetRecordAction",
     authUser: app.testAuthUser,
     authSession: app.testAuthSession,
-    id: "asdf",
+    recordID: "asdf",
     owner: app.testAuthUser,
     doc: null,
     permission: "PUBLIC",
@@ -26,7 +26,7 @@ test("Set record works", async () => {
     type: "GetRecordAction",
     authUser: app.testAuthUser,
     authSession: app.testAuthSession,
-    id: "asdf",
+    recordID: "asdf",
   })
 
   expect(resultingRecord.permission).toBe("PUBLIC")
