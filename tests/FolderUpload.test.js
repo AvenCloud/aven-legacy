@@ -23,7 +23,7 @@ afterEach(async () => {
 test("Can checksum files", async () => {
   const sourceFile = join(__dirname, "../__testDir/foo.txt")
   const checksum = await FSClient.checksumFile(sourceFile)
-  expect(checksum).toBe("0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33")
+  expect(checksum).toBe("ce7929f1bee232db4c73542c06ed42ee7a5e0679")
 })
 
 test("Can checksum folder", async () => {
@@ -34,6 +34,7 @@ test("Can checksum folder", async () => {
 
 test("Can upload files", async () => {
   const sourceFile = join(__dirname, "../__testDir/foo.txt")
+  const docID = await FSClient.checksumFile(sourceFile)
   await app.testDispatch({
     type: "SetRecordAction",
     dispatch: app.testDispatch,
@@ -50,5 +51,27 @@ test("Can upload files", async () => {
     authSession: app.testAuthSession,
     recordID: "fooFile",
   })
-  expect(uploadResult.docID).toBe("ce7929f1bee232db4c73542c06ed42ee7a5e0679")
+  expect(uploadResult.docID).toBe(docID)
+})
+
+test("Can upload folder", async () => {
+  const sourceFolder = join(__dirname, "../__testDir")
+  const docID = await FSClient.checksumDirectory(sourceFolder)
+  await app.testDispatch({
+    type: "SetRecordAction",
+    dispatch: app.testDispatch,
+    authUser: app.testAuthUser,
+    authSession: app.testAuthSession,
+    recordID: "fooFolder",
+    permission: "PUBLIC",
+    doc: null,
+    owner: app.testAuthUser,
+  })
+  const uploadResult = await FSClient.uploadPath(sourceFolder, {
+    dispatch: app.testDispatch,
+    authUser: app.testAuthUser,
+    authSession: app.testAuthSession,
+    recordID: "fooFolder",
+  })
+  expect(uploadResult.docID).toBe(docID)
 })
