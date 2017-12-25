@@ -1,4 +1,3 @@
-const Infra = require("./Infra")
 const express = require("express")
 const DB = require("./DB")
 const bodyParser = require("body-parser")
@@ -9,10 +8,6 @@ module.exports = async infra => {
 
   app.infra = infra
   app.model = DB.create(infra)
-
-  app.get("/", async (req, res) => {
-    res.json(await infra.getPublicDebugInfo())
-  })
 
   app.get("/api/debug", async (req, res) => {
     res.json(await infra.getPublicDebugInfo())
@@ -34,6 +29,10 @@ module.exports = async infra => {
       }
       res.status(e.statusCode || 500).json(e)
     }
+  })
+
+  app.get("*", async (req, res) => {
+    res.send(req.path)
   })
 
   const server = await new Promise((resolve, reject) => {

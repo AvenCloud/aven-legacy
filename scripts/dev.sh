@@ -13,7 +13,7 @@ run_app_dev() {
   echo "Running app in dev mode.."
   NODE_ENV=development
   PG_NO_SSL=true
-  DATABASE_URL=postgresql://postgres:aven-test-db@localhost:5432/postgres
+  DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres
   REDIS_URL=redis://localhost:6379
   babel-watch src/Server.js
 }
