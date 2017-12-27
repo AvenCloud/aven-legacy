@@ -1,0 +1,9 @@
+{
+	"folders":
+	[
+		{
+			"path": "/Users/eric/aven",
+      "folder_exclude_patterns": ["node_modules", "legacy-*", "dist"]
+		}
+	]
+}

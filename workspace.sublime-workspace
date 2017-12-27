@@ -1,0 +1,1341 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"doc",
+				"docID"
+			],
+			[
+				"recor",
+				"recordID"
+			],
+			[
+				"reco",
+				"recordID"
+			],
+			[
+				"testJSF",
+				"testJSFile"
+			],
+			[
+				"enum",
+				"enumeratedFiles"
+			],
+			[
+				"enu",
+				"enumerateDir"
+			],
+			[
+				"export",
+				"exportedParams"
+			],
+			[
+				"sec",
+				"secretsFile"
+			],
+			[
+				"state",
+				"setState"
+			],
+			[
+				"newP",
+				"newParentPath"
+			],
+			[
+				"usre",
+				"username"
+			],
+			[
+				"handlerId",
+				"handlerIdsBySubscribable"
+			],
+			[
+				"getN",
+				"genClientId"
+			],
+			[
+				"cons",
+				"console"
+			],
+			[
+				"defa",
+				"defaultDoc"
+			],
+			[
+				"downloadF",
+				"downloadFile"
+			],
+			[
+				"vie",
+				"viewerUser"
+			],
+			[
+				"Fol",
+				"FolderView"
+			],
+			[
+				"onCa",
+				"onChangeForm"
+			],
+			[
+				"onca",
+				"onChangeForm"
+			],
+			[
+				"onCh",
+				"onChangeForm"
+			],
+			[
+				"cOM",
+				"COMMON_FONT"
+			],
+			[
+				"COMM",
+				"COMMON_FONT"
+			],
+			[
+				"rate",
+				"RATES"
+			],
+			[
+				"proje",
+				"projectUser"
+			],
+			[
+				"defau",
+				"defaultConfigFile"
+			],
+			[
+				"aven",
+				"avenconfig"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "/Users/eric/aven/src/App.js",
+			"settings":
+			{
+				"buffer_size": 1894,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/eric/aven/src/FSClient.js",
+			"settings":
+			{
+				"buffer_size": 4058,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Searching 1235 files for \"This record cannot be found or written to\"\n\n/Users/eric/aven/dist/actions/CreateDocAction.js:\n   12        statusCode: 400,\n   13        code: \"INVALID_RECORD\",\n   14:       message: \"This record cannot be found or written to\"\n   15      };\n   16    }\n\n/Users/eric/aven/src/actions/CreateDocAction.js:\n   15        statusCode: 400,\n   16        code: \"INVALID_RECORD\",\n   17:       message: \"This record cannot be found or written to\",\n   18      }\n   19    }\n\n2 matches across 2 files\n\n\nSearching 1235 files for \"CreateDocAction\"\n\n/Users/eric/aven/prettierCheck.debug:\n    1: [{\"fileName\":\"/Users/eric/aven/src/App.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/src/DB.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/src/Dispatch.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/src/Infra-Email.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/src/Infra.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/src/Server.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/src/Utilities.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/src/actions/AuthLoginAction.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/src/actions/AuthLogoutAction.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/src/actions/AuthRegisterAction.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/src/actions/AuthVerifyAction.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/src/actions/CreateDocAction.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/src/actions/GetAuth.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/src/actions/GetRecordAction.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/src/actions/PutRecordAction.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/src/actions/SetRecordAction.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/tests/App.test.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/tests/AuthLoginAction.test.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/tests/AuthLogoutAction.test.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/tests/AuthRegisterAction.test.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/tests/CreateDocAction.test.js\",\"failureRaw\":\"jest.disableAutomock()\\n\\nconst App = require(\\\"../src/App\\\")\\nconst request = require(\\\"supertest\\\")\\nconst Infra = require(\\\"../src/Infra\\\")\\n\\nlet app = null\\nconst authUser = \\\"foo\\\"\\nlet authSession = null\\n\\nconst dispatch = async action => {\\n  const result = await request(app)\\n    .post(\\\"/api/dispatch\\\")\\n    .send(action)\\n    .set(\\\"Accept\\\", \\\"application/json\\\")\\n    .expect(200)\\n  return result.body\\n}\\n\\nconst dispatchError = async action => {\\n  const result = await request(app)\\n    .post(\\\"/api/dispatch\\\")\\n    .send(action)\\n    .set(\\\"Accept\\\", \\\"application/json\\\")\\n    .expect(400)\\n  return result.body\\n}\\n\\nbeforeEach(async () => {\\n  const infra = await Infra({ port: 6997, env: \\\"testing\\\" })\\n  app = await App(infra)\\n\\n  const reg = await dispatch({\\n    type: \\\"AuthRegisterAction\\\",\\n    displayName: \\\"Foo Bar\\\",\\n    id: authUser,\\n    password: \\\"foobar\\\",\\n    email: \\\"foo1@bar.com\\\",\\n  })\\n\\n  const emailContent = app.infra.email._testSentEmails[0].content\\n  const codeMatches = emailContent.match(/code=([a-zA-Z0-9]*)/)\\n  const verificationCode = codeMatches && codeMatches[1]\\n\\n  await dispatch({\\n    type: \\\"AuthVerifyAction\\\",\\n    code: verificationCode,\\n    id: reg.authID,\\n    user: authUser,\\n  })\\n\\n  const loginResult = await dispatch({\\n    type: \\\"AuthLoginAction\\\",\\n    user: authUser,\\n    password: \\\"foobar\\\",\\n  })\\n  authSession = loginResult.session\\n})\\n\\nafterEach(async () => {\\n  await app.model.user.truncate({ cascade: true })\\n  await app.close()\\n})\\n\\ntest(\\\"Create doc fails without a valid record\\\", async () => {\\n  const createResult = await dispatchError({\\n    type: \\\"CreateDocAction\\\",\\n    authUser,\\n    authSession,\\n    recordID: \\\"asdf\\\",\\n    value: { great: \\\"document\\\" },\\n  })\\n  expect(createResult.code).toBe(\\\"INVALID_RECORD\\\")\\n})\\n\\ntest(\\\"Create doc works with owned record\\\", async () => {\\n  const setRecordResult = await dispatch({\\n    type: \\\"SetRecordAction\\\",\\n    authUser,\\n    authSession,\\n    id: \\\"asdf\\\",\\n    owner: authUser,\\n    doc: null,\\n    permission: \\\"PUBLIC\\\",\\n  })\\n  const createResult = await dispatch({\\n    type: \\\"CreateDocAction\\\",\\n    authUser,\\n    authSession,\\n    recordID: \\\"asdf\\\",\\n    value: { great: \\\"document\\\" },\\n  })\\n})\\n\\n\\n\\n\",\"failureFormatted\":\"jest.disableAutomock()\\n\\nconst App = require(\\\"../src/App\\\")\\nconst request = require(\\\"supertest\\\")\\nconst Infra = require(\\\"../src/Infra\\\")\\n\\nlet app = null\\nconst authUser = \\\"foo\\\"\\nlet authSession = null\\n\\nconst dispatch = async action => {\\n  const result = await request(app)\\n    .post(\\\"/api/dispatch\\\")\\n    .send(action)\\n    .set(\\\"Accept\\\", \\\"application/json\\\")\\n    .expect(200)\\n  return result.body\\n}\\n\\nconst dispatchError = async action => {\\n  const result = await request(app)\\n    .post(\\\"/api/dispatch\\\")\\n    .send(action)\\n    .set(\\\"Accept\\\", \\\"application/json\\\")\\n    .expect(400)\\n  return result.body\\n}\\n\\nbeforeEach(async () => {\\n  const infra = await Infra({ port: 6997, env: \\\"testing\\\" })\\n  app = await App(infra)\\n\\n  const reg = await dispatch({\\n    type: \\\"AuthRegisterAction\\\",\\n    displayName: \\\"Foo Bar\\\",\\n    id: authUser,\\n    password: \\\"foobar\\\",\\n    email: \\\"foo1@bar.com\\\",\\n  })\\n\\n  const emailContent = app.infra.email._testSentEmails[0].content\\n  const codeMatches = emailContent.match(/code=([a-zA-Z0-9]*)/)\\n  const verificationCode = codeMatches && codeMatches[1]\\n\\n  await dispatch({\\n    type: \\\"AuthVerifyAction\\\",\\n    code: verificationCode,\\n    id: reg.authID,\\n    user: authUser,\\n  })\\n\\n  const loginResult = await dispatch({\\n    type: \\\"AuthLoginAction\\\",\\n    user: authUser,\\n    password: \\\"foobar\\\",\\n  })\\n  authSession = loginResult.session\\n})\\n\\nafterEach(async () => {\\n  await app.model.user.truncate({ cascade: true })\\n  await app.close()\\n})\\n\\ntest(\\\"Create doc fails without a valid record\\\", async () => {\\n  const createResult = await dispatchError({\\n    type: \\\"CreateDocAction\\\",\\n    authUser,\\n    authSession,\\n    recordID: \\\"asdf\\\",\\n    value: { great: \\\"document\\\" },\\n  })\\n  expect(createResult.code).toBe(\\\"INVALID_RECORD\\\")\\n})\\n\\ntest(\\\"Create doc works with owned record\\\", async () => {\\n  const setRecordResult = await dispatch({\\n    type: \\\"SetRecordAction\\\",\\n    authUser,\\n    authSession,\\n    id: \\\"asdf\\\",\\n    owner: authUser,\\n    doc: null,\\n    permission: \\\"PUBLIC\\\",\\n  })\\n  const createResult = await dispatch({\\n    type: \\\"CreateDocAction\\\",\\n    authUser,\\n    authSession,\\n    recordID: \\\"asdf\\\",\\n    value: { great: \\\"document\\\" },\\n  })\\n})\\n\",\"passed\":false},{\"fileName\":\"/Users/eric/aven/tests/Migrations.test.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/tests/PrettierCheck.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/tests/SetRecordAction.test.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true},{\"fileName\":\"/Users/eric/aven/tests/TestUtilities.js\",\"failureRaw\":false,\"failureFormatted\":false,\"passed\":true}]\n\n/Users/eric/aven/.git/index:\n    <binary>\n\n/Users/eric/aven/dist/Dispatch.js:\n    6    SetRecordAction: require(\"./actions/SetRecordAction\"),\n    7    GetRecordAction: require(\"./actions/GetRecordAction\"),\n    8:   CreateDocAction: require(\"./actions/CreateDocAction\"),\n    9    GetDocAction: require(\"./actions/GetDocAction\")\n   10  };\n\n/Users/eric/aven/dist/actions/CreateDocAction.js:\n    4  const stringify = require(\"json-stable-stringify\");\n    5  \n    6: async function CreateDocAction(action, app) {\n    7    const lastRecord = action.recordID && (await app.model.record.findOne({\n    8      where: { id: { [Op.eq]: action.recordID } }\n    .\n   43  }\n   44  \n   45: module.exports = CreateDocAction;\n\n/Users/eric/aven/legacy-src/CLI-utilities.js:\n  129  \n  130    const uploadResult = await dispatch({\n  131:       type: \"CreateDocAction\",\n  132        project: auth.projectName,\n  133        user: auth.projectUser,\n  ...\n  173    });\n  174    const uploadResult = await dispatch({\n  175:       type: \"CreateDocAction\",\n  176        project: auth.projectName,\n  177        user: auth.projectUser,\n  ...\n  217    );\n  218    const uploadResult = await dispatch({\n  219:       type: \"CreateDocAction\",\n  220        project: auth.projectName,\n  221        user: auth.projectUser,\n\n/Users/eric/aven/legacy-src/CreateDocAction.js:\n    3  import Utilities from \"./Utilities\";\n    4  \n    5: export default async function CreateDocAction(action) {\n    6    const auth = await getAuth(action.viewerUser, action.viewerSession);\n    7    if (!auth) {\n\n/Users/eric/aven/legacy-src/DispatchAction.js:\n   10  import GetAccountAction from \"./GetAccountAction\";\n   11  import PluralAction from \"./PluralAction\";\n   12: import CreateDocAction from \"./CreateDocAction\";\n   13  import SetRecordAction from \"./SetRecordAction\";\n   14  \n   ..\n   25    GetRecordAction,\n   26  \n   27:   CreateDocAction,\n   28    GetProfileAction,\n   29    AuthResetAction,\n\n/Users/eric/aven/mobile/common/Store.js:\n  168        docId,\n  169        remoteResult: this.dispatchRemote({\n  170:         type: \"CreateDocAction\",\n  171          user: projectIdPaths[0],\n  172          project: projectIdPaths[1],\n\n/Users/eric/aven/src/Dispatch.js:\n    6    SetRecordAction: require(\"./actions/SetRecordAction\"),\n    7    GetRecordAction: require(\"./actions/GetRecordAction\"),\n    8:   CreateDocAction: require(\"./actions/CreateDocAction\"),\n    9    GetDocAction: require(\"./actions/GetDocAction\"),\n   10  }\n\n/Users/eric/aven/src/FSClient.js:\n   79  \n   80      const createDoc = await dispatch({\n   81:       type: \"CreateDocAction\",\n   82        recordID,\n   83        authSession,\n   ..\n   99      )\n  100      const createDoc = await dispatch({\n  101:       type: \"CreateDocAction\",\n  102        recordID,\n  103        authSession,\n\n/Users/eric/aven/src/actions/CreateDocAction.js:\n    4  const stringify = require(\"json-stable-stringify\")\n    5  \n    6: async function CreateDocAction(action, app) {\n    7    const { recordID } = action\n    8    const lastRecord =\n    .\n   47  }\n   48  \n   49: module.exports = CreateDocAction\n   50  \n\n/Users/eric/aven/tests/CreateDocAction.test.js:\n   14  test(\"Create doc fails without a valid record\", async () => {\n   15    const createResult = await app.testDispatchError({\n   16:     type: \"CreateDocAction\",\n   17      authUser: app.testAuthUser,\n   18      authSession: app.testAuthSession,\n   ..\n   34    })\n   35    const createResult = await app.testDispatch({\n   36:     type: \"CreateDocAction\",\n   37      authUser: app.testAuthUser,\n   38      authSession: app.testAuthSession,\n\n29 matches across 12 files\n",
+			"settings":
+			{
+				"buffer_size": 11661,
+				"line_ending": "Unix",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "/Users/eric/aven/src/actions/CreateDocAction.js",
+			"settings":
+			{
+				"buffer_size": 1377,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/eric/aven/src/actions/SetRecordAction.js",
+			"settings":
+			{
+				"buffer_size": 691,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "FolderUpload.test.js",
+			"settings":
+			{
+				"buffer_size": 2478,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 119.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"form",
+				"JsPrettier: Format Code"
+			],
+			[
+				"enable pa",
+				"Package Control: Enable Package"
+			],
+			[
+				"package",
+				"Package Control: Disable Package"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"install p",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 428.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/eric/aven",
+		"/Users/eric/aven/src",
+		"/Users/eric/aven/src/actions",
+		"/Users/eric/aven/tests"
+	],
+	"file_history":
+	[
+		"/Users/eric/aven/prettierCheck.debug",
+		"/Users/eric/aven/tests/AuthLoginAction.test.js",
+		"/Users/eric/aven/src/JSModuleClient.js",
+		"/Users/eric/aven/src/JSModule.js",
+		"/Users/eric/aven/src/LocalClient.js",
+		"/Users/eric/aven/src/actions/../../tests/JSModuleClient.test.js",
+		"/Users/eric/aven/src/actions/GetRecordAction.js",
+		"/Users/eric/aven/tests/JSModuleClient.test.js",
+		"/Users/eric/aven/src/actions/CreateDocAction.js",
+		"/Users/eric/aven/scripts/dev.sh",
+		"/Users/eric/aven/package.json",
+		"/Users/eric/aven/src/App.js",
+		"/Users/eric/aven/tests/FolderUpload.test.js",
+		"/Users/eric/aven/docker-compose.yml",
+		"/Users/eric/aven/src/FSClient.js",
+		"/Users/eric/aven/dist/FSClient.js",
+		"/Users/eric/aven/dist/Server.js",
+		"/Users/eric/aven/tests/SetRecordAction.test.js",
+		"/Users/eric/aven/src/actions/SetRecordAction.js",
+		"/Users/eric/aven/tests/HttpApp.test.js",
+		"/Users/eric/aven/dist/App.js",
+		"/Users/eric/aven/tests/CreateDocAction.test.js",
+		"/Users/eric/aven/src/Utilities.js",
+		"/Users/eric/aven/legacy-src/CreateRecordAction.js",
+		"/Users/eric/aven/src/DB.js",
+		"/Users/eric/aven/tests/TestUtilities.js",
+		"/Users/eric/aven/src/Dispatch.js",
+		"/Users/eric/aven/.git/objects/c5/9663fde17ac898e828c819f15cda996d87ecca",
+		"/Users/eric/aven/.git/objects/pack/pack-68bc8dd5c1c91c72912fe3d964e9a9ec1488f352.pack",
+		"/Users/eric/aven/.git/objects/pack/pack-fc72ef0307c32e47aad6afdac56f290c98c2e98a.pack",
+		"/Users/eric/aven/legacy-src/SetRecordAction.js",
+		"/Users/eric/aven/src/actions/AuthLoginAction.js",
+		"/Users/eric/aven/src/actions/AuthLogoutAction.js",
+		"/Users/eric/aven/src/actions/AuthRegisterAction.js",
+		"/Users/eric/aven/src/actions/AuthVerifyAction.js",
+		"/Users/eric/aven/src/actions/GetAuth.js",
+		"/Users/eric/aven/src/actions/GetDocAction.js",
+		"/Users/eric/aven/src/Infra.js",
+		"/Users/eric/aven/tests/PrettierCheck.test.js",
+		"/Users/eric/aven/tests/AuthLogoutAction.test.js",
+		"/Users/eric/aven/tests/Migrations.test.js",
+		"/Users/eric/aven/dist/actions/AuthLoginAction.js",
+		"/Users/eric/aven/scripts/test.sh",
+		"/Users/eric/aven/tests/App.test.js",
+		"/Users/eric/aven/tests/AuthRegisterAction.test.js",
+		"/Users/eric/aven/legacy-src/AuthLoginAction.js",
+		"/Users/eric/aven/dist/actions/GetAuth.js",
+		"/Users/eric/aven/legacy-src/GetDocAction.js",
+		"/Users/eric/aven/tests/GetDocAction.test.js",
+		"/Users/eric/raven/src/App.js",
+		"/Users/eric/aven/legacy-src/DispatchAction.js",
+		"/Users/eric/aven/tests/CheckAuthAction.test.js",
+		"/Users/eric/aven/src/actions/PutRecordAction.js",
+		"/Users/eric/aven/tests/PutRecordAction.test.js",
+		"/Users/eric/aven/tests/PutRecordAction.js",
+		"/Users/eric/aven/tests/PrettierCheck.js",
+		"/Users/eric/aven/src/Infra-Email.js",
+		"/Users/eric/aven/.gitignore",
+		"/Users/eric/aven/src/Server.js",
+		"/Users/eric/aven/scripts/precommit.sh",
+		"/Users/eric/aven/.prettierrc.yml",
+		"/Users/eric/aven/.prettierrc",
+		"/Users/eric/aven/migrations/20171219173017-auth.js",
+		"/Users/eric/aven/migrations/20171221230548-session.js",
+		"/Users/eric/aven/migrations/20171219173035-docs.js",
+		"/Users/eric/aven/migrations/20171219173039-records.js",
+		"/Users/eric/aven/migrations/20171219173054-recordAuth.js",
+		"/Users/eric/aven/migrations/20171219172949-users.js",
+		"/Users/eric/aven/scripts/start.sh",
+		"/Users/eric/aven/dist/actions/AuthRegisterAction.js",
+		"/Users/eric/aven/legacy-src/ZedTest.js",
+		"/Users/eric/aven/.sequelizerc",
+		"/Users/eric/aven/.babelrc",
+		"/Users/eric/aven/.circleci/config.yml",
+		"/Users/eric/aven/sequelizeConfig.json",
+		"/Users/eric/aven/Procfile",
+		"/Users/eric/aven/src/AuthRegisterAction.js",
+		"/Users/eric/aven/src/AuthVerifyAction.js",
+		"/Users/eric/dove/app/DB.js",
+		"/Users/eric/dove/app/Dispatch.js",
+		"/Users/eric/dove/app/actions/AuthRegisterAction.js",
+		"/Users/eric/dove/app/App.js",
+		"/Users/eric/dove/src/Infra.js",
+		"/Users/eric/dove/src/Server.js",
+		"/Users/eric/dove/app/tests/AuthActions.test.js",
+		"/Users/eric/dove/app/tests/App.test.js",
+		"/Users/eric/dove/src/App.js",
+		"/Users/eric/dove/app/Infra.js",
+		"/Users/eric/aven/src/DispatchAction.js",
+		"/Users/eric/aven/src/CreateDocAction.js",
+		"/Users/eric/aven/src/ProjectPage.js",
+		"/Users/eric/aven/src/HandleReactComponentGet.js",
+		"/Users/eric/aven/src/NavigationActions.js",
+		"/Users/eric/aven/src/AppServer.js",
+		"/Users/eric/Desktop/proxy setup",
+		"/Users/eric/aven/src/SetProjectAction.js",
+		"/Users/eric/aven/src/LogProjectAction.js",
+		"/Users/eric/aven/mobile/src/App.js",
+		"/Users/eric/aven/mobile/app.json",
+		"/Users/eric/aven/mobile/appstoremarketing.md",
+		"/Users/eric/aven/src/static/Aven.css",
+		"/Users/eric/aven/src/SocketConnection.js",
+		"/Users/eric/aven/src/Configuration.js",
+		"/Users/eric/aven/secrets.json",
+		"/Users/eric/aven/src/CLI-upload.js",
+		"/Users/eric/aven/src/CLI-utilities.js",
+		"/Users/eric/evv-test/.avenconfig",
+		"/Users/eric/aven/mobile/exp.j",
+		"/Users/eric/secrets/strategy",
+		"/Users/eric/aven/Dockerfile",
+		"/Users/eric/aven/src/DatabaseService.js",
+		"/Users/eric/aven/src/HomePage.js",
+		"/Users/eric/aven/native/App.js",
+		"/Users/eric/evv-test/ba",
+		"/Users/eric/aven/ericvicenti/ba",
+		"/Users/eric/aven/ericvicenti/greatFolder/deepFolder/foobar.md",
+		"/Users/eric/aven/src/CLI.js",
+		"/Users/eric/aven/src/CreateProjectAction.js",
+		"/Users/eric/aven/src/CLI-init.js",
+		"/Users/eric/aven/ericvicenti/.avenconfig",
+		"/Users/eric/aven/ericvicenti/bar",
+		"/Users/eric/aven/ericvicenti/foo",
+		"/Users/eric/.profile",
+		"/Users/eric/aven/src/CreateSmallFormPage.js",
+		"/Users/eric/aven/src/HandleReactComponentForm.js",
+		"/Users/eric/aven/src/CreateFormPage.js",
+		"/Users/eric/aven/src/JSModuleComponent.js",
+		"/Users/eric/aven/src/FolderComponent.js"
+	],
+	"find":
+	{
+		"height": 44.0
+	},
+	"find_in_files":
+	{
+		"height": 125.0,
+		"where_history":
+		[
+			"",
+			"aven/",
+			"aven/node_modules/*",
+			"aven/node_modules/",
+			"aven/node_modules",
+			"node_modules",
+			"node_mod",
+			"aven/src",
+			"src",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"docID",
+			"uploadPa",
+			"putResult",
+			"docID",
+			"uploadPath",
+			"CreateDocAction",
+			"This record cannot be found or written to",
+			"SetRecordAc",
+			"uploadPath",
+			"docID",
+			"upload",
+			"dirSummary",
+			"files",
+			"checksum folder",
+			"checksumPath",
+			"docID",
+			"id",
+			"authUser",
+			"authSession",
+			"readDirectory",
+			"uploadFile",
+			"can upl",
+			"checksumf",
+			"recordID",
+			"authSession",
+			"FSClient",
+			"opts",
+			"FSClient",
+			"GetDocAction",
+			"readDirectory",
+			"checksumPath",
+			"uploadDirectory",
+			"checksumFile",
+			" ",
+			"dispatch",
+			"load",
+			".doc",
+			"permis",
+			"infra",
+			"Infra",
+			"infra.",
+			"console.lo",
+			"checksumDirectory",
+			"folder",
+			"Folder",
+			"read",
+			"read direc",
+			"checksumPath",
+			"console.lo",
+			"checksumFile",
+			"uploadFile",
+			"checksumPath",
+			"checksumDirectory",
+			"checksumPath",
+			"path",
+			"checksumPath",
+			"checksumDirectory",
+			"dirSummary",
+			"readDirectory",
+			"sourceFile",
+			"fooFile",
+			"uploadFile",
+			"action.recordI",
+			"id",
+			"fileJson",
+			"action.id",
+			"id",
+			"Session",
+			"sourceFolder",
+			"file",
+			"join",
+			"auth",
+			"fileType",
+			"cookie",
+			"denodeify",
+			"isDi",
+			"fsExists",
+			"fsReadFile",
+			"putFileObject",
+			"putFolderObject",
+			"Local",
+			"$eq",
+			"operatorsAliases",
+			"String based operators are now deprecated",
+			"where:",
+			"testJSFiles",
+			"wait disp",
+			"code",
+			"ait dispatch(",
+			"dispatch",
+			".value",
+			"authUser",
+			"action",
+			"authSession",
+			"dispatch(",
+			"authSession",
+			"setupTestUser",
+			"foobar",
+			"CreateDocAction",
+			"GetDocAction",
+			"yoo",
+			"GetRecordAction",
+			"record",
+			"failz",
+			"model.doc",
+			"SetRecordAction",
+			"CreateDocAction",
+			"GetRecordAction",
+			"compareHash",
+			"getRecordPermission",
+			"lastRecord",
+			"write",
+			"owner",
+			"thSe",
+			"AuthSet",
+			"Set",
+			"userID",
+			"record =",
+			"record",
+			"AuthSetRecordAction",
+			"sessionToken",
+			"action.",
+			"userID",
+			"readFile",
+			"function",
+			"verify_prettier",
+			"verify_format",
+			"filePath"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"[Op.eq]"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 5,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "/Users/eric/aven/src/App.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1894,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								469,
+								471
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Babel/JavaScript (Babel).sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "/Users/eric/aven/src/FSClient.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4058,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1311,
+								1316
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Babel/JavaScript (Babel).sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 533.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11661,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										210,
+										251
+									],
+									[
+										418,
+										459
+									],
+									[
+										1865,
+										1880
+									],
+									[
+										2928,
+										2943
+									],
+									[
+										4627,
+										4642
+									],
+									[
+										5122,
+										5137
+									],
+									[
+										6935,
+										6950
+									],
+									[
+										7430,
+										7445
+									],
+									[
+										8251,
+										8266
+									],
+									[
+										8287,
+										8302
+									],
+									[
+										8513,
+										8528
+									],
+									[
+										8727,
+										8742
+									],
+									[
+										8866,
+										8881
+									],
+									[
+										9047,
+										9062
+									],
+									[
+										9227,
+										9242
+									],
+									[
+										9460,
+										9475
+									],
+									[
+										9756,
+										9771
+									],
+									[
+										9780,
+										9795
+									],
+									[
+										9911,
+										9926
+									],
+									[
+										10114,
+										10129
+									],
+									[
+										10387,
+										10402
+									],
+									[
+										10423,
+										10438
+									],
+									[
+										10618,
+										10633
+									],
+									[
+										10770,
+										10785
+									],
+									[
+										10975,
+										10990
+									],
+									[
+										11118,
+										11133
+									],
+									[
+										11338,
+										11353
+									],
+									[
+										11531,
+										11546
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								1871,
+								1871
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"line_numbers": false,
+							"output_tag": 2,
+							"result_base_dir": "",
+							"result_file_regex": "^([^ \t].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 414.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/Users/eric/aven/src/actions/CreateDocAction.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1377,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								183,
+								198
+							],
+							[
+								1361,
+								1376
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Babel/JavaScript (Babel).sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 356.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/Users/eric/aven/src/actions/SetRecordAction.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 691,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								609,
+								619
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Babel/JavaScript (Babel).sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "FolderUpload.test.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2478,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2360,
+								2360
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Babel/JavaScript (Babel).sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1000.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 31.0
+	},
+	"input":
+	{
+		"height": 47.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "workspace.sublime-project",
+	"replace":
+	{
+		"height": 58.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"setrecordaction",
+				"aven/src/actions/SetRecordAction.js"
+			],
+			[
+				"setrec",
+				"aven/src/actions/SetRecordAction.js"
+			],
+			[
+				"packag",
+				"aven/package.json"
+			],
+			[
+				"fsclient",
+				"aven/dist/FSClient.js"
+			],
+			[
+				"createdocaction.t",
+				"aven/tests/CreateDocAction.test.js"
+			],
+			[
+				"getreco",
+				"aven/src/actions/GetRecordAction.js"
+			],
+			[
+				"createrec",
+				"aven/legacy-src/CreateRecordAction.js"
+			],
+			[
+				"folderuplo",
+				"aven/tests/FolderUpload.test.js"
+			],
+			[
+				"utilities.js",
+				"aven/src/Utilities.js"
+			],
+			[
+				"setrecordact",
+				"aven/src/actions/SetRecordAction.js"
+			],
+			[
+				"test",
+				"aven/scripts/test.sh"
+			],
+			[
+				"authlogina",
+				"aven/legacy-src/AuthLoginAction.js"
+			],
+			[
+				"appte",
+				"aven/tests/App.test.js"
+			],
+			[
+				"getdo",
+				"aven/legacy-src/GetDocAction.js"
+			],
+			[
+				"getauth",
+				"aven/dist/actions/GetAuth.js"
+			],
+			[
+				"db.j",
+				"aven/src/DB.js"
+			],
+			[
+				"utilii",
+				"aven/src/Utilities.js"
+			],
+			[
+				"utili",
+				"src/Utilities.js"
+			],
+			[
+				"test.",
+				"scripts/test.sh"
+			],
+			[
+				"authregisteraction.test.js",
+				"tests/AuthRegisterAction.test.js"
+			],
+			[
+				"authloginaction",
+				"legacy-src/AuthLoginAction.js"
+			],
+			[
+				"app.js",
+				"src/App.js"
+			],
+			[
+				"utilit",
+				"src/Utilities.js"
+			],
+			[
+				"di",
+				"src/DispatchAction.js"
+			],
+			[
+				"handleget",
+				"src/HandleReactComponentGet.js"
+			],
+			[
+				"projectp",
+				"src/ProjectPage.js"
+			],
+			[
+				"createdc",
+				"src/CreateDocAction.js"
+			],
+			[
+				"setprojectaction",
+				"src/SetProjectAction.js"
+			],
+			[
+				"setproje",
+				"src/SetProjectAction.js"
+			],
+			[
+				"dispa",
+				"src/DispatchAction.js"
+			],
+			[
+				"actions",
+				"src/NavigationActions.js"
+			],
+			[
+				"appserv",
+				"src/AppServer.js"
+			],
+			[
+				"configuration",
+				"src/Configuration.js"
+			],
+			[
+				"cli-uti",
+				"src/CLI-utilities.js"
+			],
+			[
+				"cli-upl",
+				"src/CLI-upload.js"
+			],
+			[
+				"databa",
+				"src/DatabaseService.js"
+			],
+			[
+				"datab",
+				"src/DatabaseService.js"
+			],
+			[
+				"configura",
+				"src/Configuration.js"
+			],
+			[
+				"socketconnection",
+				"src/SocketConnection.js"
+			],
+			[
+				"docact",
+				"src/CreateDocAction.js"
+			],
+			[
+				"projectpa",
+				"src/ProjectPage.js"
+			],
+			[
+				"dispatch",
+				"src/DispatchAction.js"
+			],
+			[
+				"setprojec",
+				"src/SetProjectAction.js"
+			],
+			[
+				"util",
+				"src/Utilities.js"
+			],
+			[
+				"appser",
+				"src/AppServer.js"
+			],
+			[
+				"cli-in",
+				"src/CLI-init.js"
+			],
+			[
+				"cli.js",
+				"src/CLI.js"
+			],
+			[
+				"cli",
+				"src/CLI-init.js"
+			],
+			[
+				"createsmallformpage",
+				"src/CreateSmallFormPage.js"
+			],
+			[
+				"authver",
+				"src/AuthVerifyAction.js"
+			],
+			[
+				"registerac",
+				"src/AuthRegisterAction.js"
+			],
+			[
+				"createpro",
+				"src/CreateProjectAction.js"
+			],
+			[
+				"",
+				"src/JSModuleComponent.js"
+			],
+			[
+				"jsmodulecomponent",
+				"src/JSModuleComponent.js"
+			],
+			[
+				"folderp",
+				"src/FolderComponent.js"
+			],
+			[
+				"react",
+				"src/HandleReactComponentGet.js"
+			],
+			[
+				"queryutils",
+				"src/QueryUtils.js"
+			],
+			[
+				"foldercom",
+				"src/FolderComponent.js"
+			],
+			[
+				"genericcomponent",
+				"src/GenericComponent.js"
+			],
+			[
+				"authlogoutaction",
+				"src/AuthLogoutAction.js"
+			],
+			[
+				"profilepa",
+				"src/ProfilePage.js"
+			],
+			[
+				"apppage",
+				"src/AppPage.js"
+			],
+			[
+				"homepage",
+				"src/HomePage.js"
+			],
+			[
+				"handlereactcomponentget",
+				"src/HandleReactComponentGet.js"
+			],
+			[
+				"navigationactions",
+				"src/NavigationActions.js"
+			],
+			[
+				"createprojectaction",
+				"src/CreateProjectAction.js"
+			],
+			[
+				"getacc",
+				"src/GetAccountAction.js"
+			],
+			[
+				"getprojecta",
+				"src/GetProjectAction.js"
+			],
+			[
+				"getdocaction",
+				"src/GetDocAction.js"
+			],
+			[
+				"server",
+				"src/AppServer.js"
+			],
+			[
+				"logout",
+				"src/HandleLogout.js"
+			],
+			[
+				"dispat",
+				"src/DispatchAction.js"
+			],
+			[
+				"getproj",
+				"src/GetProjectAction.js"
+			],
+			[
+				"cli-ini",
+				"src/CLI-init.js"
+			],
+			[
+				"simplepage",
+				"src/SimplePage.js"
+			],
+			[
+				"package",
+				"package.json"
+			],
+			[
+				"project",
+				"src/ProjectPage.js"
+			],
+			[
+				"cliut",
+				"src/CLI-utilities.js"
+			],
+			[
+				"getproje",
+				"src/GetProjectAction.js"
+			],
+			[
+				"getproject",
+				"src/GetProjectAction.js"
+			],
+			[
+				"createproj",
+				"src/CreateProjectAction.js"
+			],
+			[
+				"createdoca",
+				"src/CreateDocAction.js"
+			],
+			[
+				"handlelog",
+				"src/HandleLogout.js"
+			],
+			[
+				"authlogi",
+				"src/AuthLoginAction.js"
+			],
+			[
+				"server.",
+				"src/AppServer.js"
+			],
+			[
+				"verif",
+				"src/VerifyFormPage.js"
+			],
+			[
+				"verify",
+				"src/VerifyFormPage.js"
+			],
+			[
+				"authverif",
+				"src/AuthVerifyAction.js"
+			],
+			[
+				"authreg",
+				"src/AuthRegisterAction.js"
+			],
+			[
+				"authlogin",
+				"src/AuthLoginAction.js"
+			],
+			[
+				"loginf",
+				"src/LoginFormPage.js"
+			],
+			[
+				"authlig",
+				"src/AuthLoginAction.js"
+			],
+			[
+				"getprofi",
+				"src/GetProfileAction.js"
+			],
+			[
+				"authregistera",
+				"src/AuthRegisterAction.js"
+			],
+			[
+				"authresetaction",
+				"src/AuthRegisterAction.js"
+			],
+			[
+				"profilep",
+				"src/ProfilePage.js"
+			],
+			[
+				"createproje",
+				"src/CreateProjectAction.js"
+			],
+			[
+				"getp",
+				"src/GetProjectAction.js"
+			],
+			[
+				"handlec",
+				"src/HandleReactComponentGet.js"
+			],
+			[
+				"componentget",
+				"src/HandleReactComponentGet.js"
+			],
+			[
+				"componenget",
+				"lib/HandleReactComponentGet.js"
+			],
+			[
+				"circl",
+				"node_modules/noop-logger/circle.yml"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 295.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
