@@ -9,6 +9,8 @@ module.exports = async infra => {
   app.infra = infra
   app.model = DB.create(infra)
 
+  app.dispatch = action => Dispatch(action, app)
+
   app.get("/api/debug", async (req, res) => {
     res.json(await infra.getPublicDebugInfo())
   })
@@ -17,7 +19,7 @@ module.exports = async infra => {
     let result = null
     const action = req.body
     try {
-      result = await Dispatch(action, app)
+      result = await app.dispatch(action)
       res.json(result)
     } catch (e) {
       // avoid logging expected errors during test runs:

@@ -5,6 +5,9 @@ async function GetRecordAction(action, app) {
   const record = await app.model.record.findOne({
     where: { id: { [Op.eq]: action.recordID } },
   })
+  if (!record) {
+    return null
+  }
   return {
     id: action.recordID,
     permission: record.permission,
