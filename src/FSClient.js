@@ -9,67 +9,54 @@ const { digest } = require("../src/Utilities")
 const isBinaryFile = promisify(require("isbinaryfile"))
 
 function FSClient({ dispatch, authUser, authSession }) {
-  async function checksumFile(path) {
-    const file = await fs.readFile(path)
-    const isBinary = await isBinaryFile(file, file.length)
+  async function readFileValue(path) {
+    const stat = await fs.lstat(path)
     let fileValue = null
-    if (isBinary) {
-      // set fileValue to some special binary thing
-      throw "Cannot put binary files yet!"
+    if (stat.isDirectory()) {
+      const fileNames = await fs.readdir(path)
+      const files = await Promise.all(
+        fileNames.sort().map(async fileName => {
+          const filePath = join(path, fileName)
+          const docID = await checksumPath(filePath)
+          return { docID, fileName }
+        }),
+      )
+      return {
+        type: "Directory",
+        files,
+      }
     } else {
-      try {
-        fileValue = JSON.parse(file)
-      } catch (e) {
-        fileValue = { type: "String", value: file.toString() }
+      const file = await fs.readFile(path)
+      const isBinary = await isBinaryFile(file, file.length)
+      if (isBinary) {
+        fileValue = { type: "Buffer", value: file.toString("base64") }
+      } else {
+        try {
+          fileValue = JSON.parse(file)
+        } catch (e) {
+          fileValue = { type: "String", value: file.toString() }
+        }
       }
     }
+    return fileValue
+  }
+
+  async function checksumPath(path) {
+    const fileValue = await readFileValue(path)
     const id = digest(stringify(fileValue))
     return id
   }
 
-  async function readDirectory(path) {
-    const fileNames = await fs.readdir(path)
-    const files = await Promise.all(
-      fileNames.sort().map(async fileName => {
-        const filePath = join(path, fileName)
-        const docID = await checksumPath(filePath)
-        return { docID, fileName }
-      }),
-    )
-    return {
-      type: "Directory",
-      files,
-    }
-  }
+  async function putPath(path, recordID) {
+    const fileValue = await readFileValue(path)
 
-  async function checksumDirectory(path) {
-    const dirSummary = await readDirectory(path)
-    const checksum = digest(stringify(dirSummary))
-    return checksum
-  }
-
-  async function checksumPath(path) {
-    const stat = await fs.lstat(path)
-    if (stat.isDirectory()) {
-      return checksumDirectory(path)
-    } else {
-      return checksumFile(path)
-    }
-  }
-
-  async function putFile(path, recordID) {
-    const file = await fs.readFile(path)
-    const isBinary = await isBinaryFile(file, file.length)
-    let fileValue = null
-    if (isBinary) {
-      // set fileValue to some special binary thing
-      throw "Cannot put binary files yet!"
-    } else {
-      try {
-        fileValue = JSON.parse(file)
-      } catch (e) {
-        fileValue = { type: "String", value: file.toString() }
-      }
+    if (fileValue.type === "Directory") {
+      await Promise.all(
+        fileValue.files.map(async file => {
+          const filePath = join(path, file.fileName)
+          await putPath(filePath, recordID)
+        }),
+      )
     }
 
     const createDoc = await dispatch({
@@ -79,37 +66,7 @@ function FSClient({ dispatch, authUser, authSession }) {
       authUser,
       value: fileValue,
     })
-
     return createDoc
-  }
-
-  async function putDirectory(path, recordID) {
-    const dirValue = await readDirectory(path)
-
-    await Promise.all(
-      dirValue.files.map(async file => {
-        const filePath = join(path, file.fileName)
-        await putPath(filePath, recordID)
-      }),
-    )
-    const createDoc = await dispatch({
-      type: "CreateDocAction",
-      recordID,
-      authSession,
-      authUser,
-      value: dirValue,
-    })
-
-    return createDoc
-  }
-
-  async function putPath(path, recordID) {
-    const stat = await fs.lstat(path)
-    if (stat.isDirectory()) {
-      return await putDirectory(path, recordID)
-    } else {
-      return await putFile(path, recordID)
-    }
   }
 
   async function uploadPath(path, recordID) {
@@ -166,6 +123,8 @@ function FSClient({ dispatch, authUser, authSession }) {
           await getPath(filePath, recordID, file.docID)
         }),
       )
+    } else if (doc.value.type === "Buffer") {
+      await fs.writeFile(path, new Buffer(doc.value.value, "base64"))
     } else if (doc.value.type === "String") {
       await fs.writeFile(path, doc.value.value)
     } else {
@@ -187,11 +146,7 @@ function FSClient({ dispatch, authUser, authSession }) {
   }
 
   return {
-    checksumFile,
-    checksumDirectory,
     checksumPath,
-    putFile,
-    putDirectory,
     putPath,
     uploadPath,
     getPath,
