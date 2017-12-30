@@ -3,7 +3,7 @@
 	[
 		{
 			"path": "/Users/eric/aven",
-      "folder_exclude_patterns": ["node_modules", "legacy-*", "dist"]
+      "folder_exclude_patterns": ["node_modules", "dist"]
 		}
 	]
 }

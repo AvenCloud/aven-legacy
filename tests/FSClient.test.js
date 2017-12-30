@@ -16,7 +16,7 @@ beforeEach(async () => {
   await fs.mkdir("__testDir/foo")
   await fs.copy("graphics/favicon/favicon.prod.ico", "__testDir/favicon.ico")
   await fs.writeFile("__testDir/foo/goodnews.txt", "good news, foo!")
-  client = FSClient({
+  client = await FSClient({
     dispatch: app.testDispatch,
     authUser: app.testAuthUser,
     authSession: app.testAuthSession,

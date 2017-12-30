@@ -31,7 +31,7 @@ docker_compose_up
 echo "Containers created. Waiting for DB to start up.."
 
 # This needs to be relatively on some computers when the db is starting up, such as a MacBook 2015 12"
-sleep 10
+sleep 24
 
 echo  "Running database migration.."
 

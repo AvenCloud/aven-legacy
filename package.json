@@ -20,9 +20,11 @@
     "prettier": "^1.9.2"
   },
   "dependencies": {
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "bcrypt-nodejs": "^0.0.3",
     "bluebird": "^3.5.1",
     "express": "^4.16.2",
+    "fb-watchman": "^2.0.0",
     "file-type": "^7.4.0",
     "fqdn": "0.0.3",
     "fs-extra": "^5.0.0",
@@ -38,6 +40,7 @@
     "redis": "^2.8.0",
     "sequelize": "^4.27.0",
     "sequelize-cli": "^3.2.0",
+    "sleep-promise": "^2.0.0",
     "supertest": "^3.0.0",
     "validator": "^9.2.0"
   },

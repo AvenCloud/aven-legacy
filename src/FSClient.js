@@ -8,7 +8,10 @@ const { digest } = require("../src/Utilities")
 
 const isBinaryFile = promisify(require("isbinaryfile"))
 
-function FSClient({ dispatch, authUser, authSession }) {
+async function FSClient(context) {
+  const { dispatch, authUser, authSession } = context
+  const uploadedFiles = context.uploadedFiles || (context.uploadedFiles = {})
+
   async function readFileValue(path) {
     const stat = await fs.lstat(path)
     let fileValue = null
@@ -59,14 +62,28 @@ function FSClient({ dispatch, authUser, authSession }) {
       )
     }
 
+    const docID = digest(stringify(fileValue))
+
+    if (uploadedFiles[recordID + docID]) {
+      return {
+        recordID,
+        docID,
+      }
+    }
+
     const createDoc = await dispatch({
       type: "CreateDocAction",
       recordID,
+      docID,
       authSession,
       authUser,
       value: fileValue,
     })
-    return createDoc
+    uploadedFiles[recordID + docID] = true
+    return {
+      recordID,
+      docID,
+    }
   }
 
   async function uploadPath(path, recordID) {
