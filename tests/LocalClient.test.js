@@ -27,8 +27,8 @@ beforeEach(async () => {
 afterEach(async () => {
   await app.closeTest()
   await client.close()
-  // await fs.remove("__testDir")
-  // await fs.remove("__testTestDir")
+  await fs.remove("__testDir")
+  await fs.remove("__testTestDir")
 })
 
 test(
@@ -46,11 +46,17 @@ test(
     expect(downloadedChecksum).toBe(sourceChecksum)
     await fs.writeFile("__testDir/foo.txt", "bar")
     await fs.writeFile("__testDir/foo/goodnews.txt", "gooder news!")
+    console.log("wrrote new files!")
     const sourceChecksum2 = await client.checksumPath(sourceFolder)
+    console.log("sourceChecksum2!", sourceChecksum2)
     await fs.remove(testFolder)
+    console.log("fs.remove(testFolder)!")
     await client.downloadPath(testFolder, "fooFolder")
+    console.log("client.downloadPath(testFolder")
     await sleep(2000)
+    console.log("sleep 2")
     const downloadedChecksum2 = await client.checksumPath(testFolder)
+    console.log("downloadedChecksum2, ", downloadedChecksum2, sourceChecksum2)
     expect(downloadedChecksum2).toBe(sourceChecksum2)
   },
   12000,

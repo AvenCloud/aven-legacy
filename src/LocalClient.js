@@ -63,7 +63,7 @@ async function LocalClient(context) {
 
     watchman.on("subscription", async resp => {
       if (resp.subscription !== "mysubscription") return
-      console.log("wat omgz", resp.files.length)
+      console.log("wat omgz", resp.files.length, folder, recordID, context)
       const uploadResult = await fsClient.uploadPath(folder, recordID)
       // resp.files.forEach(async (file) => {
       //   // convert Int64 instance to javascript integer

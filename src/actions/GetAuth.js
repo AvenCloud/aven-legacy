@@ -2,6 +2,7 @@ const { Op } = require("sequelize")
 const { compareHash } = require("../Utilities")
 
 async function GetAuth(action, app, record) {
+  console.log("GetAuth", action)
   const { authSession, authUser } = action
   if (!authUser) {
     throw { message: "Non-authenticated activity is not yet implemented" }
@@ -19,6 +20,7 @@ async function GetAuth(action, app, record) {
     where: { id: { [Op.eq]: sessionID } },
   })
   if (
+    !session ||
     !await compareHash(sessionToken, session.secret) ||
     session.user !== authUser
   ) {
@@ -26,6 +28,8 @@ async function GetAuth(action, app, record) {
       statusCode: 400,
       code: "INVALID_SESSION",
       message: "Session could not be verified",
+      authSession,
+      authUser,
     }
   }
   if (!record || authUser === record.owner) {
