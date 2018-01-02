@@ -50,28 +50,12 @@ async function LocalClient(context) {
       ),
     )
 
-    console.log(
-      "watch established on ",
-      watchResult.watch,
-      " relative_path",
-      watchResult.relative_path,
-      "and subscribed",
-      subscribeResult.subscribe,
-      "and uploaded",
-      uploadResult.docID,
-    )
-
     watchman.on("subscription", async resp => {
       if (resp.subscription !== "mysubscription") return
-      console.log("wat omgz", resp.files.length, folder, recordID, context)
       const uploadResult = await fsClient.uploadPath(folder, recordID)
-      // resp.files.forEach(async (file) => {
-      //   // convert Int64 instance to javascript integer
-      //   // const mtime_ms = +file.mtime_ms
-      //   // console.log("file changed! " + file.name, mtime_ms)
-      // })
     })
   }
+
   return {
     ...fsClient,
     startLocal,

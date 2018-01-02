@@ -2,7 +2,6 @@ const { Op } = require("sequelize")
 const { compareHash } = require("../Utilities")
 
 async function GetAuth(action, app, record) {
-  console.log("GetAuth", action)
   const { authSession, authUser } = action
   if (!authUser) {
     throw { message: "Non-authenticated activity is not yet implemented" }

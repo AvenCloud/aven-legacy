@@ -31,7 +31,7 @@ afterEach(async () => {
   await fs.remove("__testTestDir")
 })
 
-test(
+test.skip(
   "startLocal - Can upload folder and watch changes",
   async () => {
     const sourceFolder = join(__dirname, "../__testDir")
