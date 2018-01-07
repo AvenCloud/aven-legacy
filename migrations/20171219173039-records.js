@@ -1,4 +1,4 @@
-"use strict";
+"use strict"
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
@@ -7,39 +7,39 @@ module.exports = {
         id: {
           allowNull: false,
           type: Sequelize.STRING,
-          primaryKey: true
+          primaryKey: true,
         },
         doc: {
           allowNull: true,
           type: Sequelize.STRING,
           references: {
             model: "Docs",
-            key: "id"
-          }
+            key: "id",
+          },
         },
         owner: {
           allowNull: false,
           type: Sequelize.STRING,
           references: {
             model: "Users",
-            key: "id"
-          }
+            key: "id",
+          },
         },
         permission: {
           allowNull: false,
-          type: Sequelize.ENUM("PUBLIC", "PRIVATE")
+          type: Sequelize.ENUM("PUBLIC", "PRIVATE"),
         },
         createdAt: {
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
         },
         updatedAt: {
-          type: Sequelize.DATE
-        }
-      })
-    ];
+          type: Sequelize.DATE,
+        },
+      }),
+    ]
   },
 
   down: (queryInterface, Sequelize) => {
-    return [queryInterface.dropTable("Records")];
-  }
-};
+    return [queryInterface.dropTable("Records")]
+  },
+}

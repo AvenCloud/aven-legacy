@@ -3,19 +3,24 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return [
-      queryInterface.createTable("Users", {
+      queryInterface.createTable("Links", {
         id: {
-          type: Sequelize.STRING,
+          type: Sequelize.UUID,
+          defaultValue: Sequelize.UUIDV4,
+          allowNull: false,
           primaryKey: true,
         },
-        displayName: {
-          type: Sequelize.STRING,
+        from: {
           allowNull: false,
+          type: Sequelize.STRING(40),
         },
-        password: {
-          // checksum
+        to: {
           allowNull: false,
-          type: Sequelize.STRING,
+          type: Sequelize.STRING(40),
+        },
+        metadata: {
+          allowNull: true,
+          type: Sequelize.JSONB,
         },
         createdAt: {
           type: Sequelize.DATE,
@@ -28,6 +33,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return [queryInterface.dropTable("Users")]
+    return [queryInterface.dropTable("Links")]
   },
 }

@@ -1,4 +1,4 @@
-"use strict";
+"use strict"
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
@@ -6,41 +6,41 @@ module.exports = {
       queryInterface.createTable("AuthMethods", {
         id: {
           type: Sequelize.STRING,
-          primaryKey: true
+          primaryKey: true,
         },
         type: {
           type: Sequelize.ENUM("PHONE", "EMAIL"),
-          allowNull: false
+          allowNull: false,
         },
         owner: {
           allowNull: false,
           type: Sequelize.STRING,
           references: {
             model: "Users",
-            key: "id"
-          }
+            key: "id",
+          },
         },
         primaryOwner: {
           unique: true,
           type: Sequelize.STRING,
           references: {
             model: "Users",
-            key: "id"
-          }
+            key: "id",
+          },
         },
         verificationKey: {
           // verification is incomplete unless this is empty!
-          type: Sequelize.STRING
+          type: Sequelize.STRING,
         },
         verificationExpiration: {
-          type: Sequelize.TIME
+          type: Sequelize.TIME,
         },
         createdAt: {
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
         },
         updatedAt: {
-          type: Sequelize.DATE
-        }
+          type: Sequelize.DATE,
+        },
       }),
       queryInterface.createTable("UserTokens", {
         user: {
@@ -48,31 +48,30 @@ module.exports = {
           allowNull: false,
           references: {
             model: "Users",
-            key: "id"
-          }
+            key: "id",
+          },
         },
         expiryTime: {
-          type: Sequelize.TIME
+          type: Sequelize.TIME,
         },
         permission: {
           allowNull: false,
-          type: Sequelize.ENUM("WRITE", "READ", "NONE")
+          type: Sequelize.ENUM("WRITE", "READ", "NONE"),
         },
-
         createdAt: {
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
         },
         updatedAt: {
-          type: Sequelize.DATE
-        }
-      }),  
-    ];
+          type: Sequelize.DATE,
+        },
+      }),
+    ]
   },
 
   down: (queryInterface, Sequelize) => {
     return [
       queryInterface.dropTable("AuthMethods"),
       queryInterface.dropTable("UserTokens"),
-    ];
-  }
-};
+    ]
+  },
+}

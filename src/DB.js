@@ -110,43 +110,54 @@ function createModel(infra) {
     },
   })
 
-  model.doc = sequelize.define(
-    "Doc",
-    {
-      id: {
-        type: Sequelize.STRING(40),
-        allowNull: false,
-        primaryKey: true,
-      },
-      value: {
-        allowNull: false,
-        type: Sequelize.JSONB,
-      },
-      associatedRecord: {
-        allowNull: false,
-        type: Sequelize.STRING,
-      },
-      size: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      uploader: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        references: {
-          model: model.user,
-          key: "id",
-        },
+  // Link:
+  //   Documents -> Documents
+  //   Records -> Documents
+  //   Documents -> Records
+  model.link = sequelize.define("Link", {
+    id: {
+      type: Sequelize.UUID,
+      defaultValue: Sequelize.UUIDV4,
+      allowNull: false,
+      primaryKey: true,
+    },
+    from: {
+      allowNull: false,
+      type: Sequelize.STRING(40),
+    },
+    to: {
+      allowNull: false,
+      type: Sequelize.STRING(40),
+    },
+    metadata: {
+      allowNull: true,
+      type: Sequelize.JSONB,
+    },
+  })
+
+  model.doc = sequelize.define("Doc", {
+    id: {
+      type: Sequelize.STRING(40),
+      allowNull: false,
+      primaryKey: true,
+    },
+    value: {
+      allowNull: false,
+      type: Sequelize.JSONB,
+    },
+    size: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+    uploader: {
+      type: Sequelize.STRING,
+      allowNull: false,
+      references: {
+        model: model.user,
+        key: "id",
       },
     },
-    {
-      indexes: [
-        {
-          fields: ["associatedRecord"],
-        },
-      ],
-    },
-  )
+  })
 
   model.record = sequelize.define("Record", {
     id: {

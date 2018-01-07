@@ -39,9 +39,13 @@ async function CreateDocAction(action, app) {
   await app.model.doc.create({
     id: docID,
     value: action.value,
-    associatedRecord: recordID,
     size: Buffer.byteLength(docContent, "utf8"),
     uploader: action.authUser,
+  })
+  // create the link
+  await app.model.link.create({
+    from: docID,
+    to: recordID,
   })
   return { docID, recordID, authPermission: permission }
 }

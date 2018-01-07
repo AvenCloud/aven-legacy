@@ -1,4 +1,4 @@
-"use strict";
+"use strict"
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
@@ -9,27 +9,27 @@ module.exports = {
           type: Sequelize.STRING,
           references: {
             model: "Records",
-            key: "id"
-          }
+            key: "id",
+          },
         },
         user: {
           allowNull: false,
           type: Sequelize.STRING,
           references: {
             model: "Users",
-            key: "id"
-          }
+            key: "id",
+          },
         },
         permission: {
           allowNull: false,
-          type: Sequelize.ENUM("ADMIN", "WRITE", "READ", "DENY")
+          type: Sequelize.ENUM("ADMIN", "WRITE", "READ", "DENY"),
         },
         createdAt: {
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
         },
         updatedAt: {
-          type: Sequelize.DATE
-        }
+          type: Sequelize.DATE,
+        },
       }),
       queryInterface.createTable("RecordTokens", {
         record: {
@@ -37,36 +37,36 @@ module.exports = {
           type: Sequelize.STRING,
           references: {
             model: "Records",
-            key: "id"
-          }
+            key: "id",
+          },
         },
         secret: {
           // checksum
           allowNull: false,
-          type: Sequelize.STRING
+          type: Sequelize.STRING,
         },
         expiryTime: {
           allowNull: false,
-          type: Sequelize.TIME
+          type: Sequelize.TIME,
         },
         permission: {
           allowNull: false,
-          type: Sequelize.ENUM("WRITE", "READ", "NONE")
+          type: Sequelize.ENUM("WRITE", "READ", "NONE"),
         },
         createdAt: {
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
         },
         updatedAt: {
-          type: Sequelize.DATE
-        }
-      })
-    ];
+          type: Sequelize.DATE,
+        },
+      }),
+    ]
   },
 
   down: (queryInterface, Sequelize) => {
     return [
       queryInterface.dropTable("RecordPermissions"),
-      queryInterface.dropTable("RecordTokens")
-    ];
-  }
-};
+      queryInterface.dropTable("RecordTokens"),
+    ]
+  },
+}

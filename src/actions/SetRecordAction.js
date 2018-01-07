@@ -17,7 +17,7 @@ async function SetRecordAction(action, app) {
       id: recordID,
       owner: action.authUser,
       permission: action.permission,
-      doc: action.doc,
+      doc: action.docID,
     })
   }
 }

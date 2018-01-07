@@ -1,4 +1,4 @@
-"use strict";
+"use strict"
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
@@ -7,49 +7,49 @@ module.exports = {
         id: {
           type: Sequelize.STRING,
           allowNull: false,
-          primaryKey: true
+          primaryKey: true,
         },
         user: {
           allowNull: false,
           type: Sequelize.STRING,
           references: {
             model: "Users",
-            key: "id"
-          }
+            key: "id",
+          },
         },
         secret: {
           // checksum
           allowNull: false,
-          type: Sequelize.STRING
+          type: Sequelize.STRING,
         },
         logoutToken: {
           // checksum
           allowNull: false,
-          type: Sequelize.STRING
+          type: Sequelize.STRING,
         },
         ip: {
           allowNull: false,
-          type: Sequelize.STRING
+          type: Sequelize.STRING,
         },
         authMethod: {
           allowNull: false,
           type: Sequelize.STRING,
           references: {
             model: "AuthMethods",
-            key: "id"
-          }
+            key: "id",
+          },
         },
         createdAt: {
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
         },
         updatedAt: {
-          type: Sequelize.DATE
-        }
-      })
-    ];
+          type: Sequelize.DATE,
+        },
+      }),
+    ]
   },
 
   down: (queryInterface, Sequelize) => {
-    return [queryInterface.dropTable("UserSessions")];
-  }
-};
+    return [queryInterface.dropTable("UserSessions")]
+  },
+}
