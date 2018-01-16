@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "start": "NODE_ENV=production scripts/start.sh",
-    "test": "NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/test.sh",
+    "test": "EMAIL_MODE=test NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/test.sh",
     "test-debug": "NODE_ARGS='--inspect-brk' yarn test",
-    "dev": "NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/dev.sh",
+    "dev": "EMAIL_MODE=development NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/dev.sh",
     "build": "scripts/build.sh",
     "postinstall": "yarn build"
   },
