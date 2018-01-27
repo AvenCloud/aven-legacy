@@ -1,7 +1,8 @@
 const express = require("express")
 const DB = require("./DB")
+const LocalAppLoader = require("./LocalAppLoader")
 const bodyParser = require("body-parser")
-const Dispatch = require("./Dispatch")
+const createDispatcher = require("./Dispatch")
 
 module.exports = async infra => {
   const app = express()
@@ -9,7 +10,7 @@ module.exports = async infra => {
   app.infra = infra
   app.model = DB.create(infra)
 
-  app.dispatch = action => Dispatch(action, app)
+  app.dispatch = createDispatcher(app)
 
   app.get("/api/debug", async (req, res) => {
     res.json(await infra.getPublicDebugInfo())
@@ -34,6 +35,11 @@ module.exports = async infra => {
   })
 
   app.get("*", async (req, res) => {
+    const { id } = await app.dispatch.GetRecordAction({ recordId: "App" })
+    console.log("haz id", id)
+    const doc = await app.dispatch.GetDocAction({ docId: id })
+
+    console.log("ok!", id)
     res.send(req.path)
   })
 
@@ -47,7 +53,17 @@ module.exports = async infra => {
     })
   })
 
+  let closeLocalLoader = () => {}
+  if (process.env.NODE_ENV === "development") {
+    try {
+      closeLocalLoader = await LocalAppLoader.start(app)
+    } catch (e) {
+      console.error("Could not load local 'app' folder!", e)
+    }
+  }
+
   app.close = async () => {
+    await closeLocalLoader()
     await infra.close()
     await new Promise((resolve, reject) => {
       server.close(function(err) {

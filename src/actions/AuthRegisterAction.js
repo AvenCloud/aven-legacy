@@ -72,6 +72,7 @@ async function AuthRegisterAction(action, app) {
     Welcome to Aven!
     http://foo/?code=${authCode}
   `,
+    { authCode },
   )
 
   return {

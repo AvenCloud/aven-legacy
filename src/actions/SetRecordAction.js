@@ -20,6 +20,7 @@ async function SetRecordAction(action, app) {
       doc: action.docID,
     })
   }
+  return { recordID }
 }
 
 module.exports = SetRecordAction

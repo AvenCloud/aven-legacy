@@ -6,7 +6,9 @@ async function GetRecordAction(action, app) {
     where: { id: { [Op.eq]: action.recordID } },
   })
   if (!record) {
-    return null
+    return {
+      id: null,
+    }
   }
   return {
     id: action.recordID,

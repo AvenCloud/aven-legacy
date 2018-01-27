@@ -9,17 +9,29 @@ const Actions = {
   GetDocAction: require("./actions/GetDocAction"),
 }
 
-async function Dispatch(action, app) {
-  if (Actions[action.type]) {
-    const result = await Actions[action.type](action, app)
-    return result
+function createDispatcher(app) {
+  async function dispatch(action) {
+    if (Actions[action.type]) {
+      const result = await Actions[action.type](action, app)
+      return result
+    }
+    throw {
+      statusCode: 400,
+      code: "UNKNOWN_ACTION",
+      field: "type",
+      message: "This action type is not recognized.",
+    }
   }
-  throw {
-    statusCode: 400,
-    code: "UNKNOWN_ACTION",
-    field: "type",
-    message: "This action type is not recognized.",
-  }
+
+  Object.keys(Actions).forEach(actionName => {
+    dispatch[actionName] = action =>
+      dispatch({
+        ...action,
+        type: actionName,
+      })
+  })
+
+  return dispatch
 }
 
-module.exports = Dispatch
+module.exports = createDispatcher

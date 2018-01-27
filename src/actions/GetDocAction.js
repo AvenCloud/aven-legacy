@@ -11,7 +11,7 @@ async function GetDocAction(action, app) {
     throw {
       statusCode: 400,
       code: "INVALID_DOC_ID",
-      message: `Document with ID '${action.docID}'' does not exist.`,
+      message: `Document with ID '${action.docID}' does not exist.`,
     }
   }
 

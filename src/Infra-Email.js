@@ -7,7 +7,7 @@ async function Email() {
 	return {
 		type: "test",
 		_testSentEmails,
-		send: async (to, subject, content) => {
+		send: async (to, subject, content, meta) => {
 			if (mode === "test") {
 				_testSentEmails.push({ to, subject, content })
 			} else if (mode === "development") {
@@ -15,6 +15,7 @@ async function Email() {
 				console.log("to: ", to)
 				console.log("subject: ", subject)
 				console.log("content: ", content)
+				_testSentEmails.push({ to, subject, content, meta })
 			} else if (mode === "sendgrid") {
 				const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
 					method: "post",

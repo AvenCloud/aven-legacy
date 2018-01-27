@@ -36,12 +36,22 @@ async function CreateDocAction(action, app) {
         "The docID, if provided, must match the sha1 (hex) checksum of the value",
     }
   }
-  await app.model.doc.create({
-    id: docID,
-    value: action.value,
-    size: Buffer.byteLength(docContent, "utf8"),
-    uploader: action.authUser,
-  })
+  try {
+    await app.model.doc.create({
+      id: docID,
+      value: action.value,
+      size: Buffer.byteLength(docContent, "utf8"),
+      uploader: action.authUser,
+    })
+  } catch (e) {
+    // This is OK, it means the exact same doc already exists in the DB. no need to store it twice!
+    if (
+      e.name !== "SequelizeUniqueConstraintError" ||
+      e.errors[0].path !== "id"
+    ) {
+      throw e
+    }
+  }
   // create the link
   await app.model.link.create({
     from: docID,
