@@ -93,9 +93,7 @@ async function FSClient(context) {
       authSession,
       authUser,
     })
-    console.log("FFFAS", record)
     if (!record.id) {
-      console.log("creating record", recordID, authSession, authUser)
       record = await dispatch({
         type: "SetRecordAction",
         recordID,
@@ -105,10 +103,8 @@ async function FSClient(context) {
         permission: "PUBLIC",
         owner: authUser,
       })
-      console.log("223333")
     }
     const putResult = await putPath(path, recordID)
-    console.log("ZOMG", putResult)
     await dispatch({
       type: "SetRecordAction",
       recordID,
@@ -118,7 +114,6 @@ async function FSClient(context) {
       permission: "PUBLIC",
       owner: authUser,
     })
-    console.log("ACK")
     return {
       recordID,
       docID: putResult.docID,

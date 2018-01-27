@@ -34,6 +34,8 @@ echo  "Running database migration.."
 
 ./node_modules/sequelize-cli/lib/sequelize db:migrate
 
+rm .AvenContext.json
+
 echo  "Migration complete."
 
 sleep 2

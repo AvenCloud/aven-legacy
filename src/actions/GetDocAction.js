@@ -7,37 +7,34 @@ async function GetDocAction(action, app) {
       id: { [Op.eq]: action.docID },
     },
   })
+
+  // Use one error for multiple types of miss, to protect privacy!
+  const notFoundError = {
+    statusCode: 400,
+    code: "INVALID_DOC",
+    message: `Document with ID '${action.docID}' and record '${
+      action.recordID
+    }' does not exist.`,
+  }
   if (!doc) {
-    throw {
-      statusCode: 400,
-      code: "INVALID_DOC_ID",
-      message: `Document with ID '${action.docID}' does not exist.`,
-    }
+    throw notFoundError
   }
 
-  const docRecordLink = await app.model.link.findOne({
+  const docRecord = await app.model.docRecord.findOne({
     where: {
-      from: { [Op.eq]: action.docID },
-      to: { [Op.eq]: action.recordID },
+      docId: { [Op.eq]: action.docID },
+      recordId: { [Op.eq]: action.recordID },
     },
   })
 
-  if (!docRecordLink) {
-    throw {
-      statusCode: 400,
-      code: "INVALID_DOC_RECORD_ASSOCIATION",
-      message: `The requested document is not associated with record with ID '${
-        action.recordID
-      }'.`,
-    }
+  if (!docRecord) {
+    throw notFoundError
   }
 
-  return (
-    doc && {
-      docID: action.docID,
-      value: doc.value,
-    }
-  )
+  return {
+    docID: action.docID,
+    value: doc.value,
+  }
 }
 
 module.exports = GetDocAction

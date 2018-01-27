@@ -35,8 +35,8 @@ module.exports = async infra => {
   })
 
   app.get("*", async (req, res) => {
-    const { id } = await app.dispatch.GetRecordAction({ recordId: "App" })
-    console.log("haz id", id)
+    const result = await app.dispatch.GetRecordAction({ recordId: "App" })
+    console.log("haz id", result)
     const doc = await app.dispatch.GetDocAction({ docId: id })
 
     console.log("ok!", id)
@@ -54,7 +54,7 @@ module.exports = async infra => {
   })
 
   let closeLocalLoader = () => {}
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === "development" && !process.env.JEST_TEST) {
     try {
       closeLocalLoader = await LocalAppLoader.start(app)
     } catch (e) {

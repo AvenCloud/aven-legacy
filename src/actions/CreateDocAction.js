@@ -53,9 +53,9 @@ async function CreateDocAction(action, app) {
     }
   }
   // create the link
-  await app.model.link.create({
-    from: docID,
-    to: recordID,
+  await app.model.docRecord.create({
+    docId: docID,
+    recordId: recordID,
   })
   return { docID, recordID, authPermission: permission }
 }

@@ -110,31 +110,6 @@ function createModel(infra) {
     },
   })
 
-  // Link:
-  //   Documents -> Documents
-  //   Records -> Documents
-  //   Documents -> Records
-  model.link = sequelize.define("Link", {
-    id: {
-      type: Sequelize.UUID,
-      defaultValue: Sequelize.UUIDV4,
-      allowNull: false,
-      primaryKey: true,
-    },
-    from: {
-      allowNull: false,
-      type: Sequelize.STRING(40),
-    },
-    to: {
-      allowNull: false,
-      type: Sequelize.STRING(40),
-    },
-    metadata: {
-      allowNull: true,
-      type: Sequelize.JSONB,
-    },
-  })
-
   model.doc = sequelize.define("Doc", {
     id: {
       type: Sequelize.STRING(40),
@@ -185,6 +160,40 @@ function createModel(infra) {
       allowNull: false,
       type: Sequelize.ENUM("PUBLIC", "PRIVATE"),
     },
+  })
+
+  // DocRecord:
+  model.docRecord = sequelize.define("DocRecord", {
+    id: {
+      type: Sequelize.UUID,
+      defaultValue: Sequelize.UUIDV4,
+      allowNull: false,
+      primaryKey: true,
+    },
+    docId: {
+      allowNull: false,
+      type: Sequelize.STRING(40),
+      references: {
+        model: model.doc,
+        key: "id",
+      },
+    },
+    recordId: {
+      allowNull: false,
+      type: Sequelize.STRING,
+      references: {
+        model: model.record,
+        key: "id",
+      },
+    },
+  })
+  model.doc.belongsToMany(model.record, {
+    through: model.docRecord,
+    foreignKey: "recordId",
+  })
+  model.record.belongsToMany(model.doc, {
+    through: model.docRecord,
+    foreignKey: "docId",
   })
 
   model.recordPermission = sequelize.define("RecordPermission", {
