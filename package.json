@@ -3,11 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "start": "NODE_ENV=production scripts/start.sh",
-    "test":
-      "JEST_TEST=true EMAIL_MODE=test NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/test.sh",
+    "test": "JEST_TEST=true EMAIL_MODE=test NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/test.sh",
     "test-debug": "NODE_ARGS='--inspect-brk' yarn test",
-    "dev":
-      "EMAIL_MODE=development NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/dev.sh",
+    "dev": "EMAIL_MODE=development NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres REDIS_URL=redis://localhost:6379 scripts/dev.sh",
     "build": "scripts/build.sh",
     "postinstall": "yarn build"
   },
@@ -37,6 +35,7 @@
     "global": "^4.3.2",
     "isbinaryfile": "^3.0.2",
     "json-stable-stringify": "^1.0.1",
+    "mime-types": "^2.1.17",
     "node-dev": "^3.1.3",
     "npx": "^9.7.1",
     "pg": "^7.4.0",

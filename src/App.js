@@ -1,6 +1,7 @@
 const express = require("express")
 const DB = require("./DB")
 const LocalAppLoader = require("./LocalAppLoader")
+const ExecServerApp = require("./ExecServerApp")
 const bodyParser = require("body-parser")
 const createDispatcher = require("./Dispatch")
 
@@ -35,12 +36,11 @@ module.exports = async infra => {
   })
 
   app.get("*", async (req, res) => {
-    const result = await app.dispatch.GetRecordAction({ recordId: "App" })
-    console.log("haz id", result)
-    const doc = await app.dispatch.GetDocAction({ docId: id })
-
-    console.log("ok!", id)
-    res.send(req.path)
+    try {
+      await ExecServerApp(app, req, res)
+    } catch (e) {
+      res.status(e.statusCode || 500).json(e)
+    }
   })
 
   const server = await new Promise((resolve, reject) => {

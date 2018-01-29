@@ -105,6 +105,7 @@ async function FSClient(context) {
       })
     }
     const putResult = await putPath(path, recordID)
+    console.log("ok1111!", putResult, recordID)
     await dispatch({
       type: "SetRecordAction",
       recordID,
@@ -114,6 +115,8 @@ async function FSClient(context) {
       permission: "PUBLIC",
       owner: authUser,
     })
+    console.log("22222!")
+
     return {
       recordID,
       docID: putResult.docID,
@@ -168,6 +171,7 @@ async function FSClient(context) {
     uploadPath,
     getPath,
     downloadPath,
+    close: () => {},
   }
 }
 

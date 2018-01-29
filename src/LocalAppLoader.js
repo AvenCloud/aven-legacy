@@ -1,6 +1,6 @@
 const fs = require("fs-extra")
 const joinPath = require("path").join
-const FSClient = require("./FSClient")
+const LocalClient = require("./LocalClient")
 
 const ROOT_USER = "root"
 
@@ -39,7 +39,7 @@ async function start(app) {
     await fs.writeFile(contextFilePath, JSON.stringify(context))
   }
   const { authUser, authSession } = context
-  const fsClient = await FSClient({
+  const fsClient = await LocalClient({
     dispatch: app.dispatch,
     authUser,
     authSession,
@@ -47,6 +47,10 @@ async function start(app) {
 
   const uploadRes = await fsClient.uploadPath(LOCAL_APP_PATH, "App")
 
+  console.log("INIT UPLOAD!", uploadRes)
+
+  const localStart = await fsClient.startLocal(LOCAL_APP_PATH, "App")
+  console.log("INIT LOCAL!", localStart)
   async function close() {
     fsClient.close()
   }

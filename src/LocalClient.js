@@ -30,7 +30,7 @@ async function LocalClient(context) {
         (err, res) => (err ? reject(err) : resolve(res)),
       ),
     )
-
+    console.log("watchResult", watchResult)
     const subscribeResult = await new Promise((resolve, reject) =>
       watchman.command(
         [
@@ -49,9 +49,11 @@ async function LocalClient(context) {
         (err, res) => (err ? reject(err) : resolve(res)),
       ),
     )
+    console.log("subscribeResult", subscribeResult)
 
     watchman.on("subscription", async resp => {
       if (resp.subscription !== "mysubscription") return
+      console.log("ZOMG!")
       const uploadResult = await fsClient.uploadPath(folder, recordID)
     })
   }
