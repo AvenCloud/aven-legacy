@@ -10,7 +10,6 @@ const isBinaryFile = promisify(require("isbinaryfile"));
 
 // babel stufs:
 const babel = require("babel-core");
-const presetEs2015 = require("babel-preset-es2015");
 const presetStage0 = require("babel-preset-stage-0");
 const presetReact = require("babel-preset-react");
 
@@ -23,31 +22,40 @@ async function FSClient(context) {
       encoding: "utf8",
     });
     let dependencies = null;
-    const parsedBabel = babel.transform(source, {
-      sourceMaps: true,
-      presets: [presetEs2015, presetStage0, presetReact],
-      plugins: [
-        ({ parse, traverse }) => ({
-          visitor: {
-            ArrowFunctionExpression(path) {
-              if (!dependencies) {
-                const input = path.node.params[0];
-                dependencies = input.properties.map(a => {
-                  return a.value.name;
-                });
-              }
+    let moduleData = null;
+    try {
+      const parsedBabel = babel.transform(source, {
+        sourceMaps: true,
+        presets: [presetReact, presetStage0],
+        plugins: [
+          ({ parse, traverse }) => ({
+            visitor: {
+              ArrowFunctionExpression(path) {
+                if (!dependencies) {
+                  const input = path.node.params[0];
+                  dependencies = input.properties.map(a => {
+                    return a.value.name;
+                  });
+                }
+              },
             },
-          },
-        }),
-      ],
-    });
-    const moduleData = {
-      dependencies,
-      type: "JSModule",
-      code: parsedBabel.code,
-      map: parsedBabel.map,
-      source,
-    };
+          }),
+        ],
+      });
+      moduleData = {
+        dependencies,
+        type: "JSModule",
+        code: parsedBabel.code,
+        map: parsedBabel.map,
+        source,
+      };
+    } catch (e) {
+      moduleData = {
+        dependencies,
+        type: "JSModule",
+        error: e.message,
+      };
+    }
     return moduleData;
   }
 

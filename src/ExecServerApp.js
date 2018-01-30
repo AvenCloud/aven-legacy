@@ -1,16 +1,29 @@
 const mime = require("mime-types");
 const { parse } = require("path");
+const React = require("react");
+const ReactDOM = require("react-dom");
+const ReactDOMServer = require("react-dom/server");
+const Platform = {};
+const _platformDeps = {
+  Platform,
+  React,
+  _npm_react: React,
+  _npm_react_dom: ReactDOM,
+};
+const _platformDepNames = Object.keys(_platformDeps);
 
-const _platformDepNames = ["React"];
 async function ExecJSModule(app, module, context) {
   if (module.type !== "JSModule") {
     return module;
+  }
+  if (module.error) {
+    return module.error;
   }
   const remoteDeps = module.dependencies.filter(
     dep => _platformDepNames.indexOf(dep) === -1,
   );
 
-  const deps = {};
+  const deps = { ..._platformDeps };
   const depsNotFound = [];
 
   await Promise.all(
@@ -54,11 +67,10 @@ async function ExecJSModule(app, module, context) {
         depsNotFound.push(remoteDep);
         return;
       }
-      deps[remoteDep] = await ExecJSModule(app, depModule, context);
+      const executedDep = await ExecJSModule(app, depModule.value, context);
+      deps[remoteDep] = executedDep;
     }),
   );
-
-  console.log("ready to eval", deps, module, depsNotFound);
 
   if (depsNotFound.length) {
     throw {
@@ -66,13 +78,12 @@ async function ExecJSModule(app, module, context) {
       message: "dependencies not found: " + depsNotFound.join(),
     };
   }
-
   computedDoc = eval(module.code)(deps);
 
   return computedDoc;
 }
 
-async function ExecDocAtPath(app, path, docID, res, context) {
+async function ExecDocAtPath(app, path, docID, { req, res }, context) {
   const doc = await app.dispatch.GetDocAction({
     docID: docID,
     recordID: "App",
@@ -88,29 +99,19 @@ async function ExecDocAtPath(app, path, docID, res, context) {
 
   if (path === "") {
     const type = doc.value.type;
-    const fileName = context && context[0] && context[0].fileName;
-    const contentType = fileName && mime.lookup(fileName);
-    contentType && res.set({ "content-type": contentType });
     switch (type) {
       case "Buffer": {
+        const fileName = context && context[0] && context[0].fileName;
+        const contentType = fileName && mime.lookup(fileName);
+        res.set("Content-Type", contentType);
         const buf = Buffer.from(doc.value.value, "base64");
         res.send(buf);
         return;
       }
-      case "JSModule": {
-        const result = await ExecJSModule(app, doc.value, context);
-        if (typeof result === "string") {
-          res.send(result);
-        } else if (result.responseValue) {
-          result.statusCode && res.statusCode(result.statusCode);
-          result.headers && result.set(headers);
-          res.send(result.responseValue);
-        } else {
-          res.json(result);
-        }
-        return;
-      }
       case "String": {
+        const fileName = context && context[0] && context[0].fileName;
+        const contentType = fileName && mime.lookup(fileName);
+        contentType && res.set("content-type", contentType);
         res.send(doc.value.value);
         return;
       }
@@ -129,7 +130,7 @@ async function ExecDocAtPath(app, path, docID, res, context) {
           const pathParts = path.split("/");
           const childPath = pathParts.slice(1).join("/");
           const childDocID = foundIndexFile.docID;
-          return await ExecDocAtPath(app, childPath, childDocID, res, [
+          return await ExecDocAtPath(app, childPath, childDocID, { req, res }, [
             {
               ...foundIndexFile,
               files: doc.value.files,
@@ -141,18 +142,43 @@ async function ExecDocAtPath(app, path, docID, res, context) {
         return;
       }
       default: {
-        res.json(doc.value);
-        return;
+        break;
       }
     }
   }
+  if (doc.value.type === "JSModule") {
+    const result = await ExecJSModule(app, doc.value, context);
+    if (React.Component.isPrototypeOf(result)) {
+      const App = result;
+      res.set("content-type", "text/html");
+      const { path, query } = req;
+      const html = ReactDOMServer.renderToString(
+        <App path={path} query={query} />,
+      );
+      res.send(`<!doctype html>${html}`);
+    } else if (typeof result === "string") {
+      res.send(result);
+    } else if (typeof result === "function") {
+      await result(app, req, res);
+    } else if (React.isValidElement(result)) {
+      res.set("content-type", "text/html");
+      const html = ReactDOMServer.renderToString(result);
+      res.send(`<!doctype html>${html}`);
+    } else if (typeof result === "string") {
+      res.send(result);
+    } else if (result.responseValue) {
+      result.statusCode && res.statusCode(result.statusCode);
+      result.headers && result.set(headers);
+      res.send(result.responseValue);
+    } else {
+      res.json(result);
+    }
+    return;
+  }
 
   if (!doc.value || doc.value.type !== "Directory") {
-    throw {
-      statusCode: 404,
-      code: "INVALID_DOC",
-      message: `Doc is not a directory`,
-    };
+    res.json(doc.value);
+    return;
   }
 
   const pathParts = path.split("/");
@@ -167,7 +193,7 @@ async function ExecDocAtPath(app, path, docID, res, context) {
   });
   if (!selectedFile) {
     doc.value.files.find(file => {
-      if (file.fileName === pathParts[0] + ".js") {
+      if (parse(file.fileName).name === pathParts[0]) {
         selectedFile = file;
         return true;
       }
@@ -195,7 +221,7 @@ async function ExecDocAtPath(app, path, docID, res, context) {
   const childPath = pathParts.slice(1).join("/");
   const childDocID = selectedFile && selectedFile.docID;
   if (childDocID) {
-    return await ExecDocAtPath(app, childPath, childDocID, res, [
+    return await ExecDocAtPath(app, childPath, childDocID, { req, res }, [
       {
         ...selectedFile,
         files: doc.value.files,
@@ -221,7 +247,7 @@ async function ExecServerApp(app, req, res) {
     };
   }
   const topPath = req.path.slice(1);
-  await ExecDocAtPath(app, topPath, result.doc, res, [
+  await ExecDocAtPath(app, topPath, result.doc, { req, res }, [
     { recordID: "App", docID: result.doc },
   ]);
 }

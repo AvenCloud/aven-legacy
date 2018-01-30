@@ -51,7 +51,6 @@ async function LocalClient(context) {
 
     watchman.on("subscription", async resp => {
       if (resp.subscription !== "mysubscription") return;
-      console.log("Uploading", resp);
       const uploadResult = await fsClient.uploadPath(folder, recordID);
     });
   }
