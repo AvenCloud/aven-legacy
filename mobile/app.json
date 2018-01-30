@@ -4,7 +4,7 @@
     "description": "Create and publish dynamic documents and tasks",
     "slug": "aven",
     "privacy": "unlisted",
-    "sdkVersion": "22.0.0",
+    "sdkVersion": "25.0.0",
     "version": "1.0.0",
     "orientation": "portrait",
     "primaryColor": "#154E61",
@@ -15,23 +15,17 @@
       "hideExponentText": true
     },
     "packagerOpts": {
-      "assetExts": [
-        "ttf",
-        "mp4"
-      ]
+      "assetExts": ["ttf", "mp4"]
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "io.aven.iosapp",
       "buildNumber": "1.0.0",
       "icon": "./assets/iPhoneIcon.png",
-      "associatedDomains": [
-        "applinks:aven.io",
-        "applinks:to.aven.io"
-      ],
+      "associatedDomains": ["applinks:aven.io", "applinks:to.aven.io"],
       "config": {
         "branch": {
-          "apiKey": "key_live_mjwSvsNRaU2BgRRteDiPHdckErd9AVd7",
+          "apiKey": "key_live_mjwSvsNRaU2BgRRteDiPHdckErd9AVd7"
         }
       }
     },
@@ -52,10 +46,11 @@
           "config": {
             "organization": "aven",
             "project": "avenapp",
-            "authToken": "81b067e9c71f4d1ead7f3fba06d24d866a23a1b1a714402da5c2eb0db0cf0d1f"
+            "authToken":
+              "81b067e9c71f4d1ead7f3fba06d24d866a23a1b1a714402da5c2eb0db0cf0d1f"
           }
         }
       ]
     }
-  },
+  }
 }
