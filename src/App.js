@@ -4,10 +4,65 @@ const LocalAppLoader = require("./LocalAppLoader");
 const ExecServerApp = require("./ExecServerApp");
 const bodyParser = require("body-parser");
 const createDispatcher = require("./Dispatch");
+const http = require("http");
+const WSServer = require("ws").Server;
+const randomBytes = require("bluebird").promisify(
+  require("crypto").randomBytes,
+);
+
+async function genClientId() {
+  const randBuf = await randomBytes(48);
+  const hex = randBuf.toString("hex");
+  return hex;
+}
 
 module.exports = async infra => {
   const app = express();
 
+  const appServer = http.createServer(app);
+
+  const wss = new WSServer({
+    server: appServer,
+  });
+
+  const handlersById = new Map();
+  const subscriptionChannels = new Map();
+  const getSubscriptionChannelSubscribers = channel =>
+    subscriptionChannels.has(channel)
+      ? subscriptionChannels.get(channel)
+      : subscriptionChannels.set(channel, new Set()).get(channel);
+  wss.on("connection", async ws => {
+    const clientID = await genClientId();
+    handlersById.set(clientID, msg => {
+      ws.send(msg);
+    });
+    ws.on("message", data => {
+      const payload = JSON.parse(data);
+      if (payload.type === "subscribe") {
+        const subscribedClients = getSubscriptionChannelSubscribers(
+          payload.recordID,
+        );
+        subscribedClients.add(clientID);
+      }
+      if (payload.type === "unsubscribe") {
+        const subscribedClients = getSubscriptionChannelSubscribers(
+          payload.recordID,
+        );
+        subscribedClients.remove(clientID);
+      }
+    });
+    ws.on("close", () => {
+      handlersById.delete(clientID);
+    });
+    handlersById.get(clientID)(JSON.stringify({ type: "Greet", clientID }));
+  });
+  app.notify = (recordID, payload) => {
+    const subscribedClients = getSubscriptionChannelSubscribers(recordID);
+    subscribedClients.forEach(clientID => {
+      const handler = handlersById.get(clientID);
+      handler && handler(JSON.stringify(payload));
+    });
+  };
   app.infra = infra;
   app.model = DB.create(infra);
 
@@ -47,7 +102,7 @@ module.exports = async infra => {
   });
 
   const server = await new Promise((resolve, reject) => {
-    const httpServer = app.listen(infra.appListenPort, err => {
+    const httpServer = appServer.listen(infra.appListenPort, err => {
       if (err) {
         reject(err);
       } else {
