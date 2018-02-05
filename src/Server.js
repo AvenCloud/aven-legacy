@@ -1,49 +1,45 @@
-const App = require("./App")
-const Infra = require("./Infra")
+const FSAgent = require("./FSAgent");
+const CreateAgentServer = require("./CreateAgentServer");
+const DBAgent = require("./DBAgent");
+const ExecServerApp = require("./ExecServerApp");
+const WatchmanAgent = require("./WatchmanAgent");
+const Infra = require("./Infra");
+const joinPath = require("path").join;
+const LOCAL_APP_PATH = joinPath(process.cwd(), "app");
+const MAIN_APP_NAME = "App";
 
-const port = process.env.PORT || 3000
+const IS_DEV = process.env.NODE_ENV === "development";
 
-Infra({ port })
-  .then(infra => App(infra))
-  .then(app => {
-    console.log("Started on http://localhost:" + port)
+module.exports = async () => {
+  const infra = await Infra({});
+  const dbAgent = await DBAgent(infra);
 
-    process.on("SIGTERM", () => {
-      app
-        .close()
-        .then(() => {
-          console.log("App Cleanly Shut Down. \n\n")
-          process.exit(0)
-        })
-        .catch(e => {
-          console.error("App Shut Down with Error: ", e)
-          process.exit(1)
-        })
-    })
+  const fsAgent = await FSAgent(dbAgent, infra);
+  const appAgent = IS_DEV ? await WatchmanAgent(fsAgent, infra) : fsAgent;
+  // const appAgent = await AuthAgent(fsAgent, infra);
 
-    process.on("SIGINT", () => {
-      app
-        .close()
-        .then(() => {
-          console.log("App Cleanly Interrupted. \n\n")
-          process.exit(0)
-        })
-        .catch(e => {
-          console.error("App Interrupted with Error: ", e)
-          process.exit(1)
-        })
-    })
+  const app = await CreateAgentServer(appAgent, infra);
 
-    process.on("SIGQUIT", () => {
-      app
-        .close()
-        .then(() => {
-          console.log("App Cleanly Quit. \n\n")
-          process.exit(0)
-        })
-        .catch(e => {
-          console.error("App Quit with Error: ", e)
-          process.exit(1)
-        })
-    })
-  })
+  appAgent.provideDirectory(LOCAL_APP_PATH, MAIN_APP_NAME);
+
+  app.get("*", async (req, res) => {
+    try {
+      await ExecServerApp(appAgent, req, res, MAIN_APP_NAME);
+    } catch (e) {
+      console.log("Error:", e);
+      res
+        .status(e.statusCode || 500)
+        .json({ message: e.message, type: e.type });
+    }
+  });
+
+  console.log("Started on " + infra.hostURI);
+
+  const close = async () => {
+    await agent.close();
+    await infra.close();
+    await app.close();
+  };
+
+  return close;
+};

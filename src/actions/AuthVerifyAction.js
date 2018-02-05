@@ -1,7 +1,7 @@
-const { Op } = require("sequelize")
+const { Op } = require("sequelize");
 
-async function AuthVerifyAction(action, app, dispatch) {
-  const authMethod = await app.model.authMethod.findOne({
+async function AuthVerifyAction(action, infra) {
+  const authMethod = await infra.model.authMethod.findOne({
     where: {
       id: {
         [Op.eq]: action.id,
@@ -13,13 +13,13 @@ async function AuthVerifyAction(action, app, dispatch) {
         [Op.eq]: action.user,
       },
     },
-  })
+  });
   if (!authMethod) {
     throw {
       statusCode: 400,
       code: "INVALID_VERIFICATON",
       message: "Could not be verified",
-    }
+    };
   }
   if (authMethod.verificationExpiration) {
     // todo check time to verify late verification
@@ -27,11 +27,11 @@ async function AuthVerifyAction(action, app, dispatch) {
   await authMethod.update({
     verificationExpiration: null,
     verificationKey: null,
-  })
+  });
   return {
     userID: action.user,
     authID: action.id,
-  }
+  };
 }
 
-module.exports = AuthVerifyAction
+module.exports = AuthVerifyAction;

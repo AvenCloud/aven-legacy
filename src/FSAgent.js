@@ -13,9 +13,16 @@ const babel = require("babel-core");
 const presetStage0 = require("babel-preset-stage-0");
 const presetReact = require("babel-preset-react");
 
-async function FSClient(context) {
-  const { dispatch, authUser, authSession } = context;
-  const uploadedFiles = context.uploadedFiles || (context.uploadedFiles = {});
+async function FSAgent(agent) {
+  const {
+    dispatch,
+    authUser,
+    authSession,
+    subscribe,
+    unsubscribe,
+    close,
+  } = agent;
+  const uploadedFiles = agent.uploadedFiles || (agent.uploadedFiles = {});
 
   async function readJSModuleValue(path) {
     const source = await fs.readFile(path, {
@@ -213,14 +220,79 @@ async function FSClient(context) {
     await getPath(path, recordID, record.doc);
   }
 
+  const _providedDirs = {};
+
+  const fsDocs = {};
+  const fsRecords = {};
+
+  const _providePathDocs = async (path, recordID) => {
+    console.log(path);
+    const value = await readFileValue(path);
+    const docID = digest(stringify(value));
+    fsDocs[docID] = {
+      docID,
+      recordID,
+      value,
+    };
+    if (value.type === "Directory") {
+      await Promise.all(
+        value.files.map(async file => {
+          const filePath = join(path, file.fileName);
+          await _providePathDocs(filePath, recordID);
+        }),
+      );
+    }
+
+    return {
+      doc: docID,
+      owner: "FSAgent",
+    };
+  };
+
+  const provideDirectory = async (path, recordID) => {
+    _providedDirs[recordID] = path;
+
+    const record = _providePathDocs(path, recordID);
+    fsRecords[recordID] = record;
+    return () => {
+      delete _providedDirs[recordID];
+    };
+  };
+
+  const onDispatch = async action => {
+    if (action.type === "GetRecordAction") {
+      const providedDir = _providedDirs[action.recordID];
+      const fsRecord = fsRecords[action.recordID];
+      if (providedDir && fsRecord) {
+        return fsRecord;
+      }
+    }
+    if (action.type === "GetDocAction") {
+      const fsDoc = fsDocs[action.docID];
+      if (fsDoc) {
+        return fsDoc;
+      }
+    }
+
+    //fallback
+    const result = await dispatch(action);
+    return result;
+  };
+
   return {
     checksumPath,
     putPath,
     uploadPath,
     getPath,
     downloadPath,
-    close: () => {},
+    close,
+    dispatch: onDispatch,
+    authUser,
+    authSession,
+    subscribe,
+    unsubscribe,
+    provideDirectory,
   };
 }
 
-module.exports = FSClient;
+module.exports = FSAgent;

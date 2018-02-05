@@ -15,7 +15,7 @@ run_app_dev() {
   PG_NO_SSL=true
   DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres
   REDIS_URL=redis://localhost:6379
-  babel-watch src/Server.js
+  babel-watch src/RunServer.js
 }
 
 
@@ -33,8 +33,6 @@ sleep 12
 echo  "Running database migration.."
 
 ./node_modules/sequelize-cli/lib/sequelize db:migrate
-
-rm .AvenContext.json
 
 echo  "Migration complete."
 

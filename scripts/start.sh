@@ -12,4 +12,4 @@ echo "Performing Production DB migration.."
 
 echo "Starting Production App at directory $PWD.."
 
-node dist/Server.js
+node dist/RunServer.js

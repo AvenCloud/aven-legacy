@@ -1,9 +1,5 @@
 const express = require("express");
-const DB = require("./DB");
-const LocalAppLoader = require("./LocalAppLoader");
-const ExecServerApp = require("./ExecServerApp");
 const bodyParser = require("body-parser");
-const createDispatcher = require("./Dispatch");
 const http = require("http");
 const WSServer = require("ws").Server;
 const randomBytes = require("bluebird").promisify(
@@ -16,14 +12,8 @@ async function genClientId() {
   return hex;
 }
 
-module.exports = async infra => {
+const CreateAgentServer = async (agent, infra) => {
   const app = express();
-
-  const appServer = http.createServer(app);
-
-  const wss = new WSServer({
-    server: appServer,
-  });
 
   const handlersById = new Map();
   const subscriptionChannels = new Map();
@@ -31,7 +21,7 @@ module.exports = async infra => {
     subscriptionChannels.has(channel)
       ? subscriptionChannels.get(channel)
       : subscriptionChannels.set(channel, new Set()).get(channel);
-  wss.on("connection", async ws => {
+  const onWSSConnection = async ws => {
     const clientID = await genClientId();
     handlersById.set(clientID, msg => {
       ws.send(msg);
@@ -55,7 +45,7 @@ module.exports = async infra => {
       handlersById.delete(clientID);
     });
     handlersById.get(clientID)(JSON.stringify({ type: "Greet", clientID }));
-  });
+  };
   app.notify = (recordID, payload) => {
     const subscribedClients = getSubscriptionChannelSubscribers(recordID);
     subscribedClients.forEach(clientID => {
@@ -64,9 +54,9 @@ module.exports = async infra => {
     });
   };
   app.infra = infra;
-  app.model = DB.create(infra);
+  app.model = infra.model;
 
-  app.dispatch = createDispatcher(app);
+  app.agent = agent;
 
   app.get("/api/debug", async (req, res) => {
     res.json(await infra.getPublicDebugInfo());
@@ -76,7 +66,7 @@ module.exports = async infra => {
     let result = null;
     const action = req.body;
     try {
-      result = await app.dispatch(action);
+      result = await agent.dispatch(action);
       res.json(result);
     } catch (e) {
       // avoid logging expected errors during test runs:
@@ -90,47 +80,30 @@ module.exports = async infra => {
     }
   });
 
-  app.get("*", async (req, res) => {
-    try {
-      await ExecServerApp(app, req, res);
-    } catch (e) {
-      console.log("Error:", e);
-      res
-        .status(e.statusCode || 500)
-        .json({ message: e.message, type: e.type });
-    }
-  });
+  const appServer = http.createServer(app);
 
-  const server = await new Promise((resolve, reject) => {
-    const httpServer = appServer.listen(infra.appListenPort, err => {
+  const wss = new WSServer({
+    server: appServer,
+  });
+  wss.on("connection", onWSSConnection);
+
+  const httpServer = await new Promise((resolve, reject) => {
+    const s = appServer.listen(infra.appListenPort, err => {
       if (err) {
         reject(err);
       } else {
-        resolve(httpServer);
+        resolve(s);
       }
     });
   });
 
-  let closeLocalLoader = () => {};
-  if (process.env.NODE_ENV === "development" && !process.env.JEST_TEST) {
-    try {
-      closeLocalLoader = await LocalAppLoader.start(app);
-    } catch (e) {
-      console.error("Could not load local 'app' folder!", e);
-    }
-  }
-
   app.close = async () => {
-    await closeLocalLoader();
-    await infra.close();
     await new Promise((resolve, reject) => {
-      server.close(function(err) {
+      httpServer.close(err => {
         if (err) {
           reject(err);
         } else {
-          setTimeout(() => {
-            resolve();
-          }, 200);
+          resolve();
         }
       });
     });
@@ -138,3 +111,5 @@ module.exports = async infra => {
 
   return app;
 };
+
+module.exports = CreateAgentServer;

@@ -12,7 +12,7 @@ const _platformDeps = {
 };
 const _platformDepNames = Object.keys(_platformDeps);
 
-async function ExecJSModule(app, module, context) {
+async function ExecJSModule(agent, module, context) {
   if (module.type !== "JSModule") {
     return module;
   }
@@ -48,7 +48,8 @@ async function ExecJSModule(app, module, context) {
       });
       if (!childDocID) {
         childRecordID = remoteDep;
-        const depModuleRecord = await app.dispatch.GetRecordAction({
+        const depModuleRecord = await agent.dispatch({
+          type: "GetRecordAction",
           recordID: childRecordID,
         });
         if (depModuleRecord && depModuleRecord.doc) {
@@ -59,7 +60,8 @@ async function ExecJSModule(app, module, context) {
         depsNotFound.push(remoteDep);
         return;
       }
-      const depModule = await app.dispatch.GetDocAction({
+      const depModule = await agent.dispatch({
+        type: "GetDocAction",
         recordID: childRecordID,
         docID: childDocID,
       });
@@ -67,7 +69,7 @@ async function ExecJSModule(app, module, context) {
         depsNotFound.push(remoteDep);
         return;
       }
-      const executedDep = await ExecJSModule(app, depModule.value, context);
+      const executedDep = await ExecJSModule(agent, depModule.value, context);
       deps[remoteDep] = executedDep;
     }),
   );
@@ -83,8 +85,9 @@ async function ExecJSModule(app, module, context) {
   return computedDoc;
 }
 
-async function ExecDocAtPath(app, path, docID, { req, res }, context) {
-  const doc = await app.dispatch.GetDocAction({
+async function ExecDocAtPath(agent, path, docID, { req, res }, context) {
+  const doc = await agent.dispatch({
+    type: "GetDocAction",
     docID: docID,
     recordID: "App",
   });
@@ -130,13 +133,19 @@ async function ExecDocAtPath(app, path, docID, { req, res }, context) {
           const pathParts = path.split("/");
           const childPath = pathParts.slice(1).join("/");
           const childDocID = foundIndexFile.docID;
-          return await ExecDocAtPath(app, childPath, childDocID, { req, res }, [
-            {
-              ...foundIndexFile,
-              files: doc.value.files,
-            },
-            ...context,
-          ]);
+          return await ExecDocAtPath(
+            agent,
+            childPath,
+            childDocID,
+            { req, res },
+            [
+              {
+                ...foundIndexFile,
+                files: doc.value.files,
+              },
+              ...context,
+            ],
+          );
         }
         res.json(doc.value);
         return;
@@ -147,7 +156,7 @@ async function ExecDocAtPath(app, path, docID, { req, res }, context) {
     }
   }
   if (doc.value.type === "JSModule") {
-    const result = await ExecJSModule(app, doc.value, context);
+    const result = await ExecJSModule(agent, doc.value, context);
     if (React.Component.isPrototypeOf(result)) {
       const App = result;
       res.set("content-type", "text/html");
@@ -159,7 +168,7 @@ async function ExecDocAtPath(app, path, docID, { req, res }, context) {
     } else if (typeof result === "string") {
       res.send(result);
     } else if (typeof result === "function") {
-      await result(app, req, res);
+      await result(agent, req, res);
     } else if (React.isValidElement(result)) {
       res.set("content-type", "text/html");
       const html = ReactDOMServer.renderToString(result);
@@ -221,7 +230,7 @@ async function ExecDocAtPath(app, path, docID, { req, res }, context) {
   const childPath = pathParts.slice(1).join("/");
   const childDocID = selectedFile && selectedFile.docID;
   if (childDocID) {
-    return await ExecDocAtPath(app, childPath, childDocID, { req, res }, [
+    return await ExecDocAtPath(agent, childPath, childDocID, { req, res }, [
       {
         ...selectedFile,
         files: doc.value.files,
@@ -237,18 +246,21 @@ async function ExecDocAtPath(app, path, docID, { req, res }, context) {
   };
 }
 
-async function ExecServerApp(app, req, res) {
-  const result = await app.dispatch.GetRecordAction({ recordID: "App" });
+async function ExecServerApp(agent, req, res, mainRecord) {
+  const result = await agent.dispatch({
+    type: "GetRecordAction",
+    recordID: mainRecord,
+  });
   if (!result || !result.doc) {
     throw {
       statusCode: 404,
       code: "INVALID_APP",
-      message: "App Record doc not found!",
+      message: `App Record doc "${mainRecord}" not found!`,
     };
   }
   const topPath = req.path.slice(1);
-  await ExecDocAtPath(app, topPath, result.doc, { req, res }, [
-    { recordID: "App", docID: result.doc },
+  await ExecDocAtPath(agent, topPath, result.doc, { req, res }, [
+    { recordID: mainRecord, docID: result.doc },
   ]);
 }
 

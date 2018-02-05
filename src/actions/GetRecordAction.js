@@ -1,8 +1,8 @@
 const { Op } = require("sequelize");
 
-async function GetRecordAction(action, app) {
+async function GetRecordAction(action, infra) {
   // todo, authentication here
-  const record = await app.model.record.findOne({
+  const record = await infra.model.record.findOne({
     where: { id: { [Op.eq]: action.recordID } },
   });
   if (!record) {

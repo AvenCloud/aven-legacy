@@ -11,7 +11,7 @@
             />
           </head>
           <body>
-            <Title>Hello!</Title>
+            <Title>Hello2!</Title>
           </body>
         </html>
       );

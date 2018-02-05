@@ -1,8 +1,7 @@
-const Sequelize = require("sequelize")
+const Sequelize = require("sequelize");
 
-function createModel(infra) {
-  const { sequelize } = infra
-  const model = {}
+function createModel(sequelize) {
+  const model = {};
 
   model.user = sequelize.define("User", {
     id: {
@@ -18,7 +17,7 @@ function createModel(infra) {
       allowNull: false,
       type: Sequelize.STRING,
     },
-  })
+  });
 
   model.authMethod = sequelize.define("AuthMethod", {
     id: {
@@ -52,7 +51,7 @@ function createModel(infra) {
     verificationExpiration: {
       type: Sequelize.TIME,
     },
-  })
+  });
 
   model.userToken = sequelize.define("UserToken", {
     user: {
@@ -70,7 +69,7 @@ function createModel(infra) {
       allowNull: false,
       type: Sequelize.ENUM("WRITE", "READ", "NONE"),
     },
-  })
+  });
 
   model.userSession = sequelize.define("UserSession", {
     id: {
@@ -108,7 +107,7 @@ function createModel(infra) {
         key: "id",
       },
     },
-  })
+  });
 
   model.doc = sequelize.define("Doc", {
     id: {
@@ -132,7 +131,7 @@ function createModel(infra) {
         key: "id",
       },
     },
-  })
+  });
 
   model.record = sequelize.define("Record", {
     id: {
@@ -160,7 +159,7 @@ function createModel(infra) {
       allowNull: false,
       type: Sequelize.ENUM("PUBLIC", "PRIVATE"),
     },
-  })
+  });
 
   // DocRecord:
   model.docRecord = sequelize.define("DocRecord", {
@@ -186,15 +185,15 @@ function createModel(infra) {
         key: "id",
       },
     },
-  })
+  });
   model.doc.belongsToMany(model.record, {
     through: model.docRecord,
     foreignKey: "recordId",
-  })
+  });
   model.record.belongsToMany(model.doc, {
     through: model.docRecord,
     foreignKey: "docId",
-  })
+  });
 
   model.recordPermission = sequelize.define("RecordPermission", {
     record: {
@@ -217,7 +216,7 @@ function createModel(infra) {
       allowNull: false,
       type: Sequelize.ENUM("ADMIN", "WRITE", "READ", "DENY"),
     },
-  })
+  });
 
   model.recordToken = sequelize.define("RecordToken", {
     record: {
@@ -241,11 +240,11 @@ function createModel(infra) {
       allowNull: false,
       type: Sequelize.ENUM("WRITE", "READ", "NONE"),
     },
-  })
+  });
 
-  return model
+  return model;
 }
 
 module.exports = {
-  create: createModel,
-}
+  createModel,
+};

@@ -261,3 +261,34 @@ export class ReactNativeAgent {
 
   // agent.off*(...)
 }
+
+// Aven Agent Architecture
+//# Every Agent exports dispatch,subs,unsubs
+
+// const ServerAgent => (infra) => {
+//   connection {
+//     dispatch
+//     subscribe
+//     unsubscribe
+//   }
+// }
+
+// const ClientNetworkAgent => (host, useSSL) => {
+//   connection {
+//     dispatch
+//     subscribe
+//     unsubscribe
+//   }
+// }
+
+// const ClientAgent => (conn, localStorage?) => {
+//   ...exec,
+//   ...various helpers...
+
+//   connection {
+//     dispatch
+//     subscribe
+//     unsubscribe
+//   }
+// }
+

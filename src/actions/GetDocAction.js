@@ -1,12 +1,12 @@
-const { Op } = require("sequelize")
+const { Op } = require("sequelize");
 
-async function GetDocAction(action, app) {
+async function GetDocAction(action, infra) {
   // todo, authentication here
-  const doc = await app.model.doc.findOne({
+  const doc = await infra.model.doc.findOne({
     where: {
       id: { [Op.eq]: action.docID },
     },
-  })
+  });
 
   // Use one error for multiple types of miss, to protect privacy!
   const notFoundError = {
@@ -15,26 +15,26 @@ async function GetDocAction(action, app) {
     message: `Document with ID '${action.docID}' and record '${
       action.recordID
     }' does not exist.`,
-  }
+  };
   if (!doc) {
-    throw notFoundError
+    throw notFoundError;
   }
 
-  const docRecord = await app.model.docRecord.findOne({
+  const docRecord = await infra.model.docRecord.findOne({
     where: {
       docId: { [Op.eq]: action.docID },
       recordId: { [Op.eq]: action.recordID },
     },
-  })
+  });
 
   if (!docRecord) {
-    throw notFoundError
+    throw notFoundError;
   }
 
   return {
     docID: action.docID,
     value: doc.value,
-  }
+  };
 }
 
-module.exports = GetDocAction
+module.exports = GetDocAction;
