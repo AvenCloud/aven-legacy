@@ -226,9 +226,15 @@ async function FSAgent(agent) {
   const fsRecords = {};
 
   const _providePathDocs = async (path, recordID) => {
-    console.log(path);
     const value = await readFileValue(path);
     const docID = digest(stringify(value));
+    const newRecord = {
+      doc: docID,
+      owner: "FSAgent",
+    };
+    if (fsDocs[docID]) {
+      return newRecord;
+    }
     fsDocs[docID] = {
       docID,
       recordID,
@@ -243,20 +249,29 @@ async function FSAgent(agent) {
       );
     }
 
-    return {
-      doc: docID,
-      owner: "FSAgent",
-    };
+    return newRecord;
   };
 
   const provideDirectory = async (path, recordID) => {
     _providedDirs[recordID] = path;
 
-    const record = _providePathDocs(path, recordID);
+    const record = await _providePathDocs(path, recordID);
     fsRecords[recordID] = record;
     return () => {
       delete _providedDirs[recordID];
     };
+  };
+
+  const invalidateDirectory = async path => {
+    await Promise.all(
+      Object.entries(_providedDirs).map(async recordCommaPath => {
+        if (recordCommaPath[1] === path) {
+          const recordID = recordCommaPath[0];
+          const record = await _providePathDocs(path, recordID);
+          fsRecords[recordID] = record;
+        }
+      }),
+    );
   };
 
   const onDispatch = async action => {
@@ -273,10 +288,7 @@ async function FSAgent(agent) {
         return fsDoc;
       }
     }
-
-    //fallback
-    const result = await dispatch(action);
-    return result;
+    return await dispatch(action);
   };
 
   return {
@@ -292,6 +304,7 @@ async function FSAgent(agent) {
     subscribe,
     unsubscribe,
     provideDirectory,
+    invalidateDirectory,
   };
 }
 

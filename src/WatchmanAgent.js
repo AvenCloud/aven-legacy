@@ -20,37 +20,37 @@ async function WatchmanAgent(fsAgent, infra) {
   }
 
   async function provideDirectory(folder, recordID) {
-    return await fsAgent.provideDirectory(folder, recordID);
+    await fsAgent.provideDirectory(folder, recordID);
 
-    // const watchResult = await new Promise((resolve, reject) =>
-    //   watchman.command(
-    //     ["watch-project", folder],
-    //     (err, res) => (err ? reject(err) : resolve(res)),
-    //   ),
-    // );
-    // const subscribeResult = await new Promise((resolve, reject) =>
-    //   watchman.command(
-    //     [
-    //       "subscribe",
-    //       watchResult.watch,
-    //       "mysubscription",
-    //       {
-    //         // expression: ["allof", ["match", "*.js"]],
-    //         expression: ["allof", ["match", "*"]],
-    //         fields: ["name", "size", "mtime_ms", "exists", "type"],
-    //         relative_root: watchResult.relative_path
-    //           ? watchResult.relative_path
-    //           : undefined,
-    //       },
-    //     ],
-    //     (err, res) => (err ? reject(err) : resolve(res)),
-    //   ),
-    // );
+    const watchResult = await new Promise((resolve, reject) =>
+      watchman.command(
+        ["watch-project", folder],
+        (err, res) => (err ? reject(err) : resolve(res)),
+      ),
+    );
+    const subscribeResult = await new Promise((resolve, reject) =>
+      watchman.command(
+        [
+          "subscribe",
+          watchResult.watch,
+          "mysubscription",
+          {
+            // expression: ["allof", ["match", "*.js"]],
+            expression: ["allof", ["match", "*"]],
+            fields: ["name", "size", "mtime_ms", "exists", "type"],
+            relative_root: watchResult.relative_path
+              ? watchResult.relative_path
+              : undefined,
+          },
+        ],
+        (err, res) => (err ? reject(err) : resolve(res)),
+      ),
+    );
 
-    // watchman.on("subscription", async resp => {
-    //   if (resp.subscription !== "mysubscription") return;
-    //   // Our files has changed!! Do something htere plz now feb18
-    // });
+    watchman.on("subscription", async resp => {
+      if (resp.subscription !== "mysubscription") return;
+      await fsAgent.invalidateDirectory(folder);
+    });
   }
 
   async function close() {
