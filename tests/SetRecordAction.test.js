@@ -1,15 +1,15 @@
-const { initTestApp, setupTestUserSession } = require("./TestUtilities")
+const { initTestApp, setupTestUserSession } = require("./TestUtilities");
 
-let app = null
+let app = null;
 
 beforeEach(async () => {
-  app = await initTestApp()
-  await setupTestUserSession(app)
-})
+  app = await initTestApp();
+  await setupTestUserSession(app);
+});
 
 afterEach(async () => {
-  await app.closeTest()
-})
+  await app.closeTest();
+});
 
 test("Set record works", async () => {
   await app.testDispatch({
@@ -18,17 +18,17 @@ test("Set record works", async () => {
     authSession: app.testAuthSession,
     recordID: "asdf",
     owner: app.testAuthUser,
-    doc: null,
+    docID: null,
     permission: "PUBLIC",
-  })
+  });
 
   const resultingRecord = await app.testDispatch({
     type: "GetRecordAction",
     authUser: app.testAuthUser,
     authSession: app.testAuthSession,
     recordID: "asdf",
-  })
+  });
 
-  expect(resultingRecord.permission).toBe("PUBLIC")
-  expect(resultingRecord.owner).toBe(app.testAuthUser)
-})
+  expect(resultingRecord.permission).toBe("PUBLIC");
+  expect(resultingRecord.owner).toBe(app.testAuthUser);
+});

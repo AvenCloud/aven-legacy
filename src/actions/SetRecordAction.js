@@ -10,9 +10,9 @@ async function SetRecordAction(action, infra, onSetRecord) {
   if (permission === "WRITE" && lastRecord) {
     await lastRecord.update({
       permission: action.permission,
-      doc: action.doc,
+      doc: action.docID,
     });
-    onSetRecord(recordID, { docID: action.doc, recordID });
+    onSetRecord(recordID, { docID: action.docID, recordID });
   } else if (permission === "WRITE") {
     await infra.model.record.create({
       id: recordID,

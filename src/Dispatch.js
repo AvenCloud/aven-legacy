@@ -9,10 +9,10 @@ const Actions = {
   GetDocAction: require("./actions/GetDocAction"),
 };
 
-function createDispatcher(infra) {
+function createDispatcher(infra, onSetRecord) {
   async function dispatch(action) {
     if (Actions[action.type]) {
-      const result = await Actions[action.type](action, infra);
+      const result = await Actions[action.type](action, infra, onSetRecord);
       return result;
     }
     throw {

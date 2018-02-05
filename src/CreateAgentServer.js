@@ -15,48 +15,35 @@ async function genClientId() {
 const CreateAgentServer = async (agent, infra) => {
   const app = express();
 
-  const handlersById = new Map();
-  const subscriptionChannels = new Map();
-  const getSubscriptionChannelSubscribers = channel =>
-    subscriptionChannels.has(channel)
-      ? subscriptionChannels.get(channel)
-      : subscriptionChannels.set(channel, new Set()).get(channel);
   const onWSSConnection = async ws => {
     const clientID = await genClientId();
-    handlersById.set(clientID, msg => {
-      ws.send(msg);
-    });
+    let recordHandlers = new Map();
     ws.on("message", data => {
       const payload = JSON.parse(data);
+      const { recordID } = payload;
       if (payload.type === "subscribe") {
-        const subscribedClients = getSubscriptionChannelSubscribers(
-          payload.recordID,
-        );
-        subscribedClients.add(clientID);
-      }
-      if (payload.type === "unsubscribe") {
-        const subscribedClients = getSubscriptionChannelSubscribers(
-          payload.recordID,
-        );
-        subscribedClients.remove(clientID);
+        if (recordHandlers.get(recordID)) {
+          return;
+        }
+        const handler = record => {
+          ws.send(JSON.stringify(record));
+        };
+        recordHandlers.set(recordID, handler);
+        agent.subscribe(recordID, handler);
+      } else if (payload.type === "unsubscribe") {
+        const handler = recordHandlers.get(recordID);
+        agent.unsubscribe(recordID, handler);
+        recordHandlers.delete(recordID);
       }
     });
     ws.on("close", () => {
-      handlersById.delete(clientID);
-    });
-    handlersById.get(clientID)(JSON.stringify({ type: "Greet", clientID }));
-  };
-  app.notify = (recordID, payload) => {
-    const subscribedClients = getSubscriptionChannelSubscribers(recordID);
-    subscribedClients.forEach(clientID => {
-      const handler = handlersById.get(clientID);
-      handler && handler(JSON.stringify(payload));
+      recordHandlers.forEach((recordID, handler) => {
+        agent.unsubscribe(recordID, handler);
+        recordHandlers.delete(recordID);
+      });
+      recordHandlers = null;
     });
   };
-  app.infra = infra;
-  app.model = infra.model;
-
-  app.agent = agent;
 
   app.get("/api/debug", async (req, res) => {
     res.json(await infra.getPublicDebugInfo());

@@ -33,6 +33,7 @@ async function GetDocAction(action, infra) {
 
   return {
     docID: action.docID,
+    recordID: action.recordID,
     value: doc.value,
   };
 }

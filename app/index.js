@@ -1,20 +1,29 @@
-({ React, Team, Title }) => {
+({ React, Team, Title, Platform, _npm_react_native }) => {
   class TestApp extends React.Component {
     render() {
-      return (
-        <html>
-          <head>
-            <title>Aven</title>
-            <script
-              type="text/javascript"
-              dangerouslySetInnerHTML={{ __html: `//alert('hi')` }}
-            />
-          </head>
-          <body>
-            <Title>Hello3!</Title>
-          </body>
-        </html>
-      );
+      if (Platform.web) {
+        return (
+          <html>
+            <head>
+              <title>Aven</title>
+              <script
+                type="text/javascript"
+                dangerouslySetInnerHTML={{ __html: `//alert('hi')` }}
+              />
+            </head>
+            <body>
+              <Title>Hello6! {String(Platform.web)}</Title>
+            </body>
+          </html>
+        );
+      } else {
+        const { View, Text } = _npm_react_native;
+        return (
+          <View>
+            <Text>Hello, RN!!!2@!@?</Text>
+          </View>
+        );
+      }
     }
   }
 

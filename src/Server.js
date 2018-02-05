@@ -4,6 +4,7 @@ const DBAgent = require("./DBAgent");
 const ExecServerApp = require("./ExecServerApp");
 const WatchmanAgent = require("./WatchmanAgent");
 const Infra = require("./Infra");
+const ExecAgent = require("./ExecAgent");
 const joinPath = require("path").join;
 const LOCAL_APP_PATH = joinPath(process.cwd(), "app");
 const MAIN_APP_NAME = "App";
@@ -20,11 +21,13 @@ module.exports = async () => {
 
   const app = await CreateAgentServer(appAgent, infra);
 
+  const execAgent = await ExecAgent(appAgent, infra);
+
   appAgent.provideDirectory(LOCAL_APP_PATH, MAIN_APP_NAME);
 
   app.get("*", async (req, res) => {
     try {
-      await ExecServerApp(appAgent, req, res, MAIN_APP_NAME);
+      await ExecServerApp(execAgent, req, res, MAIN_APP_NAME);
     } catch (e) {
       console.log("Error:", e);
       res
@@ -36,9 +39,9 @@ module.exports = async () => {
   console.log("Started on " + infra.hostURI);
 
   const close = async () => {
-    await agent.close();
-    await infra.close();
     await app.close();
+    await appAgent.close();
+    await infra.close();
   };
 
   return close;

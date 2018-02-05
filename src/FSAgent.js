@@ -167,7 +167,7 @@ async function FSAgent(agent) {
       recordID,
       authSession,
       authUser,
-      doc: putResult.docID,
+      docID: putResult.docID,
       permission: "PUBLIC",
       owner: authUser,
     });
@@ -229,7 +229,7 @@ async function FSAgent(agent) {
     const value = await readFileValue(path);
     const docID = digest(stringify(value));
     const newRecord = {
-      doc: docID,
+      docID,
       owner: "FSAgent",
     };
     if (fsDocs[docID]) {
@@ -256,7 +256,7 @@ async function FSAgent(agent) {
     _providedDirs[recordID] = path;
 
     const record = await _providePathDocs(path, recordID);
-    fsRecords[recordID] = record;
+    fsRecords[recordID] = { ...record, recordID };
     return () => {
       delete _providedDirs[recordID];
     };
@@ -268,7 +268,7 @@ async function FSAgent(agent) {
         if (recordCommaPath[1] === path) {
           const recordID = recordCommaPath[0];
           const record = await _providePathDocs(path, recordID);
-          fsRecords[recordID] = record;
+          fsRecords[recordID] = { ...record, recordID };
         }
       }),
     );

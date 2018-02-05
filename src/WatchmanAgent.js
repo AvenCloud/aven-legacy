@@ -19,8 +19,17 @@ async function WatchmanAgent(fsAgent, infra) {
     throw `Incompatible watchman client! (version ${capabilityResult.version})`;
   }
 
+  const providedHandlers = new Map();
+
   async function provideDirectory(folder, recordID) {
     await fsAgent.provideDirectory(folder, recordID);
+
+    if (providedHandlers.has(recordID)) {
+      throw "already providing this record id";
+    }
+
+    const handlersForProvided = new Set();
+    providedHandlers.set(recordID, handlersForProvided);
 
     const watchResult = await new Promise((resolve, reject) =>
       watchman.command(
@@ -50,7 +59,33 @@ async function WatchmanAgent(fsAgent, infra) {
     watchman.on("subscription", async resp => {
       if (resp.subscription !== "mysubscription") return;
       await fsAgent.invalidateDirectory(folder);
+
+      const record = await fsAgent.dispatch({
+        type: "GetRecordAction",
+        recordID,
+      });
+
+      handlersForProvided.forEach(handler => handler(record));
     });
+  }
+
+  async function subscribe(recordID, handler) {
+    const handlerSet = providedHandlers.get(recordID);
+    if (handlerSet) {
+      console.log("subscribing to ", recordID);
+      handlerSet.add(handler);
+      return;
+    }
+    fsAgent.subscribe(recordID, handler);
+  }
+
+  async function unsubscribe(recordID, handler) {
+    const handlerSet = providedHandlers.get(recordID);
+    if (handlerSet) {
+      handlerSet.delete(handler);
+      return;
+    }
+    fsAgent.unsubscribe(recordID, handler);
   }
 
   async function close() {
@@ -60,6 +95,8 @@ async function WatchmanAgent(fsAgent, infra) {
 
   return {
     ...fsAgent,
+    subscribe,
+    unsubscribe,
     provideDirectory,
     close,
   };
