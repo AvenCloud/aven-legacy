@@ -8,7 +8,7 @@ const Platform = {
   mobile: false,
   os: "web",
 };
-const _platformDeps = {
+const platformDeps = {
   Platform,
   React,
   _npm_react: React,
@@ -16,4 +16,4 @@ const _platformDeps = {
   _npm_react_native: null,
 };
 
-module.exports = _platformDeps;
+module.exports = platformDeps;

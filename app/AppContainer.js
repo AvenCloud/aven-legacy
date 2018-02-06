@@ -1,4 +1,4 @@
-({ Platform }) =>
+({ React, Platform, _npm_react_native }) => {
   class AppContainer extends React.Component {
     render() {
       if (Platform.web) {
@@ -20,4 +20,6 @@
         return <View>{this.props.children}</View>;
       }
     }
-  };
+  }
+  return AppContainer;
+};

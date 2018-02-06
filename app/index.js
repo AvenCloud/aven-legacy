@@ -1,15 +1,22 @@
-({ React, Team, Title, AppContainer, LoadingContainer }) =>
+({ React, Team, Title, Alert, Agent, Button, AppContainer, Platform }) => {
   class TestApp extends React.Component {
     render() {
       return (
         <AppContainer title="mother">
-          <LoadingContainer
-            recordId="Team"
-            // render={team => <Title>{team.length} members!</Title>}
-          >
-            {team => <Title>{team.length} members!</Title>}
-          </LoadingContainer>
+          <Title>members!</Title>
+          <Button
+            label="PressMe"
+            onPress={async () => {
+              const a = await Agent.dispatch({
+                type: "GetRecordAction",
+                recordID: "App",
+              });
+              Alert(JSON.stringify(a));
+            }}
+          />
         </AppContainer>
       );
     }
-  };
+  }
+  return TestApp;
+};

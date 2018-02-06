@@ -7,19 +7,24 @@ const ExecAgent = agent => {
     const recordID = context[context.length - 1].recordID;
     const moduleDoc = doc.value;
     if (moduleDoc.type !== "JSModule") {
-      console.log("here goes", moduleDoc);
       if (moduleDoc.type === "Directory") {
         const indexFile = moduleDoc.files.find(f => f.fileName === "index.js");
-        console.log("here indexFile", indexFile);
         if (indexFile) {
           const doc = await agent.dispatch({
             type: "GetDocAction",
             docID: indexFile.docID,
             recordID,
           });
-          console.log("here doc", doc);
 
-          return await exec(doc, context);
+          return await exec(doc, [
+            context,
+            {
+              files: moduleDoc.files,
+              recordID,
+              fileName: indexFile.fileName,
+              docID: indexFile.docID,
+            },
+          ]);
         }
       }
       return moduleDoc;
@@ -30,6 +35,7 @@ const ExecAgent = agent => {
 
     const basicDeps = { ...platformDeps, Agent: agent };
     const basicDepNames = Object.keys(basicDeps);
+    console.log("ok wtfs", basicDepNames);
     const remoteDeps = moduleDoc.dependencies.filter(
       dep => basicDepNames.indexOf(dep) === -1,
     );
@@ -91,7 +97,13 @@ const ExecAgent = agent => {
         message: "dependencies not found: " + depsNotFound.join(),
       };
     }
-    computedDoc = eval(moduleDoc.code)(deps);
+    let computedDoc = null;
+    try {
+      computedDoc = eval(moduleDoc.code)(deps);
+    } catch (e) {
+      console.log("lolz wtf", e, context);
+      computedDoc = null;
+    }
 
     return computedDoc;
   }

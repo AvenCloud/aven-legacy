@@ -1,4 +1,4 @@
-({ Agent, React }) => {
+({ Agent, React, Title }) => {
   class LoadingContainer extends React.Component {
     async componentDidMount() {
       // const record = Agent.dispatch({
@@ -7,7 +7,7 @@
       // })
     }
     render() {
-      return null;
+      return <Title>OK7!</Title>;
     }
   }
   return LoadingContainer;
