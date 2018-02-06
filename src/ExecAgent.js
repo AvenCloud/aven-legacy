@@ -1,22 +1,6 @@
-const React = require("react");
-const ReactDOM = require("react-dom");
-const pathParse = require("path").parse;
+const pathParse = require("path-parse");
 
-const Platform = {
-  web: true,
-  webServer: true,
-  webBrowser: false,
-  mobile: false,
-  os: "web",
-};
-const _platformDeps = {
-  Platform,
-  React,
-  _npm_react: React,
-  _npm_react_dom: ReactDOM,
-  _npm_react_native: null,
-};
-const _platformDepNames = Object.keys(_platformDeps);
+const platformDeps = require("./PlatformDeps");
 
 const ExecAgent = agent => {
   async function exec(doc, context) {
@@ -43,11 +27,14 @@ const ExecAgent = agent => {
     if (moduleDoc.error) {
       return moduleDoc.error;
     }
+
+    const basicDeps = { ...platformDeps, Agent: agent };
+    const basicDepNames = Object.keys(basicDeps);
     const remoteDeps = moduleDoc.dependencies.filter(
-      dep => _platformDepNames.indexOf(dep) === -1,
+      dep => basicDepNames.indexOf(dep) === -1,
     );
 
-    const deps = { ..._platformDeps };
+    const deps = { ...basicDeps };
     const depsNotFound = [];
 
     await Promise.all(

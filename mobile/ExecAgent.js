@@ -1,42 +1,25 @@
-const React = require("react");
-const ReactNative = require("react-native");
 const pathParse = require("path-parse");
 
-const Platform = {
-  web: false,
-  webServer: false,
-  webBrowser: false,
-  mobile: true,
-  ...ReactNative.Platform,
-  os: "web",
-};
-const _platformDeps = {
-  Platform,
-  React,
-  _npm_react: React,
-  _npm_react_dom: null,
-  _npm_react_native: ReactNative,
-};
-const _platformDepNames = Object.keys(_platformDeps);
+const platformDeps = require("./PlatformDeps");
 
 const ExecAgent = agent => {
   async function exec(doc, context) {
     const recordID = context[context.length - 1].recordID;
-    console.log("exec", recordID, doc, context);
     const moduleDoc = doc.value;
     if (moduleDoc.type !== "JSModule") {
+      console.log("here goes", moduleDoc);
       if (moduleDoc.type === "Directory") {
         const indexFile = moduleDoc.files.find(f => f.fileName === "index.js");
+        console.log("here indexFile", indexFile);
         if (indexFile) {
           const doc = await agent.dispatch({
             type: "GetDocAction",
             docID: indexFile.docID,
             recordID,
           });
-          return await exec(doc, [
-            { ...indexFile, files: moduleDoc.files },
-            ...context,
-          ]);
+          console.log("here doc", doc);
+
+          return await exec(doc, context);
         }
       }
       return moduleDoc;
@@ -44,11 +27,14 @@ const ExecAgent = agent => {
     if (moduleDoc.error) {
       return moduleDoc.error;
     }
+
+    const basicDeps = { ...platformDeps, Agent: agent };
+    const basicDepNames = Object.keys(basicDeps);
     const remoteDeps = moduleDoc.dependencies.filter(
-      dep => _platformDepNames.indexOf(dep) === -1,
+      dep => basicDepNames.indexOf(dep) === -1,
     );
 
-    const deps = { ..._platformDeps };
+    const deps = { ...basicDeps };
     const depsNotFound = [];
 
     await Promise.all(
