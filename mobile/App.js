@@ -14,41 +14,53 @@ const upstreamDev = {
 };
 
 export default class App extends React.Component {
+  static mainRecord = "App";
   agent = null;
   async componentDidMount() {
     const netAgent = await ReactNativeNetworkAgent(upstreamDev);
     this.agent = ExecAgent(netAgent);
     this.agent.onStatus(this._setStatus);
-    const mainRecord = "App";
     const result = await this.agent.dispatch({
       type: "GetRecordAction",
-      recordID: mainRecord,
+      recordID: App.mainRecord,
     });
     const { docID } = result;
     if (!result || !docID) {
       throw {
         statusCode: 404,
         code: "INVALID_APP",
-        message: `App Record doc "${mainRecord}" not found!`,
+        message: `App Record doc "${App.mainRecord}" not found!`,
       };
     }
     const doc = await this.agent.dispatch({
       type: "GetDocAction",
       docID: docID,
-      recordID: mainRecord,
+      recordID: App.mainRecord,
     });
     const ExecComponent = await this.agent.exec(doc, [
-      { recordID: mainRecord, docID },
+      { recordID: App.mainRecord, docID },
     ]);
     this.setState({ ExecComponent });
-    // this.agent.onRecordDoc("App", this._setRecord);
+    this.agent.subscribe(App.mainRecord, this._updateApp);
   }
   componentWillUnmount() {
     this.agent.offStatus(this._setStatus);
-    // this.agent.offRecordDoc("App", this._setRecord);
+    this.agent.unsubscribe(App.mainRecord, this._updateApp);
   }
   _setStatus = status => this.setState({ status });
   _setRecord = record => this.setState({ record });
+  _updateApp = async record => {
+    console.log("woah!", record);
+    const doc = await this.agent.dispatch({
+      type: "GetDocAction",
+      docID: record.docID,
+      recordID: App.mainRecord,
+    });
+    const ExecComponent = await this.agent.exec(doc, [
+      { recordID: App.mainRecord, docID: record.docID },
+    ]);
+    this.setState({ ExecComponent });
+  };
   state = { status: {}, ExecComponent: null };
   render() {
     const { status, ExecComponent } = this.state;

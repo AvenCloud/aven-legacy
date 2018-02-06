@@ -89,6 +89,7 @@ const ReactNativeNetworkAgent = async ({ useSSL, host }) => {
 
   const _onWebsocketMessage = async e => {
     const payload = JSON.parse(e.data);
+    console.log("dd", payload);
     if (payload.recordID && payload.docID) {
       _deliverRecord(payload);
     }
@@ -131,38 +132,42 @@ const ReactNativeNetworkAgent = async ({ useSSL, host }) => {
     return body;
   }
 
-  _recordHandlers = new Map();
+  const _recordHandlers = new Map();
   _getRecordHandlerSet = recordID =>
-    this._recordHandlers.has(recordID)
-      ? this._recordHandlers.get(recordID)
-      : this._recordHandlers.set(recordID, new Set()).get(recordID);
+    _recordHandlers.has(recordID)
+      ? _recordHandlers.get(recordID)
+      : _recordHandlers.set(recordID, new Set()).get(recordID);
 
   async function _subscribeToUpstreamRecord(recordID) {
-    if (!this._upstreamSubscribedRecords.has(recordID)) {
-      this._upstreamSubscribedRecords.add(recordID);
-      this.sendWebsocketMessage({ type: "subscribe", recordID });
+    if (!_upstreamSubscribedRecords.has(recordID)) {
+      _upstreamSubscribedRecords.add(recordID);
+      sendWebsocketMessage({ type: "subscribe", recordID });
+      console.log("send subs", recordID);
     }
   }
   async function _unsubscribeToUpstreamRecord(recordID) {
-    const recordHandlers = this._getRecordHandlerSet(recordID);
-    const docHandlers = this._getRecordDocHandlerSet(recordID);
+    const recordHandlers = _getRecordHandlerSet(recordID);
+    const docHandlers = _getRecordDocHandlerSet(recordID);
     if (recordHandlers.size === 0 || docHandlers.size === 0) {
-      this._upstreamSubscribedRecords.delete(recordID);
-      this.sendWebsocketMessage({ type: "unsubscribe", recordID });
+      _upstreamSubscribedRecords.delete(recordID);
+      sendWebsocketMessage({ type: "unsubscribe", recordID });
+      console.log("send unsubs", recordID);
     }
   }
 
   async function _deliverRecord(record) {
-    const handlers = this._getRecordHandlerSet(record.recordID);
+    const handlers = _getRecordHandlerSet(record.recordID);
     handlers.forEach(handler => handler(record));
   }
   async function subscribe(recordID, handler) {
-    this._getRecordHandlerSet(recordID).add(handler);
-    await this._subscribeToUpstreamRecord(recordID);
+    console.log("subs", recordID);
+    _getRecordHandlerSet(recordID).add(handler);
+    await _subscribeToUpstreamRecord(recordID);
   }
   function unsubscribe(recordID, handler) {
-    this._getRecordHandlerSet(recordID).remove(handler);
-    this._unsubscribeToUpstreamRecord(recordID);
+    console.log("unsubs", recordID);
+    _getRecordHandlerSet(recordID).remove(handler);
+    _unsubscribeToUpstreamRecord(recordID);
   }
   return {
     dispatch,

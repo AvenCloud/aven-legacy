@@ -35,7 +35,6 @@ const ExecAgent = agent => {
 
     const basicDeps = { ...platformDeps, Agent: agent };
     const basicDepNames = Object.keys(basicDeps);
-    console.log("ok wtfs", basicDepNames);
     const remoteDeps = moduleDoc.dependencies.filter(
       dep => basicDepNames.indexOf(dep) === -1,
     );
@@ -101,7 +100,6 @@ const ExecAgent = agent => {
     try {
       computedDoc = eval(moduleDoc.code)(deps);
     } catch (e) {
-      console.log("lolz wtf", e, context);
       computedDoc = null;
     }
 

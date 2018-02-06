@@ -5,7 +5,7 @@
         <AppContainer title="mother">
           <Title>members!</Title>
           <Button
-            label="PressMe"
+            label="PressMe7"
             onPress={async () => {
               const a = await Agent.dispatch({
                 type: "GetRecordAction",
