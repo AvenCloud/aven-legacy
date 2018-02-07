@@ -22,6 +22,6 @@ Welcome to Aven: Live Documents!
 
 * Publish documents on the web, so anybody with the link can see!
 
-* Use charts, forms, and ReactJS to make your documents unique and interactive! 
+* Use charts, forms, and ReactJS to make your documents unique and interactive!
 
 * Collborate with our taskforce to customize Live Documents to suit your needs!

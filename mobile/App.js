@@ -65,8 +65,9 @@ export default class App extends React.Component {
   render() {
     const { status, ExecComponent } = this.state;
     if (ExecComponent) {
-      return <ExecComponent />;
+      return <ExecComponent status={status} agent={this.agent} />;
     }
+    return null;
     return (
       <View style={styles.container}>
         <Text>{JSON.stringify(this.state.status)}</Text>

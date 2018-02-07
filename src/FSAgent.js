@@ -252,9 +252,12 @@ async function FSAgent(agent) {
     return newRecord;
   };
 
-  const provideDirectory = async (path, recordID) => {
+  let _rootProvidedDir = null;
+  const provideDirectory = async (path, recordID, isRoot) => {
     _providedDirs[recordID] = path;
-
+    if (isRoot || !_rootProvidedDir) {
+      _rootProvidedDir = recordID;
+    }
     const record = await _providePathDocs(path, recordID);
     fsRecords[recordID] = { ...record, recordID };
     return () => {
@@ -281,6 +284,13 @@ async function FSAgent(agent) {
       if (providedDir && fsRecord) {
         return fsRecord;
       }
+      const record = await dispatch(action);
+      if (record) {
+        return record;
+      }
+      const topDoc = fsDocs[fsRecord[_rootProvidedDir].docID];
+      console.log("AAAAA", topDoc);
+      return { foo: "bae" };
     }
     if (action.type === "GetDocAction") {
       const fsDoc = fsDocs[action.docID];

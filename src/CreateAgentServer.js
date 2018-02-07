@@ -17,8 +17,11 @@ const CreateAgentServer = async (agent, infra) => {
 
   const onWSSConnection = async ws => {
     const clientID = await genClientId();
+    console.log("onWSSConnection", clientID);
     let recordHandlers = new Map();
+    let isConnected = true;
     ws.on("message", data => {
+      console.log("onwsMessage", clientID, data);
       const payload = JSON.parse(data);
       const { recordID } = payload;
       if (payload.type === "subscribe") {
@@ -26,9 +29,15 @@ const CreateAgentServer = async (agent, infra) => {
           return;
         }
         const handler = record => {
+          if (!isConnected) {
+            return;
+          }
+          console.log("sending to clientID", clientID, record);
           ws.send(JSON.stringify(record));
         };
+
         recordHandlers.set(recordID, handler);
+        console.log("agent.subscribe", recordID);
         agent.subscribe(recordID, handler);
       } else if (payload.type === "unsubscribe") {
         const handler = recordHandlers.get(recordID);
@@ -37,6 +46,7 @@ const CreateAgentServer = async (agent, infra) => {
       }
     });
     ws.on("close", () => {
+      isConnected = false;
       recordHandlers.forEach((recordID, handler) => {
         agent.unsubscribe(recordID, handler);
         recordHandlers.delete(recordID);

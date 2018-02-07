@@ -58,6 +58,8 @@ async function WatchmanAgent(fsAgent, infra) {
 
     watchman.on("subscription", async resp => {
       if (resp.subscription !== "mysubscription") return;
+      console.log("subscription subscription ", resp);
+
       await fsAgent.invalidateDirectory(folder);
 
       const record = await fsAgent.dispatch({
@@ -72,7 +74,6 @@ async function WatchmanAgent(fsAgent, infra) {
   async function subscribe(recordID, handler) {
     const handlerSet = providedHandlers.get(recordID);
     if (handlerSet) {
-      console.log("subscribing to ", recordID);
       handlerSet.add(handler);
       return;
     }
