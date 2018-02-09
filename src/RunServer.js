@@ -1,3 +1,5 @@
+import "babel-polyfill";
+
 const Server = require("./Server");
 
 const reportError = type => e => {

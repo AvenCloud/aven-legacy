@@ -14,6 +14,7 @@ const platformDeps = {
   _npm_react: React,
   _npm_react_dom: null,
   _npm_react_native: ReactNative,
+  _npm_react_native_web: null,
 };
 
 module.exports = platformDeps;

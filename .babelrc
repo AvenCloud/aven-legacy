@@ -1,6 +1,7 @@
 {
   "presets": [
-  	"flow",
+    "env",
+    "react-native",
     "react"
   ],
   "plugins": [

@@ -9,10 +9,11 @@
   AppContainer,
   LoadingContainer,
   Platform,
+  View,
 }) => {
   class MembersList extends React.Component {
     render() {
-      return <Title>11111MembersList</Title>;
+      return <Title>Ok, just a bit!</Title>;
     }
   }
   class JoinForm extends React.Component {
@@ -32,12 +33,15 @@
   class TestApp extends React.Component {
     render() {
       return (
-        <AppContainer title="Team Page">
-          <Title>{JSON.stringify(this.props.status)}</Title>
-          <LoadingContainer
-            recordID="Team"
-            render={record => <MembersList members={record} />}
-          />
+        <AppContainer title="Aven">
+          <Title>Welcome to Aven</Title>
+          <View style={{ borderWidth: 3 }}>
+            <LoadingContainer
+              recordID="Team"
+              render={record => <MembersList members={record} />}
+            />
+          </View>
+
           <JoinForm />
         </AppContainer>
       );

@@ -1,8 +1,6 @@
 const pathParse = require("path-parse");
 
-const platformDeps = require("./PlatformDeps");
-
-const ExecAgent = agent => {
+const ExecAgent = (agent, platformDeps) => {
   async function exec(doc, context) {
     const recordID = context[context.length - 1].recordID;
     const moduleDoc = doc.value;

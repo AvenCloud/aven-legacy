@@ -1,20 +1,22 @@
 ({ React, Platform, _npm_react_native }) => {
   class AppContainer extends React.Component {
     render() {
-      if (Platform.web) {
+      if (Platform.webServer) {
         return (
           <html>
             <head>
               <title>{this.props.title || "Aven"}</title>
-              <script
-                type="text/javascript"
-                dangerouslySetInnerHTML={{ __html: `//alert('hi')` }}
-              />
             </head>
-            <body>{this.props.children}</body>
+            <body>
+              <div id="root">{this.props.children}</div>
+              <script type="text/javascript" src="/_client_app.js" />
+            </body>
           </html>
         );
-      } else {
+      } else if (Platform.web) {
+        return this.props.children;
+      }
+      {
         const { View } = _npm_react_native;
 
         return <View>{this.props.children}</View>;
