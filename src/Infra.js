@@ -1,4 +1,3 @@
-const fqdn = require("fqdn");
 const { promisifyAll } = require("bluebird");
 const Sequelize = require("sequelize");
 const { createModel } = require("./DB");
@@ -43,7 +42,6 @@ module.exports = async options => {
   async function getPublicDebugInfo() {
     const results = {
       asOf: new Date().toISOString(),
-      fqdn: fqdn(),
       NODE_ENV: process.env.NODE_ENV,
       nodever: process.version,
       versions: process.versions,

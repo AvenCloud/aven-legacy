@@ -1,4 +1,4 @@
-({ React, Platform, View, StyleSheet }) => {
+({ React, Platform, View, StyleSheet, Agent }) => {
   class AppContainer extends React.Component {
     render() {
       if (Platform.webServer) {
@@ -8,7 +8,9 @@
               <link rel="stylesheet" href="/assets/normalize.css" />
               <link rel="stylesheet" href="/assets/app.css" />
               <title>{this.props.title || "Aven"}</title>
-              <script>{}</script>
+              <script>
+                {`window.avenEnv = ${JSON.stringify(Agent.getEnv())};`}
+              </script>
             </head>
             <body>
               <div id="root">{this.props.children}</div>
