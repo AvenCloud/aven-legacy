@@ -31,6 +31,8 @@
       );
     }
     _onSubmit = fields => {
+      Alert("Hi " + JSON.stringify(fields));
+
       // Agent.dispatch...
     };
   }

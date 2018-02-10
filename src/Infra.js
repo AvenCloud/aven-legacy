@@ -48,6 +48,8 @@ module.exports = async options => {
       nodever: process.version,
       versions: process.versions,
       args: process.argv,
+      host,
+      useSSL: hostSSL,
     };
     try {
       await pg.query("SELECT $1::text as message", ["Hello world!"]);

@@ -5,7 +5,7 @@
       return (
         <View style={styles.container}>
           <Text style={styles.label}>{field.label}</Text>
-          <TextInput value={value} onTextChange={onValue} />
+          <TextInput value={value} onChangeText={onValue} />
         </View>
       );
     }
@@ -16,7 +16,6 @@
   class Form extends React.Component {
     state = { fields: {} };
     render() {
-      // return <Text style={styles.label}>wtf</Text>;
       return (
         <View>
           {this.props.fields.map(field => (
@@ -25,8 +24,9 @@
               key={field.name}
               value={this.state.fields[field.name]}
               onValue={value => {
-                this.setState(({ fields }) => ({
-                  fields: { ...fields, [field.name]: value },
+                console.log("wat", field.name, value);
+                this.setState(state => ({
+                  fields: { ...state.fields, [field.name]: value },
                 }));
               }}
             />
@@ -36,7 +36,7 @@
       );
     }
     _onSubmit = () => {
-      Alert("Hi");
+      this.props.onSubmit(this.state.fields);
     };
   }
   return Form;
