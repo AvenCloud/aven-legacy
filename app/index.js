@@ -1,10 +1,11 @@
 ({
   React,
-  Team,
   Title,
   Form,
   Alert,
   Agent,
+  Image,
+  Page,
   Button,
   AppContainer,
   LoadingContainer,
@@ -16,12 +17,15 @@
       return <Title>Ok, just a bit!</Title>;
     }
   }
-  class JoinForm extends React.Component {
+  class CommentForm extends React.Component {
     state = { name: "" };
     render() {
       return (
         <Form
-          fields={[{ name: "name", type: "string", label: "Your name:" }]}
+          fields={[
+            { name: "name", type: "string", label: "Your name:" },
+            { name: "content", type: "string", label: "Comment:" },
+          ]}
           onSubmit={this._onSubmit}
         />
       );
@@ -33,17 +37,22 @@
   class TestApp extends React.Component {
     render() {
       return (
-        <AppContainer title="Aven">
+        <Page title="Aven">
           <Title>Welcome to Aven</Title>
-          <View style={{ borderWidth: 3 }}>
-            <LoadingContainer
-              recordID="Team"
-              render={record => <MembersList members={record} />}
-            />
-          </View>
+          <Image
+            style={{ width: 50, height: 50 }}
+            source={{
+              uri:
+                "https://media2.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif",
+            }}
+          />
+          <LoadingContainer
+            recordID="TestComments"
+            render={record => <MembersList members={record} />}
+          />
 
-          <JoinForm />
-        </AppContainer>
+          <CommentForm />
+        </Page>
       );
     }
   }

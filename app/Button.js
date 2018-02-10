@@ -1,17 +1,16 @@
-({ React, Platform, _npm_react_native }) => {
+({ React, Touchable, Text, StyleSheet }) => {
   class Button extends React.Component {
     render() {
-      if (Platform.web) {
-        return <button onClick={this.props.onPress}>{this.props.label}</button>;
-      } else {
-        const { TouchableOpacity, Text } = _npm_react_native;
-        return (
-          <TouchableOpacity onPress={this.props.onPress}>
-            <Text>{this.props.label}</Text>
-          </TouchableOpacity>
-        );
-      }
+      return (
+        <Touchable onPress={this.props.onPress}>
+          <Text>{this.props.label}</Text>
+        </Touchable>
+      );
     }
   }
+
+  const styles = StyleSheet.create({
+    foo: {},
+  });
   return Button;
 };

@@ -1,23 +1,43 @@
-({ React, Platform, _npm_react_native }) => {
-  class Form extends React.Component {
+({ React, Platform, Alert, View, Button, Text, TextInput, StyleSheet }) => {
+  class FormField extends React.Component {
     render() {
-      if (Platform.web) {
-        return (
-          <div>
-            {this.props.children} {this.props.fields.length}
-          </div>
-        );
-      } else {
-        const { View } = _npm_react_native;
-        const { Text } = _npm_react_native;
-
-        return (
-          <View>
-            <Text>{this.props.fields.length}</Text>
-          </View>
-        );
-      }
+      const { field, onValue, value } = this.props;
+      return (
+        <View style={styles.container}>
+          <Text style={styles.label}>{field.label}</Text>
+          <TextInput value={value} onTextChange={onValue} />
+        </View>
+      );
     }
+  }
+  const styles = StyleSheet.create({
+    label: { color: "red" },
+  });
+  class Form extends React.Component {
+    state = { fields: {} };
+    render() {
+      // return <Text style={styles.label}>wtf</Text>;
+      return (
+        <View>
+          {this.props.fields.map(field => (
+            <FormField
+              field={field}
+              key={field.name}
+              value={this.state.fields[field.name]}
+              onValue={value => {
+                this.setState(({ fields }) => ({
+                  fields: { ...fields, [field.name]: value },
+                }));
+              }}
+            />
+          ))}
+          <Button onPress={this._onSubmit} label="Submit" />
+        </View>
+      );
+    }
+    _onSubmit = () => {
+      Alert("Hi");
+    };
   }
   return Form;
 };

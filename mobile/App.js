@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-const ExecAgent = require("./ExecAgent");
+const ExecAgent = require("./src/ExecAgent");
 const ReactNativeNetworkAgent = require("./ReactNativeNetworkAgent");
 
 const upstreamProd = {
