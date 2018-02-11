@@ -45,8 +45,9 @@ const DBAgent = async infra => {
         type: actionName,
       });
   });
+  const env = await infra.getPublicDebugInfo();
   return {
-    getEnv: () => infra.getPublicDebugInfo(),
+    env,
     close: () => {},
     dispatch,
     subscribe,

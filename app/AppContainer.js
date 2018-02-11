@@ -8,9 +8,11 @@
               <link rel="stylesheet" href="/assets/normalize.css" />
               <link rel="stylesheet" href="/assets/app.css" />
               <title>{this.props.title || "Aven"}</title>
-              <script>
-                {`window.avenEnv = ${JSON.stringify(Agent.getEnv())};`}
-              </script>
+              <script
+                dangerouslySetInnerHTML={{
+                  __html: `window.avenEnv = ${JSON.stringify(Agent.env)};`,
+                }}
+              />
             </head>
             <body>
               <div id="root">{this.props.children}</div>

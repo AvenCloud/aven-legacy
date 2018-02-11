@@ -41,11 +41,7 @@ module.exports = async options => {
 
   async function getPublicDebugInfo() {
     const results = {
-      asOf: new Date().toISOString(),
-      NODE_ENV: process.env.NODE_ENV,
-      nodever: process.version,
-      versions: process.versions,
-      args: process.argv,
+      mode: process.env.NODE_ENV,
       host,
       useSSL: hostSSL,
     };
