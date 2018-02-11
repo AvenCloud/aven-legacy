@@ -2,9 +2,6 @@ const { promisifyAll } = require("bluebird");
 const Sequelize = require("sequelize");
 const { createModel } = require("./DB");
 const { Client } = require("pg");
-// const Redis = require("redis");
-// promisifyAll(Redis.RedisClient.prototype);
-// promisifyAll(Redis.Multi.prototype);
 
 const Email = require("./Infra-Email");
 
@@ -24,8 +21,6 @@ module.exports = async options => {
   });
   await pg.connect();
 
-  // const redis = Redis.createClient(process.env.REDIS_URL);
-
   const sequelize = new Sequelize(process.env.DATABASE_URL, {
     logging: false,
     operatorsAliases: false,
@@ -35,7 +30,6 @@ module.exports = async options => {
 
   const close = async () => {
     await pg.end();
-    // await redis.quit();
     await sequelize.close();
   };
 
@@ -51,13 +45,6 @@ module.exports = async options => {
     } catch (e) {
       results.pg = false;
     }
-    // try {
-    //   await redis.set("test", "value");
-    //   await redis.del("test");
-    //   results.redis = true;
-    // } catch (e) {
-    //   results.redis = false;
-    // }
     try {
       await sequelize.authenticate();
       results.sequelize = true;
@@ -75,7 +62,6 @@ module.exports = async options => {
     hostSSL,
     hostURI,
     pg,
-    // redis,
     sequelize,
     email,
     close,

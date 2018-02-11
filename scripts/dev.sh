@@ -14,7 +14,6 @@ run_app_dev() {
   NODE_ENV=development
   PG_NO_SSL=true
   DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres
-  REDIS_URL=redis://localhost:6379
   babel-watch src/RunServer.js
 }
 
@@ -22,7 +21,7 @@ run_app_dev() {
 echo  "Initiate development sequence!"
 echo  "------------------------------"
 
-echo "Starting Postgres and Redis in docker.."
+echo "Starting Postgres in docker.."
 
 docker_compose_up
 
@@ -41,12 +40,12 @@ sleep 2
 if run_app_dev "$@"; then
   echo  "App Complete!"
 
-  echo "Cleaning up Postgres and Redis containers.."
+  echo "Cleaning up Postgres container.."
   docker_compose_down
 else
   echo "App Exited with error."
 
-  echo "Cleaning up Postgres and Redis containers.."
+  echo "Cleaning up Postgres container.."
   docker_compose_down
   exit 1
   echo "Done. \n"
