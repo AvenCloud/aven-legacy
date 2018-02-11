@@ -7,6 +7,7 @@ const DBActions = {
   GetRecordAction: require("./DBAgentActions/GetRecordAction"),
   CreateDocAction: require("./DBAgentActions/CreateDocAction"),
   GetDocAction: require("./DBAgentActions/GetDocAction"),
+  GetPermissionAction: require("./DBAgentActions/GetPermissionAction"),
 };
 
 const DBAgent = async infra => {

@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 const ExecAgent = require("./src/ExecAgent");
+const PlatformDeps = require("./PlatformDeps");
 const ReactNativeNetworkAgent = require("./ReactNativeNetworkAgent");
 
 const upstreamProd = {
@@ -18,7 +19,7 @@ export default class App extends React.Component {
   agent = null;
   async componentDidMount() {
     const netAgent = await ReactNativeNetworkAgent(upstreamDev);
-    this.agent = ExecAgent(netAgent);
+    this.agent = ExecAgent(netAgent, PlatformDeps);
     this.agent.onStatus(this._setStatus);
     const result = await this.agent.dispatch({
       type: "GetRecordAction",

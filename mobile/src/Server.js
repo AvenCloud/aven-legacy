@@ -1,7 +1,7 @@
 const FSAgent = require("./FSAgent");
 const CreateAgentServer = require("./CreateAgentServer");
 const DBAgent = require("./DBAgent");
-const ExecServerApp = require("./ExecServerApp");
+const ServerApp = require("./ServerApp");
 const WatchmanAgent = require("./WatchmanAgent");
 const Infra = require("./Infra");
 const fs = require("fs-extra");
@@ -32,6 +32,12 @@ module.exports = async () => {
   appAgent.provideDirectory(LOCAL_APP_PATH, MAIN_APP_NAME);
 
   app.get("/_client_app.js", async (req, res) => {
+    const { host, useSSL } = appAgent.env;
+    res.set({
+      "Access-Control-Allow-Origin": `http${useSSL ? "s" : ""}://${host}`,
+      "Content-Type": "application/javascript; charset=utf-8",
+    });
+
     if (IS_DEV) {
       await execFile("./scripts/build.sh");
       const built = await fs.readFile(CLIENT_APP, {
@@ -50,7 +56,7 @@ module.exports = async () => {
 
   app.get("*", async (req, res) => {
     try {
-      await ExecServerApp(execAgent, req, res, MAIN_APP_NAME);
+      await ServerApp(execAgent, req, res, MAIN_APP_NAME);
     } catch (e) {
       console.log("Error:", e);
       res

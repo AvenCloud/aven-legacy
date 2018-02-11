@@ -1,7 +1,18 @@
-const createDispatcher = require("./Dispatch");
+const DBActions = {
+  AuthRegisterAction: require("./DBAgentActions/AuthRegisterAction"),
+  AuthVerifyAction: require("./DBAgentActions/AuthVerifyAction"),
+  AuthLoginAction: require("./DBAgentActions/AuthLoginAction"),
+  AuthLogoutAction: require("./DBAgentActions/AuthLogoutAction"),
+  SetRecordAction: require("./DBAgentActions/SetRecordAction"),
+  GetRecordAction: require("./DBAgentActions/GetRecordAction"),
+  CreateDocAction: require("./DBAgentActions/CreateDocAction"),
+  GetDocAction: require("./DBAgentActions/GetDocAction"),
+  GetPermissionAction: require("./DBAgentActions/GetPermissionAction"),
+};
 
-const RootAgent = async infra => {
+const DBAgent = async infra => {
   const recordHandlers = new Map();
+  // todo, pubsub with postgres to observe record changes from other processes
   const getRecordHandlers = recordID =>
     recordHandlers.has(recordID)
       ? recordHandlers.get(recordID)
@@ -15,9 +26,29 @@ const RootAgent = async infra => {
   const onSetRecord = (recordID, record) => {
     getRecordHandlers(recordID).forEach(handler => handler(record));
   };
-  const dispatch = createDispatcher(infra, onSetRecord);
+  async function dispatch(action) {
+    if (DBActions[action.type]) {
+      const result = await DBActions[action.type](action, infra, onSetRecord);
+      return result;
+    }
+    throw {
+      statusCode: 400,
+      code: "UNKNOWN_ACTION",
+      field: "type",
+      message: "This action type is not recognized.",
+    };
+  }
 
+  Object.keys(DBActions).forEach(actionName => {
+    dispatch[actionName] = action =>
+      dispatch({
+        ...action,
+        type: actionName,
+      });
+  });
+  const env = await infra.getPublicDebugInfo();
   return {
+    env,
     close: () => {},
     dispatch,
     subscribe,
@@ -25,4 +56,4 @@ const RootAgent = async infra => {
   };
 };
 
-module.exports = RootAgent;
+module.exports = DBAgent;

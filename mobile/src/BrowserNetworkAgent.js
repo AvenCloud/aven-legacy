@@ -1,11 +1,13 @@
 import { NetInfo } from "react-native-web";
 
-const useSSL = window.avenUseSSL || false;
-const host = window.avenHost || "localhost:3000";
-
 // heads up, this file was mostly copy-pasted from ReactNativeNetworkAgent
 
 const BroserNetworkAgent = async () => {
+  const env = window.avenEnv;
+
+  const useSSL = env.useSSL || false;
+  const host = env.host || "localhost:3000";
+
   let _isOnline = false;
   let _isWsConnected = false;
 
@@ -176,6 +178,7 @@ const BroserNetworkAgent = async () => {
     _unsubscribeToUpstreamRecord(recordID);
   }
   return {
+    getEnv: () => env,
     dispatch,
     subscribe,
     unsubscribe,

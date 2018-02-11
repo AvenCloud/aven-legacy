@@ -11,7 +11,7 @@ if (typeof document === "undefined") {
     createElement: () => null,
   };
 }
-const {AppRegistry} = require('react-native-web')
+const { AppRegistry } = require("react-native-web");
 
 async function ExecDocAtPath(agent, path, docID, { req, res }, context) {
   const doc = await agent.dispatch({
@@ -95,9 +95,12 @@ async function ExecDocAtPath(agent, path, docID, { req, res }, context) {
       if (appKeys.indexOf(appKey) === -1) {
         AppRegistry.registerComponent(appKey, () => App);
       }
-const { element, getStyleElement } = AppRegistry.getApplication(appKey, { path, query });
-const appHtml = ReactDOMServer.renderToString(element);
-const css = ReactDOMServer.renderToStaticMarkup(getStyleElement());
+      const { element, getStyleElement } = AppRegistry.getApplication(appKey, {
+        path,
+        query,
+      });
+      const appHtml = ReactDOMServer.renderToString(element);
+      const css = ReactDOMServer.renderToStaticMarkup(getStyleElement());
 
       const title = "AaaAaayvvyen";
       res.send(`
@@ -116,7 +119,7 @@ const css = ReactDOMServer.renderToStaticMarkup(getStyleElement());
   <div id="root">
 ${appHtml}
   </div>
-  <script type="text/javascript" src="/_client_app.js" />
+  <script type="text/javascript" src="/_client_app.js"></script>
 </body>
 </html>
 `);
@@ -132,7 +135,7 @@ ${appHtml}
       res.send(result);
     } else if (result.responseValue) {
       result.statusCode && res.statusCode(result.statusCode);
-      result.headers && result.set(headers);
+      result.headers && res.set(result.headers);
       res.send(result.responseValue);
     } else {
       res.json(result);
@@ -201,7 +204,7 @@ ${appHtml}
   };
 }
 
-async function ExecServerApp(agent, req, res, mainRecord) {
+async function ServerApp(agent, req, res, mainRecord) {
   const result = await agent.dispatch({
     type: "GetRecordAction",
     recordID: mainRecord,
@@ -220,4 +223,4 @@ async function ExecServerApp(agent, req, res, mainRecord) {
   ]);
 }
 
-module.exports = ExecServerApp;
+module.exports = ServerApp;

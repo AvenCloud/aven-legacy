@@ -20,7 +20,9 @@ const CreateAgentServer = async (agent, infra) => {
     console.log("onWSSConnection", clientID);
     let recordHandlers = new Map();
     let isConnected = true;
-    ws.on("error", e => console.error("WS Connection Errored!", e));
+    ws.on("error", e => {
+      console.error("WSConnection Error:", clientID, e);
+    });
     ws.on("message", data => {
       console.log("onwsMessage", clientID, data);
       const payload = JSON.parse(data);
@@ -84,7 +86,9 @@ const CreateAgentServer = async (agent, infra) => {
     server: appServer,
   });
   wss.on("connection", onWSSConnection);
-  wss.on("error", e => console.error("WS Server Errored!", e));
+  wss.on("error", e => {
+    console.error("WSServer Error:", e);
+  });
 
   const httpServer = await new Promise((resolve, reject) => {
     const s = appServer.listen(infra.appListenPort, err => {

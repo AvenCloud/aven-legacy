@@ -14,14 +14,7 @@ const presetStage0 = require("babel-preset-stage-0");
 const presetReact = require("babel-preset-react");
 
 async function FSAgent(agent) {
-  const {
-    dispatch,
-    authUser,
-    authSession,
-    subscribe,
-    unsubscribe,
-    close,
-  } = agent;
+  const { dispatch, authUser, authSession } = agent;
   const uploadedFiles = agent.uploadedFiles || (agent.uploadedFiles = {});
 
   async function readJSModuleValue(path) {
@@ -289,7 +282,6 @@ async function FSAgent(agent) {
         return record;
       }
       const topDoc = fsDocs[fsRecord[_rootProvidedDir].docID];
-      console.log("AAAAA", topDoc);
       return { foo: "bae" };
     }
     if (action.type === "GetDocAction") {
@@ -302,17 +294,15 @@ async function FSAgent(agent) {
   };
 
   return {
+    ...agent,
     checksumPath,
     putPath,
     uploadPath,
     getPath,
     downloadPath,
-    close,
     dispatch: onDispatch,
     authUser,
     authSession,
-    subscribe,
-    unsubscribe,
     provideDirectory,
     invalidateDirectory,
   };

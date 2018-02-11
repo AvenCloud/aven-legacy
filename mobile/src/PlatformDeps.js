@@ -2,13 +2,13 @@ const React = require("react");
 const ReactDOM = require("react-dom");
 
 // Having troubles with ReactNativeWeb depending on ART depending on document global..
-// I attempted to use the react-native-web babel preset, but it caused a compile-time crash while art depended on global.document...
+// I attempted to use the react-native-web babel plugin, but it caused a compile-time crash while art depended on global.document...
 // https://github.com/necolas/react-native-web/issues/737
-// if (typeof document === "undefined") {
-//   global.document = {
-//     createElement: () => null,
-//   };
-// }
+if (typeof document === "undefined") {
+  global.document = {
+    createElement: () => null,
+  };
+}
 
 const Platform = {
   web: true,
