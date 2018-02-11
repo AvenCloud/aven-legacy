@@ -12,8 +12,10 @@ async function genClientId() {
   return hex;
 }
 
-const CreateAgentServer = async (agent, infra) => {
+const CreateAgentServer = async (agent, infra, routing) => {
   const app = express();
+
+  routing(app);
 
   const onWSSConnection = async ws => {
     const clientID = await genClientId();

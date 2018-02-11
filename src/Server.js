@@ -25,7 +25,18 @@ module.exports = async () => {
   const appAgent = IS_DEV ? await WatchmanAgent(fsAgent, infra) : fsAgent;
   // const appAgent = await AuthAgent(fsAgent, infra);
 
-  const app = await CreateAgentServer(appAgent, infra);
+  const routing = app => {
+    app.use((req, res, next) => {
+      if (appAgent.env.useSSL && req.protocol === "http") {
+        res.redirect(`https://${req.hostname}${req.url}`);
+      } else if (appAgent.env.host !== req.get("host")) {
+        res.redirect(`${req.protocol}://${appAgent.env.host}${req.url}`);
+      } else {
+        next();
+      }
+    });
+  };
+  const app = await CreateAgentServer(appAgent, infra, routing);
 
   const execAgent = await ExecAgent(appAgent, PlatformDeps);
 
