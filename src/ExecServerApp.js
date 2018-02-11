@@ -3,6 +3,16 @@ const pathParse = require("path").parse;
 const React = require("react");
 const ReactDOMServer = require("react-dom/server");
 
+// Having troubles with ReactNativeWeb depending on ART depending on document global..
+// I attempted to use the react-native-web babel plugin, but it caused a compile-time crash while art depended on global.document...
+// https://github.com/necolas/react-native-web/issues/737
+if (typeof document === "undefined") {
+  global.document = {
+    createElement: () => null,
+  };
+}
+const {AppRegistry} = require('react-native-web')
+
 async function ExecDocAtPath(agent, path, docID, { req, res }, context) {
   const doc = await agent.dispatch({
     type: "GetDocAction",
@@ -79,10 +89,37 @@ async function ExecDocAtPath(agent, path, docID, { req, res }, context) {
       const App = result;
       res.set("content-type", "text/html");
       const { path, query } = req;
-      const html = ReactDOMServer.renderToString(
-        <App path={path} query={query} />,
-      );
-      res.send(`<!doctype html>${html}`);
+      // Horrible horrible hacks to support react native web styles:
+      const appKey = `App-${docID}`;
+      const appKeys = AppRegistry.getAppKeys();
+      if (appKeys.indexOf(appKey) === -1) {
+        AppRegistry.registerComponent(appKey, () => App);
+      }
+const { element, getStyleElement } = AppRegistry.getApplication(appKey, { path, query });
+const appHtml = ReactDOMServer.renderToString(element);
+const css = ReactDOMServer.renderToStaticMarkup(getStyleElement());
+
+      const title = "AaaAaayvvyen";
+      res.send(`
+<!doctype html>
+<html>
+<head>
+  <link rel="stylesheet" href="/assets/normalize.css" />
+  <link rel="stylesheet" href="/assets/app.css" />
+  <title>${title}</title>
+  ${css}
+  <script>
+    window.avenEnv = ${JSON.stringify(agent.env)};
+  </script>
+</head>
+<body>
+  <div id="root">
+${appHtml}
+  </div>
+  <script type="text/javascript" src="/_client_app.js" />
+</body>
+</html>
+`);
     } else if (typeof result === "string") {
       res.send(result);
     } else if (typeof result === "function") {
