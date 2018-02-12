@@ -1,11 +1,7 @@
-<p align="center">
-  <img width="460" height="300" src="https://i.imgur.com/3XwBhVR.png">
-</p>
-
 ![Aven Cloud](./graphics/AvenLogo.png)
 
 
-# Aven - A full-stack ReactJS framework
+# A Full Stack ReactJS framework
 
 Heads up, a lot of this is aspirational:
 
