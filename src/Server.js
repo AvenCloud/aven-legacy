@@ -27,13 +27,7 @@ module.exports = async () => {
 
   const routing = app => {
     app.use((req, res, next) => {
-      if (appAgent.env.useSSL && req.protocol === "http") {
-        res.redirect(`https://${req.hostname}${req.url}`);
-      } else if (appAgent.env.host !== req.get("host")) {
-        res.redirect(`${req.protocol}://${appAgent.env.host}${req.url}`);
-      } else {
-        next();
-      }
+      next();
     });
   };
   const app = await CreateAgentServer(appAgent, infra, routing);
