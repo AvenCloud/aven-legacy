@@ -35,6 +35,7 @@ sleep 24
 
 echo  "Running database migration.."
 
+cp -f sequelizeConfig.postgres.json sequelizeConfig.json
 ./node_modules/sequelize-cli/lib/sequelize db:migrate
 
 echo  "Migration complete."

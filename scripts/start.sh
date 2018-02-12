@@ -8,6 +8,7 @@ echo "-------------------------------"
 
 echo "Performing Production DB migration.."
 
+cp -f sequelizeConfig.postgres.json sequelizeConfig.json
 ./node_modules/sequelize-cli/lib/sequelize db:migrate
 
 echo "Starting Production App at directory $PWD.."

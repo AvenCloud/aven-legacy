@@ -6,3 +6,5 @@ dist
 npm-debug.log
 prettierCheck.debug
 mobile/src
+aven.sqlite
+sequelizeConfig.json

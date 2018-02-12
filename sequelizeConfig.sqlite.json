@@ -1,0 +1,15 @@
+{
+    "development": {
+      "dialect": "sqlite",
+      "storage": "aven.sqlite"
+    },
+    "test": {
+      "dialect": "sqlite",
+      "storage": "aven.sqlite"
+    },
+    "production": {
+      "dialect": "sqlite",
+      "storage": "aven.sqlite"
+    }
+  }
+  

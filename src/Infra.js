@@ -15,21 +15,36 @@ module.exports = async options => {
 
   const env = options.env || process.env.NODE_ENV;
 
-  const pg = new Client({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.PG_NO_SSL ? false : true,
-  });
-  await pg.connect();
+  let pg = null;
+  let sequelize = null;
+  if (process.env.DATABASE_URL) {
+    console.log("Running with Postgres DB from env!");
+    pg = new Client({
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.PG_NO_SSL ? false : true,
+    });
+    await pg.connect();
+    sequelize = new Sequelize(process.env.DATABASE_URL, {
+      logging: false,
+      operatorsAliases: false,
+    });
+  } else {
+    console.log("Looking for SQLite DB in " + process.cwd());
+    sequelize = new Sequelize({
+      dialect: "sqlite",
+      storage: "aven.sqlite",
 
-  const sequelize = new Sequelize(process.env.DATABASE_URL, {
-    logging: false,
-    operatorsAliases: false,
-  });
-
+      logging: false,
+      operatorsAliases: false,
+    });
+  }
+  if (!sequelize) {
+    throw "Could not initialize the database!";
+  }
   const email = await Email();
 
   const close = async () => {
-    await pg.end();
+    if (pg) await pg.end();
     await sequelize.close();
   };
 
@@ -39,11 +54,13 @@ module.exports = async options => {
       host,
       useSSL: hostSSL,
     };
-    try {
-      await pg.query("SELECT $1::text as message", ["Hello world!"]);
-      results.pg = true;
-    } catch (e) {
-      results.pg = false;
+    if (pg) {
+      try {
+        await pg.query("SELECT $1::text as message", ["Hello world!"]);
+        results.pg = true;
+      } catch (e) {
+        results.pg = false;
+      }
     }
     try {
       await sequelize.authenticate();

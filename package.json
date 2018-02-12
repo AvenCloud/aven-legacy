@@ -5,7 +5,8 @@
         "start": "NODE_ENV=production scripts/start.sh",
         "test": "JEST_TEST=true EMAIL_MODE=test NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres scripts/test.sh",
         "test-debug": "NODE_ARGS='--inspect-brk' yarn test",
-        "dev": "EMAIL_MODE=development NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres scripts/dev.sh",
+        "dev": "EMAIL_MODE=development NODE_ENV=development scripts/dev.sh",
+        "dev-pg": "EMAIL_MODE=development NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres scripts/dev-pg.sh",
         "build": "scripts/build.sh",
         "link-mobile": "wml add ~/aven/src ~/aven/mobile/src && wml start",
         "postinstall": "yarn build"
@@ -57,6 +58,7 @@
         "sequelize": "^4.27.0",
         "sequelize-cli": "^3.2.0",
         "sleep-promise": "^2.0.0",
+        "sqlite3": "^3.1.13",
         "supertest": "^3.0.0",
         "validator": "^9.2.0",
         "ws": "^4.0.0"
