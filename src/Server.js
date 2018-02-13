@@ -31,7 +31,7 @@ module.exports = async () => {
     });
   };
   const app = await CreateAgentServer(appAgent, infra, routing);
-
+  app.infra = infra;
   const execAgent = await ExecAgent(appAgent, PlatformDeps);
 
   appAgent.provideDirectory(LOCAL_APP_PATH, MAIN_APP_NAME);
@@ -72,11 +72,11 @@ module.exports = async () => {
 
   console.log("Started on " + infra.hostURI);
 
-  const close = async () => {
+  const closeServer = async () => {
     await app.close();
     await appAgent.close();
     await infra.close();
   };
 
-  return close;
+  return { closeServer, app };
 };

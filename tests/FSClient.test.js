@@ -4,7 +4,7 @@ let app = null;
 let client = null;
 const fs = require("fs-extra");
 const { join } = require("path");
-const FSClient = require("../src/FSClient");
+const FSAgent = require("../src/FSAgent");
 
 beforeEach(async () => {
   app = await initTestApp();
@@ -16,7 +16,7 @@ beforeEach(async () => {
   await fs.mkdir("__testDir/foo");
   await fs.copy("graphics/favicon/favicon.prod.ico", "__testDir/favicon.ico");
   await fs.writeFile("__testDir/foo/goodnews.txt", "good news, foo!");
-  client = await FSClient({
+  client = await FSAgent({
     dispatch: app.testDispatch,
     authUser: app.testAuthUser,
     authSession: app.testAuthSession,

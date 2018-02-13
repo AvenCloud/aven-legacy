@@ -1,9 +1,10 @@
 {
-    "name": "aven-cli",
+    "name": "aven-core",
     "version": "0.1.0-alpha.1",
     "bin": {
         "aven": "dist/CLI.js"
     },
+    "license": "Apache-2.0",
     "scripts": {
         "start": "NODE_ENV=production scripts/start.sh",
         "test": "JEST_TEST=true EMAIL_MODE=test NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres scripts/test.sh",
@@ -13,6 +14,9 @@
         "build": "scripts/build.sh",
         "link-mobile": "wml add ~/aven/src ~/aven/mobile/src && wml start",
         "postinstall": "yarn build"
+    },
+    "jest": {
+        "setupFiles": ["jest-canvas-mock"]
     },
     "devDependencies": {
         "babel-cli": "^6.26.0",
@@ -28,6 +32,7 @@
         "eslint-config-prettier": "^2.9.0",
         "eslint-plugin-prettier": "^2.4.0",
         "jest": "^22.1.4",
+        "jest-canvas-mock": "^0.0.4",
         "node-fetch": "^1.7.3",
         "prettier": "^1.9.2",
         "wml": "^0.0.83"

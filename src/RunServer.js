@@ -14,7 +14,7 @@ const reportSuccess = type => () => {
 };
 
 Server()
-  .then(closeServer => {
+  .then(({ closeServer }) => {
     process.on("SIGTERM", () => {
       closeServer()
         .then(reportSuccess("Shut Down"))
