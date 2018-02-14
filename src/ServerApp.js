@@ -102,7 +102,7 @@ async function ExecDocAtPath(agent, path, docID, { req, res }, context) {
       const appHtml = ReactDOMServer.renderToString(element);
       const css = ReactDOMServer.renderToStaticMarkup(getStyleElement());
 
-      const title = "AaaAaayvvyen";
+      const title = App.title;
       res.send(`
 <!doctype html>
 <html>

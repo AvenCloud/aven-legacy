@@ -17,17 +17,17 @@ then
 else
 
     run_app_dev() {
-    echo "Running app.."
-    node dist/RunServer.js
+        echo "Running app.."
+        node dist/RunServer.js
     }
 
     cp -f sequelizeConfig.sqlite.json sequelizeConfig.json
     ./node_modules/sequelize-cli/lib/sequelize db:migrate
 
     if run_app_dev "$@"; then
-    echo  "App Complete!"
-    else
-    echo "App Exited with error."
+        echo  "App Complete!"
+        else
+        echo "App Exited with error."
     fi
 
     exit 0
