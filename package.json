@@ -6,26 +6,28 @@
     },
     "license": "Apache-2.0",
     "scripts": {
-        "start": "NODE_ENV=production scripts/start.sh",
+        "start": "NODE_ENV=local scripts/start.sh",
+        "start-production": "NODE_ENV=production scripts/start.sh",
         "test": "JEST_TEST=true EMAIL_MODE=test NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres scripts/test.sh",
         "test-debug": "NODE_ARGS='--inspect-brk' yarn test",
         "dev": "EMAIL_MODE=development NODE_ENV=development scripts/dev.sh",
         "dev-pg": "EMAIL_MODE=development NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres scripts/dev-pg.sh",
         "build": "scripts/build.sh",
-        "link-mobile": "wml add ~/aven/src ~/aven/mobile/src && wml start",
-        "postinstall": "yarn build"
+        "link-mobile": "wml add ~/aven/src ~/aven/mobile/src && wml start"
     },
     "jest": {
-        "setupFiles": ["jest-canvas-mock"]
+        "setupFiles": [
+            "jest-canvas-mock"
+        ]
     },
+    "files": [
+        "dist",
+        "scripts",
+        "default-app"
+    ],
     "devDependencies": {
         "babel-cli": "^6.26.0",
-        "babel-core": "^6.26.0",
         "babel-eslint": "^8.1.2",
-        "babel-plugin-transform-react-jsx": "^6.24.1",
-        "babel-preset-env": "^1.6.1",
-        "babel-preset-react": "^6.24.1",
-        "babel-preset-react-native": "^4.0.0",
         "babel-watch": "^2.0.7",
         "browserify": "^16.0.0",
         "eslint": "^4.15.0",
@@ -33,29 +35,33 @@
         "eslint-plugin-prettier": "^2.4.0",
         "jest": "^22.1.4",
         "jest-canvas-mock": "^0.0.4",
-        "node-fetch": "^1.7.3",
         "prettier": "^1.9.2",
         "wml": "^0.0.83"
     },
     "dependencies": {
+        "babel-core": "^6.26.0",
         "babel-plugin-react-native-web": "^0.4.0",
         "babel-plugin-transform-object-rest-spread": "^6.26.0",
         "babel-polyfill": "^6.26.0",
-        "babel-preset-es2015": "^6.24.1",
-        "babel-preset-es2018": "^1.0.0",
+        "babel-preset-env": "^1.6.1",
+        "babel-preset-react": "^6.24.1",
+        "babel-preset-react-native": "^4.0.0",
         "babel-preset-stage-0": "^6.24.1",
         "bcrypt-nodejs": "^0.0.3",
         "bluebird": "^3.5.1",
+        "chalk": "^2.3.1",
         "express": "^4.16.2",
         "fb-watchman": "^2.0.0",
         "file-type": "^7.4.0",
         "fqdn": "0.0.3",
         "fs-extra": "^5.0.0",
         "global": "^4.3.2",
+        "inquirer": "^5.1.0",
         "isbinaryfile": "^3.0.2",
         "json-stable-stringify": "^1.0.1",
         "mime-types": "^2.1.17",
         "node-dev": "^3.1.3",
+        "node-fetch": "^1.7.3",
         "npx": "^9.7.1",
         "pg": "^7.4.0",
         "pg-hstore": "^2.3.2",

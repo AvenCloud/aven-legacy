@@ -1,16 +1,36 @@
 #!/usr/bin/env bash
 
+if [ NODE_ENV == "production" ] 
+then
+    echo "STARTING PRODUCTION AVEN SERVER"
+    echo "-------------------------------"
 
-# This script is only meant to be used in production. Use "yarn dev" for local development
+    echo "Performing Production DB migration.."
 
-echo "STARTING PRODUCTION AVEN SERVER"
-echo "-------------------------------"
+    cp -f sequelizeConfig.postgres.json sequelizeConfig.json
+    ./node_modules/sequelize-cli/lib/sequelize db:migrate
 
-echo "Performing Production DB migration.."
+    echo "Starting Production App at directory $PWD.."
 
-cp -f sequelizeConfig.postgres.json sequelizeConfig.json
-./node_modules/sequelize-cli/lib/sequelize db:migrate
+    node dist/RunServer.js
 
-echo "Starting Production App at directory $PWD.."
+else
 
-node dist/RunServer.js
+    run_app_dev() {
+    echo "Running app.."
+    node dist/RunServer.js
+    }
+
+    cp -f sequelizeConfig.sqlite.json sequelizeConfig.json
+    ./node_modules/sequelize-cli/lib/sequelize db:migrate
+
+    if run_app_dev "$@"; then
+    echo  "App Complete!"
+    else
+    echo "App Exited with error."
+    fi
+
+    exit 0
+
+
+fi

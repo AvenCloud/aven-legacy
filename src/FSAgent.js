@@ -4,7 +4,7 @@ const { promisify } = require("bluebird");
 const fs = require("fs-extra");
 const stringify = require("json-stable-stringify");
 const { join, basename } = require("path");
-const { digest } = require("../src/Utilities");
+const { digest } = require("./Utilities");
 
 const isBinaryFile = promisify(require("isbinaryfile"));
 

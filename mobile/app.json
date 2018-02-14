@@ -1,5 +1,15 @@
 {
   "expo": {
+    "name": "Aven Framework",
+    "icon": "./iPhoneIcon.png",
+    "version": "1.0.0",
+    "slug": "aven",
+    "ios": {
+      "bundleIdentifier": "io.aven.framework"
+    },
+    "android": {
+      "package": "io.aven.framework"
+    },
     "sdkVersion": "25.0.0"
   }
 }

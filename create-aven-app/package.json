@@ -1,0 +1,13 @@
+{
+    "name": "create-aven-app",
+    "version": "0.1.0-alpha.1",
+    "license": "Apache-2.0",
+    "bin": {
+        "create-aven-app": "index.js"
+    },
+    "dependencies": {
+        "chalk": "^2.3.1",
+        "commander": "^2.14.1",
+        "fs-extra": "^5.0.0"
+    }
+}

@@ -12,6 +12,7 @@ const MAIN_APP_NAME = "App";
 const { promisify } = require("bluebird");
 const execFile = promisify(require("child_process").execFile);
 const IS_DEV = process.env.NODE_ENV === "development";
+const IS_LOCAL = process.env.NODE_ENV === "local";
 let prodClientAppCache = null;
 const CLIENT_APP_SRC = joinPath(__dirname, "BrowserApp.js");
 const CLIENT_APP = joinPath(__dirname, "../dist/BrowserApp.bundle.js");
@@ -22,7 +23,8 @@ module.exports = async () => {
   const dbAgent = await DBAgent(infra);
 
   const fsAgent = await FSAgent(dbAgent, infra);
-  const appAgent = IS_DEV ? await WatchmanAgent(fsAgent, infra) : fsAgent;
+  const appAgent =
+    IS_DEV || IS_LOCAL ? await WatchmanAgent(fsAgent, infra) : fsAgent;
   // const appAgent = await AuthAgent(fsAgent, infra);
 
   const routing = app => {
