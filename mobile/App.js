@@ -18,7 +18,7 @@ export default class App extends React.Component {
   static mainRecord = "App";
   agent = null;
   async componentDidMount() {
-    const netAgent = await ReactNativeNetworkAgent(upstreamDev);
+    const netAgent = await ReactNativeNetworkAgent(upstreamProd);
     this.agent = ExecAgent(netAgent, PlatformDeps);
     this.agent.onStatus(this._setStatus);
     const result = await this.agent.dispatch({

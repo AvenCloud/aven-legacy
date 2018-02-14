@@ -22,7 +22,7 @@
     "expo": "^25.0.0",
     "path-parse": "^1.0.5",
     "react": "16.2.0",
-    "react-native": "0.52.0",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-25.0.0.tar.gz",
     "react-navigation": "^1.0.3"
   }
 }
