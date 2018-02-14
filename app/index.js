@@ -77,6 +77,7 @@
     };
   }
   class TestApp extends React.Component {
+    static title = "Aven";
     render() {
       return (
         <Page title="Aven">

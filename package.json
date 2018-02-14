@@ -13,6 +13,7 @@
         "dev": "EMAIL_MODE=development NODE_ENV=development scripts/dev.sh",
         "dev-pg": "EMAIL_MODE=development NODE_ENV=development PG_NO_SSL=true DATABASE_URL=postgresql://postgres:aven-test-password@localhost:5432/postgres scripts/dev-pg.sh",
         "build": "scripts/build.sh",
+        "heroku-postbuild": "yarn build",
         "link-mobile": "wml add ~/aven/src ~/aven/mobile/src && wml start"
     },
     "jest": {
