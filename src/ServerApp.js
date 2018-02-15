@@ -53,8 +53,8 @@ async function ServeAppPath(
   );
   const doc = await agent.dispatch({
     type: "GetDocAction",
-    docID: docID,
-    recordID: "App",
+    docID,
+    recordID,
   });
 
   if (!doc) {
@@ -123,7 +123,7 @@ async function ServeAppPath(
     }
   }
   if (doc.value.type === "JSModule") {
-    const result = await agent.exec(doc, context);
+    const result = await agent.exec(doc.docID, doc.recordID, context);
     if (React.Component.isPrototypeOf(result)) {
       const App = result;
       res.set("content-type", "text/html");

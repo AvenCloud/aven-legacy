@@ -1,7 +1,13 @@
 const pathParse = require("path-parse");
 
 const ExecAgent = (agent, platformDeps) => {
-  async function exec(doc, context) {
+  async function exec(docID, recordID, context) {
+    const doc = await agent.dispatch({
+      type: "GetDocAction",
+      docID,
+      recordID,
+    });
+    context = context || [];
     console.log(
       "Exec",
       doc.value.type,
@@ -13,7 +19,6 @@ const ExecAgent = (agent, platformDeps) => {
         inheritRecord,
       })),
     );
-    const recordID = context[context.length - 1].recordID;
     const moduleDoc = doc.value;
     if (moduleDoc.type !== "JSModule") {
       if (moduleDoc.type === "Directory") {
@@ -25,7 +30,7 @@ const ExecAgent = (agent, platformDeps) => {
             recordID,
           });
           console.log("Handling index behavior!!");
-          return await exec(doc, [
+          return await exec(indexFile.docID, indexFile.recordID, [
             context,
             {
               ...moduleDoc,
