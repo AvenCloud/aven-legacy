@@ -13,7 +13,7 @@ const reportSuccess = type => () => {
   type !== "Startup" && process.exit(0);
 };
 
-Server()
+Server({})
   .then(({ closeServer }) => {
     process.on("SIGTERM", () => {
       closeServer()

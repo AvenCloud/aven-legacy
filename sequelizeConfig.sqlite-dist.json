@@ -1,15 +1,15 @@
 {
     "development": {
       "dialect": "sqlite",
-      "storage": ".AvenDB.sqlite"
+      "storage": "AvenDBTemplate.sqlite"
     },
     "test": {
       "dialect": "sqlite",
-      "storage": ".AvenDB.sqlite"
+      "storage": "AvenDBTemplate.sqlite"
     },
     "production": {
       "dialect": "sqlite",
-      "storage": ".AvenDB.sqlite"
+      "storage": "AvenDBTemplate.sqlite"
     }
   }
   

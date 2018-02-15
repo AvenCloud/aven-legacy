@@ -18,7 +18,6 @@ module.exports = async options => {
   let pg = null;
   let sequelize = null;
   if (process.env.DATABASE_URL) {
-    console.log("Running with Postgres DB from env!");
     pg = new Client({
       connectionString: process.env.DATABASE_URL,
       ssl: process.env.PG_NO_SSL ? false : true,
@@ -29,10 +28,9 @@ module.exports = async options => {
       operatorsAliases: false,
     });
   } else {
-    console.log("Looking for SQLite DB in " + process.cwd());
     sequelize = new Sequelize({
       dialect: "sqlite",
-      storage: "aven.sqlite",
+      storage: options.dbPath,
 
       logging: false,
       operatorsAliases: false,

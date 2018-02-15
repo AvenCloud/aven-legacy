@@ -7,24 +7,29 @@ const Infra = require("./Infra");
 const fs = require("fs-extra");
 const ExecAgent = require("./ExecAgent");
 const joinPath = require("path").join;
-const LOCAL_APP_PATH = joinPath(process.cwd(), "app");
-const MAIN_APP_NAME = "App";
+const EXAMPLE_APP_PATH = joinPath(process.cwd(), "app");
+const FRAMEWORK_PATH = joinPath(__dirname, "../framework");
+const APP_RECORD = "App";
+const FRAMEWORK_RECORD = "Framework";
 const { promisify } = require("bluebird");
 const execFile = promisify(require("child_process").execFile);
-const IS_DEV = process.env.NODE_ENV === "development";
-const IS_LOCAL = process.env.NODE_ENV === "local";
 let prodClientAppCache = null;
 const CLIENT_APP_SRC = joinPath(__dirname, "BrowserApp.js");
 const CLIENT_APP = joinPath(__dirname, "../dist/BrowserApp.bundle.js");
 const PlatformDeps = require("./PlatformDeps");
 
-module.exports = async () => {
-  const infra = await Infra({});
+module.exports = async options => {
+  const infra = await Infra({
+    dbPath: options.dbPath || ".AvenDB.sqlite",
+  });
   const dbAgent = await DBAgent(infra);
 
   const fsAgent = await FSAgent(dbAgent, infra);
+  const isDev = process.env.NODE_ENV === "development";
+  const isLocal = process.env.NODE_ENV === "local";
+
   const appAgent =
-    IS_DEV || IS_LOCAL ? await WatchmanAgent(fsAgent, infra) : fsAgent;
+    isDev || isLocal ? await WatchmanAgent(fsAgent, infra) : fsAgent;
   // const appAgent = await AuthAgent(fsAgent, infra);
 
   const routing = app => {
@@ -36,7 +41,21 @@ module.exports = async () => {
   app.infra = infra;
   const execAgent = await ExecAgent(appAgent, PlatformDeps);
 
-  appAgent.provideDirectory(LOCAL_APP_PATH, MAIN_APP_NAME);
+  const appDirectory = options.appDir || EXAMPLE_APP_PATH;
+
+  if (isDev) {
+    // now developing aven itself. watch for changes in framework and app code
+    await appAgent.provideDirectory(FRAMEWORK_PATH, FRAMEWORK_RECORD);
+    await appAgent.provideDirectory(appDirectory, APP_RECORD);
+  } else if (isLocal) {
+    // user is running locally via npm script. framework will not change.
+    await fsAgent.provideDirectory(FRAMEWORK_PATH, FRAMEWORK_RECORD);
+    await appAgent.provideDirectory(appDirectory, APP_RECORD);
+  } else {
+    // prod. serve from fs agent
+    await fsAgent.provideDirectory(FRAMEWORK_PATH, FRAMEWORK_RECORD);
+    await fsAgent.provideDirectory(appDirectory, APP_RECORD);
+  }
 
   app.get("/_client_app.js", async (req, res) => {
     const { host, useSSL } = appAgent.env;
@@ -45,7 +64,7 @@ module.exports = async () => {
       "Content-Type": "application/javascript; charset=utf-8",
     });
 
-    if (IS_DEV) {
+    if (isDev) {
       await execFile("./scripts/build.sh");
       const built = await fs.readFile(CLIENT_APP, {
         encoding: "utf8",
@@ -63,7 +82,7 @@ module.exports = async () => {
 
   app.get("*", async (req, res) => {
     try {
-      await ServerApp(execAgent, req, res, MAIN_APP_NAME);
+      await ServerApp(execAgent, req, res, APP_RECORD);
     } catch (e) {
       console.log("Error:", e);
       res

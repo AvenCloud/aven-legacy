@@ -2,6 +2,17 @@ const pathParse = require("path-parse");
 
 const ExecAgent = (agent, platformDeps) => {
   async function exec(doc, context) {
+    console.log(
+      "Exec",
+      doc.value.type,
+      context.map(({ docID, recordID, files, inheritRecord, fileName }) => ({
+        docID,
+        fileName,
+        recordID,
+        files: files.length,
+        inheritRecord,
+      })),
+    );
     const recordID = context[context.length - 1].recordID;
     const moduleDoc = doc.value;
     if (moduleDoc.type !== "JSModule") {
@@ -13,11 +24,11 @@ const ExecAgent = (agent, platformDeps) => {
             docID: indexFile.docID,
             recordID,
           });
-
+          console.log("Handling index behavior!!");
           return await exec(doc, [
             context,
             {
-              files: moduleDoc.files,
+              ...moduleDoc,
               recordID,
               fileName: indexFile.fileName,
               docID: indexFile.docID,
@@ -52,6 +63,9 @@ const ExecAgent = (agent, platformDeps) => {
               }
             });
           }
+          if (parentContext.inheritRecord) {
+            console.log("FFF INHERIT!! ", parentContext.inheritRecord);
+          }
         });
         let childRecordID = null;
         context.find(parentContext => {
@@ -60,6 +74,7 @@ const ExecAgent = (agent, platformDeps) => {
             return true;
           }
         });
+
         if (!childDocID) {
           childRecordID = remoteDep;
           const depModuleRecord = await agent.dispatch({
@@ -83,6 +98,7 @@ const ExecAgent = (agent, platformDeps) => {
           depsNotFound.push(remoteDep);
           return;
         }
+        console.log("Executing dependency!", remoteDep);
         const executedDep = await exec(depModule, context);
         deps[remoteDep] = executedDep;
       }),

@@ -1,22 +1,16 @@
-#!/usr/bin/env node
-require("babel-polyfill");
-const promisify = require("bluebird").promisify;
-const fs = require("fs");
 const pathJoin = require("path").join;
-const FSAgent = require("./FSAgent");
-const readFile = promisify(fs.readFile);
-const readdir = promisify(fs.readdir);
+// const FSAgent = require("./FSAgent");
 const runInit = require("./CLI-Init");
 const runStart = require("./CLI-Start");
 
-const CONFIG_DEFAULTS = {
-  host: "aven.io",
-  useSSL: true,
-  authUser: null,
-  authSession: null,
-  syncDirectoryRecord: null,
-  syncDirectoryPath: null,
-};
+// const CONFIG_DEFAULTS = {
+//   host: "aven.io",
+//   useSSL: true,
+//   authUser: null,
+//   authSession: null,
+//   syncDirectoryRecord: null,
+//   syncDirectoryPath: null,
+// };
 
 async function runCLI({ args, cwd }) {
   const cmd = args[0];
