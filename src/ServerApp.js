@@ -13,7 +13,44 @@ if (typeof document === "undefined") {
 }
 const { AppRegistry } = require("react-native-web");
 
-async function ExecDocAtPath(agent, path, docID, { req, res }, context) {
+async function ServerApp(agent, req, res, mainRecord) {
+  const result = await agent.dispatch({
+    type: "GetRecordAction",
+    recordID: mainRecord,
+  });
+  const { docID } = result;
+  if (!result || !docID) {
+    throw {
+      statusCode: 404,
+      code: "INVALID_APP",
+      message: `App Record doc "${mainRecord}" not found!`,
+    };
+  }
+  const topPath = req.path.slice(1);
+  await ServeAppPath(agent, mainRecord, docID, topPath, { req, res }, []);
+}
+
+async function ServeAppPath(
+  agent,
+  recordID,
+  docID,
+  path,
+  { req, res },
+  context,
+) {
+  console.log(
+    "ServeAppPath",
+    recordID,
+    docID,
+    path,
+    context.map(({ docID, recordID, files, inheritRecord, fileName }) => ({
+      docID,
+      fileName,
+      recordID,
+      files: files.length,
+      inheritRecord,
+    })),
+  );
   const doc = await agent.dispatch({
     type: "GetDocAction",
     docID: docID,
@@ -61,15 +98,17 @@ async function ExecDocAtPath(agent, path, docID, { req, res }, context) {
           const pathParts = path.split("/");
           const childPath = pathParts.slice(1).join("/");
           const childDocID = foundIndexFile.docID;
-          return await ExecDocAtPath(
+          return await ServeAppPath(
             agent,
-            childPath,
+            recordID,
             childDocID,
+            childPath,
             { req, res },
             [
               {
+                ...doc.value,
                 ...foundIndexFile,
-                files: doc.value.files,
+                recordID,
               },
               ...context,
             ],
@@ -188,13 +227,21 @@ ${appHtml}
   const childPath = pathParts.slice(1).join("/");
   const childDocID = selectedFile && selectedFile.docID;
   if (childDocID) {
-    return await ExecDocAtPath(agent, childPath, childDocID, { req, res }, [
-      {
-        ...selectedFile,
-        files: doc.value.files,
-      },
-      ...context,
-    ]);
+    return await ServeAppPath(
+      agent,
+      recordID,
+      childDocID,
+      childPath,
+      { req, res },
+      [
+        {
+          ...doc.value,
+          ...selectedFile,
+          recordID,
+        },
+        ...context,
+      ],
+    );
   }
 
   throw {
@@ -202,25 +249,6 @@ ${appHtml}
     message: "Cannot handle this file",
     fields: { doc },
   };
-}
-
-async function ServerApp(agent, req, res, mainRecord) {
-  const result = await agent.dispatch({
-    type: "GetRecordAction",
-    recordID: mainRecord,
-  });
-  const { docID } = result;
-  if (!result || !docID) {
-    throw {
-      statusCode: 404,
-      code: "INVALID_APP",
-      message: `App Record doc "${mainRecord}" not found!`,
-    };
-  }
-  const topPath = req.path.slice(1);
-  await ExecDocAtPath(agent, topPath, docID, { req, res }, [
-    { recordID: mainRecord, docID },
-  ]);
 }
 
 module.exports = ServerApp;

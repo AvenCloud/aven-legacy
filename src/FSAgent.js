@@ -8,6 +8,8 @@ const { digest } = require("./Utilities");
 
 const isBinaryFile = promisify(require("isbinaryfile"));
 
+const EMBARASSING_HACK_BAN_FILE_NAMES = ["node_modules", "Directory.json"];
+
 // babel stufs:
 const babel = require("babel-core");
 const presetStage0 = require("babel-preset-stage-0");
@@ -66,7 +68,15 @@ async function FSAgent(agent) {
       return await readJSModuleValue(path);
     }
     if (stat.isDirectory()) {
-      const fileNames = await fs.readdir(path);
+      let fileNames = await fs.readdir(path);
+      fileNames = fileNames.filter(
+        f => EMBARASSING_HACK_BAN_FILE_NAMES.indexOf(f) === -1,
+      );
+      let directory = {};
+      try {
+        const dirJSON = await fs.readFile(join(path, "Directory.json"));
+        directory = JSON.parse(dirJSON);
+      } catch (e) {}
       const files = await Promise.all(
         fileNames.sort().map(async fileName => {
           const filePath = join(path, fileName);
@@ -75,6 +85,7 @@ async function FSAgent(agent) {
         }),
       );
       return {
+        ...directory,
         type: "Directory",
         files,
       };
@@ -245,12 +256,8 @@ async function FSAgent(agent) {
     return newRecord;
   };
 
-  let _rootProvidedDir = null;
-  const provideDirectory = async (path, recordID, isRoot) => {
+  const provideDirectory = async (path, recordID) => {
     _providedDirs[recordID] = path;
-    if (isRoot || !_rootProvidedDir) {
-      _rootProvidedDir = recordID;
-    }
     const record = await _providePathDocs(path, recordID);
     fsRecords[recordID] = { ...record, recordID };
     return () => {
@@ -278,11 +285,7 @@ async function FSAgent(agent) {
         return fsRecord;
       }
       const record = await dispatch(action);
-      if (record) {
-        return record;
-      }
-      const topDoc = fsDocs[fsRecord[_rootProvidedDir].docID];
-      return { foo: "bae" };
+      return record;
     }
     if (action.type === "GetDocAction") {
       const fsDoc = fsDocs[action.docID];

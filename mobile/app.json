@@ -1,9 +1,11 @@
 {
   "expo": {
     "name": "Aven",
+    "description": "Coming soon",
     "icon": "./iPhoneIcon.png",
     "version": "1.0.0",
     "slug": "aven",
+    "orientation": "portrait",
     "ios": {
       "bundleIdentifier": "io.aven.framework"
     },
@@ -16,6 +18,7 @@
       "image": "./MobileSplash.png",
       "backgroundColor": "#FFFFFF"
     },
-    "sdkVersion": "25.0.0"
+    "sdkVersion": "25.0.0",
+    "assetBundlePatterns": []
   }
 }
