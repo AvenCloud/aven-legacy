@@ -35,7 +35,6 @@ const ReactNativeNetworkAgent = async ({ useSSL, host }) => {
       _emitStatusChange();
     }
     if (!wasOnline && isOnline) {
-      console.log("Just came on line!");
       attachWebsocket();
     } else if (!isOnline && wasOnline) {
       detachWebsocket();
@@ -50,22 +49,22 @@ const ReactNativeNetworkAgent = async ({ useSSL, host }) => {
   let _ws;
 
   async function detachWebsocket() {
-    if (_ws) {
-      _ws.close();
-    }
-    _ws = null;
-    _isWsConnected = false;
-    _emitStatusChange();
+    // if (_ws) {
+    //   _ws.close();
+    // }
+    // _ws = null;
+    // _isWsConnected = false;
+    // _emitStatusChange();
   }
   async function attachWebsocket() {
-    await detachWebsocket();
-    const protocolAndHost = `ws${useSSL ? "s" : ""}://${host}`;
-    console.log("Connecting to ", protocolAndHost);
-    _ws = new WebSocket(protocolAndHost);
-    _ws.onopen = _onWebsocketOpen;
-    _ws.onclose = _onWebsocketClose;
-    _ws.onerror = _onWebsocketClose;
-    _ws.onmessage = _onWebsocketMessage;
+    // await detachWebsocket();
+    // const protocolAndHost = `ws${useSSL ? "s" : ""}://${host}`;
+    // console.log("Connecting to ", protocolAndHost);
+    // _ws = new WebSocket(protocolAndHost);
+    // _ws.onopen = _onWebsocketOpen;
+    // _ws.onclose = _onWebsocketClose;
+    // _ws.onerror = _onWebsocketClose;
+    // _ws.onmessage = _onWebsocketMessage;
   }
 
   const _onWebsocketOpen = () => {
@@ -89,7 +88,6 @@ const ReactNativeNetworkAgent = async ({ useSSL, host }) => {
 
   const _onWebsocketMessage = async e => {
     const payload = JSON.parse(e.data);
-    console.log("dd", payload);
     if (payload.recordID && payload.docID) {
       _deliverRecord(payload);
     }
@@ -97,12 +95,10 @@ const ReactNativeNetworkAgent = async ({ useSSL, host }) => {
 
   const _onWebsocketError = e => {
     detachWebsocket();
-    console.log("Connection Errored", e.code, e.reason);
   };
   let _reconnectTimeout = null;
   const _onWebsocketClose = e => {
     detachWebsocket();
-    console.log("Connection Closed", e.code, e.reason);
 
     // we assume accidental disconnection. Wait 5 seconds and retry
     clearTimeout(_reconnectTimeout);
@@ -128,7 +124,6 @@ const ReactNativeNetworkAgent = async ({ useSSL, host }) => {
     try {
       body = textBody && JSON.parse(textBody);
     } catch (e) {}
-    console.log(action.type, action, body);
     return body;
   }
 
@@ -142,7 +137,6 @@ const ReactNativeNetworkAgent = async ({ useSSL, host }) => {
     if (!_upstreamSubscribedRecords.has(recordID)) {
       _upstreamSubscribedRecords.add(recordID);
       sendWebsocketMessage({ type: "subscribe", recordID });
-      console.log("send subs", recordID);
     }
   }
   async function _unsubscribeToUpstreamRecord(recordID) {
@@ -151,7 +145,6 @@ const ReactNativeNetworkAgent = async ({ useSSL, host }) => {
     if (recordHandlers.size === 0 || docHandlers.size === 0) {
       _upstreamSubscribedRecords.delete(recordID);
       sendWebsocketMessage({ type: "unsubscribe", recordID });
-      console.log("send unsubs", recordID);
     }
   }
 
@@ -160,12 +153,10 @@ const ReactNativeNetworkAgent = async ({ useSSL, host }) => {
     handlers.forEach(handler => handler(record));
   }
   async function subscribe(recordID, handler) {
-    console.log("subs", recordID);
     _getRecordHandlerSet(recordID).add(handler);
     await _subscribeToUpstreamRecord(recordID);
   }
   function unsubscribe(recordID, handler) {
-    console.log("unsubs", recordID);
     _getRecordHandlerSet(recordID).remove(handler);
     _unsubscribeToUpstreamRecord(recordID);
   }

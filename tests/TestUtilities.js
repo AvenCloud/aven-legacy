@@ -37,7 +37,7 @@ async function setupTestUserSession(app) {
   const reg = await app.testDispatch({
     type: "AuthRegisterAction",
     displayName: "Foo Monkey",
-    id: app.testAuthUser,
+    userID: app.testAuthUser,
     password: "foobar",
     email: "foo1@bar.com",
   });
@@ -47,8 +47,8 @@ async function setupTestUserSession(app) {
   await app.testDispatch({
     type: "AuthVerifyAction",
     code: verificationCode,
-    id: reg.authID,
-    user: app.testAuthUser,
+    authID: reg.authID,
+    userID: app.testAuthUser,
   });
   const loginResult = await app.testDispatch({
     type: "AuthLoginAction",

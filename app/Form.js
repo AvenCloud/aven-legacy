@@ -11,7 +11,7 @@
     }
   }
   const styles = StyleSheet.create({
-    label: { color: "red" },
+    label: { color: "black" },
   });
   class Form extends React.Component {
     state = { fields: {} };
@@ -24,7 +24,6 @@
               key={field.name}
               value={this.state.fields[field.name]}
               onValue={value => {
-                console.log("wat", field.name, value);
                 this.setState(state => ({
                   fields: { ...state.fields, [field.name]: value },
                 }));

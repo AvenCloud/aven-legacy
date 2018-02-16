@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Aven Framework",
+    "name": "Aven",
     "icon": "./iPhoneIcon.png",
     "version": "1.0.0",
     "slug": "aven",
@@ -8,7 +8,13 @@
       "bundleIdentifier": "io.aven.framework"
     },
     "android": {
+      "icon": "./AndroidIcon.png",
       "package": "io.aven.framework"
+    },
+    "splash": {
+      "resizeMode": "contain",
+      "image": "./MobileSplash.png",
+      "backgroundColor": "#FFFFFF"
     },
     "sdkVersion": "25.0.0"
   }

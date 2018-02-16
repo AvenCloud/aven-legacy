@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-
+import { AppLoading } from "expo";
 const ExecAgent = require("./src/ExecAgent");
 const PlatformDeps = require("./PlatformDeps");
 const ReactNativeNetworkAgent = require("./ReactNativeNetworkAgent");
@@ -17,8 +17,10 @@ const upstreamDev = {
 export default class App extends React.Component {
   static mainRecord = "App";
   agent = null;
-  async componentDidMount() {
+  _initialLoad = async () => {
+    console.log("ok");
     const netAgent = await ReactNativeNetworkAgent(upstreamProd);
+    console.log("wtf");
     this.agent = ExecAgent(netAgent, PlatformDeps);
     this.agent.onStatus(this._setStatus);
     const result = await this.agent.dispatch({
@@ -41,9 +43,9 @@ export default class App extends React.Component {
     const ExecComponent = await this.agent.exec(doc, [
       { recordID: App.mainRecord, docID },
     ]);
-    this.setState({ ExecComponent });
     this.agent.subscribe(App.mainRecord, this._updateApp);
-  }
+    this.setState({ ExecComponent });
+  };
   componentWillUnmount() {
     this.agent.offStatus(this._setStatus);
     this.agent.unsubscribe(App.mainRecord, this._updateApp);
@@ -51,7 +53,6 @@ export default class App extends React.Component {
   _setStatus = status => this.setState({ status });
   _setRecord = record => this.setState({ record });
   _updateApp = async record => {
-    console.log("woah!", record);
     const doc = await this.agent.dispatch({
       type: "GetDocAction",
       docID: record.docID,
@@ -62,19 +63,42 @@ export default class App extends React.Component {
     ]);
     this.setState({ ExecComponent });
   };
-  state = { status: {}, ExecComponent: null };
+  state = { status: {}, ExecComponent: null, isInitialLoad: true };
   render() {
-    const { status, ExecComponent } = this.state;
+    const { status, ExecComponent, isInitialLoad } = this.state;
+    if (isInitialLoad) {
+      // return <Text>Uhh</Text>;
+      return (
+        <AppLoading
+          startAsync={this._initialLoad}
+          onFinish={() => this.setState({ isInitialLoad: false })}
+          onError={console.error}
+        />
+      );
+    }
     if (ExecComponent) {
       return <ExecComponent status={status} agent={this.agent} />;
     }
-    return null;
     return (
       <View style={styles.container}>
-        <Text>{JSON.stringify(this.state.status)}</Text>
+        <Text>Not found!</Text>
       </View>
     );
+
+    return null;
   }
+
+  // render() {
+  //   const { ExecComponent } = this.state;
+  //   if (ExecComponent) {
+  //     return <ExecComponent status={null} agent={this.agent} />;
+  //   }
+  //   return (
+  //     <View style={styles.container}>
+  //       <Text>{JSON.stringify(this.state)}</Text>
+  //     </View>
+  //   );
+  // }
 }
 
 const styles = StyleSheet.create({

@@ -4,13 +4,13 @@ async function AuthVerifyAction(action, infra) {
   const authMethod = await infra.model.authMethod.findOne({
     where: {
       id: {
-        [Op.eq]: action.id,
+        [Op.eq]: action.authID,
       },
       verificationKey: {
         [Op.eq]: action.code,
       },
       owner: {
-        [Op.eq]: action.user,
+        [Op.eq]: action.userID,
       },
     },
   });
@@ -29,8 +29,8 @@ async function AuthVerifyAction(action, infra) {
     verificationKey: null,
   });
   return {
-    userID: action.user,
-    authID: action.id,
+    userID: action.userID,
+    authID: action.authID,
   };
 }
 

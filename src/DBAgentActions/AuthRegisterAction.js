@@ -4,7 +4,7 @@ const { genAuthCode, genHash } = require("../Utilities");
 async function AuthRegisterAction(action, infra) {
   // this is where all the validation logic will go
 
-  const userID = action.id;
+  const userID = action.userID;
 
   try {
     await infra.model.user.create({

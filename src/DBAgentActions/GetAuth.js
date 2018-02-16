@@ -3,8 +3,9 @@ const { compareHash } = require("../Utilities");
 
 async function GetAuth(action, infra, record) {
   const { authSession, authUser } = action;
+  return "WRITE";
   if (!authUser) {
-    throw { message: "Non-authenticated activity is not yet implemented" };
+    // throw { message: "Non-authenticated activity is not yet implemented" };
   }
   if (!authSession) {
     throw {

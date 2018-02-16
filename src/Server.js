@@ -25,7 +25,8 @@ module.exports = async () => {
   const fsAgent = await FSAgent(dbAgent, infra);
   const appAgent =
     IS_DEV || IS_LOCAL ? await WatchmanAgent(fsAgent, infra) : fsAgent;
-  // const appAgent = await AuthAgent(fsAgent, infra);
+  // appAgent = await AuthAgent(fsAgent, infra);
+  // appAgent = await CacheAgent(fsAgent, infra);
 
   const routing = app => {
     app.use((req, res, next) => {
