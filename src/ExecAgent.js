@@ -30,8 +30,9 @@ const ExecAgent = (agent, platformDeps) => {
             recordID,
           });
           console.log("Handling index behavior!!");
+
           return await exec(indexFile.docID, indexFile.recordID, [
-            context,
+            ...context,
             {
               ...moduleDoc,
               recordID,
@@ -59,24 +60,21 @@ const ExecAgent = (agent, platformDeps) => {
     await Promise.all(
       remoteDeps.map(async remoteDep => {
         let childDocID = null;
+        let childRecordID = null;
+
         context.find(parentContext => {
           if (parentContext.files) {
-            return parentContext.files.find(file => {
+            const foundFile = parentContext.files.find(file => {
               if (pathParse(file.fileName).name === remoteDep) {
+                childRecordID = parentContext.recordID;
                 childDocID = file.docID;
                 return true;
               }
             });
-          }
-          if (parentContext.inheritRecord) {
-            console.log("FFF INHERIT!! ", parentContext.inheritRecord);
-          }
-        });
-        let childRecordID = null;
-        context.find(parentContext => {
-          if (parentContext.recordID) {
-            childRecordID = parentContext.recordID;
-            return true;
+            if (!foundFile && parentContext.inheritRecord) {
+              console.log("SHIT OK INHERIT FPR " + remoteDep);
+              return true;
+            }
           }
         });
 
@@ -94,17 +92,17 @@ const ExecAgent = (agent, platformDeps) => {
           depsNotFound.push(remoteDep);
           return;
         }
-        const depModule = await agent.dispatch({
-          type: "GetDocAction",
-          recordID: childRecordID,
-          docID: childDocID,
-        });
-        if (!depModule) {
+        console.log(
+          "Executing dependency!",
+          remoteDep,
+          childDocID,
+          childRecordID,
+        );
+        const executedDep = await exec(childDocID, childRecordID, context);
+        if (!executedDep) {
           depsNotFound.push(remoteDep);
           return;
         }
-        console.log("Executing dependency!", remoteDep);
-        const executedDep = await exec(depModule, context);
         deps[remoteDep] = executedDep;
       }),
     );

@@ -6,6 +6,7 @@ const WatchmanAgent = require("./WatchmanAgent");
 const Infra = require("./Infra");
 const fs = require("fs-extra");
 const ExecAgent = require("./ExecAgent");
+const HelperAgent = require("./HelperAgent");
 const joinPath = require("path").join;
 const EXAMPLE_APP_PATH = joinPath(process.cwd(), "app");
 const FRAMEWORK_PATH = joinPath(__dirname, "../framework");
@@ -28,8 +29,10 @@ module.exports = async options => {
   const isDev = process.env.NODE_ENV === "development";
   const isLocal = process.env.NODE_ENV === "local";
 
-  const appAgent =
+  const watchingAgent =
     isDev || isLocal ? await WatchmanAgent(fsAgent, infra) : fsAgent;
+
+  const appAgent = await HelperAgent(watchingAgent);
   // const appAgent = await AuthAgent(fsAgent, infra);
 
   const routing = app => {
