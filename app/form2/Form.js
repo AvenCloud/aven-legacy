@@ -1,10 +1,10 @@
-({ React, Platform, Alert, View, Button, Text, TextInput, StyleSheet }) => {
+({ React, Platform, View, Button, Text, TextInput, StyleSheet }) => {
   class FormField extends React.Component {
     render() {
       const { field, onValue, value } = this.props;
       return (
         <View style={styles.container}>
-          <Text style={styles.label}>{field.label} F0RM</Text>
+          <Text style={styles.label}>{field.label} F2RM</Text>
           <TextInput value={value} onChangeText={onValue} />
         </View>
       );

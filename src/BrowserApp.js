@@ -23,14 +23,7 @@ class LoadingContainer extends React.Component {
         message: `App Record doc "${this.props.recordID}" not found!`,
       };
     }
-    const doc = await this.agent.dispatch({
-      type: "GetDocAction",
-      docID: docID,
-      recordID: this.props.recordID,
-    });
-    const ExecComponent = await this.agent.exec(doc, [
-      { recordID: this.props.recordID, docID },
-    ]);
+    const ExecComponent = await this.agent.exec(docID, this.props.recordID, "");
     this.setState({ ExecComponent });
     this.agent.subscribe(this.props.recordID, this._updateApp);
   }
@@ -41,14 +34,11 @@ class LoadingContainer extends React.Component {
   _setStatus = status => this.setState({ status });
   _setRecord = record => this.setState({ record });
   _updateApp = async record => {
-    const doc = await this.agent.dispatch({
-      type: "GetDocAction",
-      docID: record.docID,
-      recordID: this.props.recordID,
-    });
-    const ExecComponent = await this.agent.exec(doc, [
-      { recordID: this.props.recordID, docID: record.docID },
-    ]);
+    const ExecComponent = await this.agent.exec(
+      record.docID,
+      this.props.recordID,
+      "",
+    );
     this.setState({ ExecComponent });
   };
   state = { status: {}, ExecComponent: null };

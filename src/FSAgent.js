@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+const mime = require("mime-types");
 const fileType = require("file-type");
 const { promisify } = require("bluebird");
 const fs = require("fs-extra");
@@ -92,13 +93,18 @@ async function FSAgent(agent) {
     } else {
       const file = await fs.readFile(path);
       const isBinary = await isBinaryFile(file, file.length);
+      const contentType = mime.lookup(path);
       if (isBinary) {
-        fileValue = { type: "Buffer", value: file.toString("base64") };
+        fileValue = {
+          type: "Buffer",
+          value: file.toString("base64"),
+          contentType,
+        };
       } else {
         try {
           fileValue = JSON.parse(file.toString());
         } catch (e) {
-          fileValue = { type: "String", value: file.toString() };
+          fileValue = { type: "String", value: file.toString(), contentType };
         }
       }
     }
