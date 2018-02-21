@@ -26,87 +26,11 @@ async function ServerApp(agent, req, res, mainRecord) {
       message: `App Record doc "${mainRecord}" not found!`,
     };
   }
-  const topPath = req.path.slice(1);
-  await ServeAppPath(agent, mainRecord, docID, topPath, { req, res }, []);
-}
+  const path = req.path.slice(1);
 
-async function ServeAppPath(agent, recordID, docID, path, { req, res }) {
-  console.log("ServeAppPath", recordID, docID, path);
-  // const doc = await agent.dispatch({
-  //   type: "GetDocAction",
-  //   docID,
-  //   recordID,
-  // });
-
-  // if (!doc) {
-  //   throw {
-  //     statusCode: 404,
-  //     code: "INVALID_DOC",
-  //     message: `Doc not found for path`,
-  //   };
-  // }
-
-  // if (path === "") {
-  //   const type = doc.value.type;
-  //   switch (type) {
-  //     case "Buffer": {
-  //       const fileName = context && context[0] && context[0].fileName;
-  //       const contentType = fileName && mime.lookup(fileName);
-  //       res.set("Content-Type", contentType);
-  //       const buf = Buffer.from(doc.value.value, "base64");
-  //       res.send(buf);
-  //       return;
-  //     }
-  //     case "String": {
-  //       const fileName = context && context[0] && context[0].fileName;
-  //       const contentType = fileName && mime.lookup(fileName);
-  //       contentType && res.set("content-type", contentType);
-  //       res.send(doc.value.value);
-  //       return;
-  //     }
-  //     case "Directory": {
-  //       const indexTypes = ["html", "js"];
-  //       let foundIndexFile = null;
-  //       indexTypes.find(indexType =>
-  //         doc.value.files.find(file => {
-  //           if (file.fileName === `index.${indexType}`) {
-  //             foundIndexFile = file;
-  //             return true;
-  //           }
-  //         }),
-  //       );
-  //       if (foundIndexFile && foundIndexFile.docID) {
-  //         const pathParts = path.split("/");
-  //         const childPath = pathParts.slice(1).join("/");
-  //         const childDocID = foundIndexFile.docID;
-  //         return await ServeAppPath(
-  //           agent,
-  //           recordID,
-  //           childDocID,
-  //           childPath,
-  //           { req, res },
-  //           [
-  //             {
-  //               ...doc.value,
-  //               ...foundIndexFile,
-  //               recordID,
-  //             },
-  //             ...context,
-  //           ],
-  //         );
-  //       }
-  //       res.json(doc.value);
-  //       return;
-  //     }
-  //     default: {
-  //       break;
-  //     }
-  //   }
-  // }
-  // if (doc.value.type === "JSModule") {
-  const result = await agent.exec(docID, recordID, path);
-  if (React.Component.isPrototypeOf(result)) {
-    const App = result;
+  const execResult = await agent.exec(docID, mainRecord, path);
+  if (React.Component.isPrototypeOf(execResult)) {
+    const App = execResult;
     res.set("content-type", "text/html");
     const { path, query } = req;
     // Horrible horrible hacks to support react native web styles:
@@ -143,104 +67,35 @@ ${appHtml}
 </body>
 </html>
 `);
-  } else if (typeof result === "string") {
-    res.send(result);
-  } else if (typeof result === "function") {
-    await result(agent, req, res);
-  } else if (React.isValidElement(result)) {
+  } else if (typeof execResult === "string") {
+    res.send(execResult);
+  } else if (typeof execResult === "function") {
+    await execResult(agent, req, res);
+  } else if (React.isValidElement(execResult)) {
     res.set("content-type", "text/html");
-    const html = ReactDOMServer.renderToString(result);
+    const html = ReactDOMServer.renderToString(execResult);
     res.send(`<!doctype html>${html}`);
-  } else if (typeof result === "string") {
-    res.send(result);
-  } else if (result.responseValue) {
-    result.statusCode && res.statusCode(result.statusCode);
-    result.headers && res.set(result.headers);
-    res.send(result.responseValue);
-  } else if (result.type === "Buffer") {
-    if (result.contentType) {
-      res.set("Content-Type", result.contentType);
+  } else if (typeof execResult === "string") {
+    res.send(execResult);
+  } else if (execResult.responseValue) {
+    execResult.statusCode && res.statusCode(execResult.statusCode);
+    execResult.headers && res.set(execResult.headers);
+    res.send(execResult.responseValue);
+  } else if (execResult.type === "Buffer") {
+    if (execResult.contentType) {
+      res.set("Content-Type", execResult.contentType);
     }
-    const buf = Buffer.from(result.value, "base64");
+    const buf = Buffer.from(execResult.value, "base64");
     res.send(buf);
-  } else if (result.type === "String") {
-    if (result.contentType) {
-      res.set("Content-Type", result.contentType);
+  } else if (execResult.type === "String") {
+    if (execResult.contentType) {
+      res.set("Content-Type", execResult.contentType);
     }
-    res.send(result.value);
+    res.send(execResult.value);
   } else {
-    res.json(result);
+    res.json(execResult);
   }
   return;
 }
-
-//   if (!doc.value || doc.value.type !== "Directory") {
-//     res.json(doc.value);
-//     return;
-//   }
-
-//   const pathParts = path.split("/");
-
-//   let selectedFile = null;
-//   doc.value.files.find(file => {
-//     if (file.fileName === pathParts[0]) {
-//       selectedFile = file;
-//       return true;
-//     }
-//     return false;
-//   });
-//   if (!selectedFile) {
-//     doc.value.files.find(file => {
-//       if (pathParse(file.fileName).name === pathParts[0]) {
-//         selectedFile = file;
-//         return true;
-//       }
-//       return false;
-//     });
-//   }
-//   if (!selectedFile) {
-//     doc.value.files.find(file => {
-//       if (file.fileName === pathParts[0] + ".html") {
-//         selectedFile = file;
-//         return true;
-//       }
-//       return false;
-//     });
-//   }
-//   if (!selectedFile) {
-//     throw {
-//       statusCode: 404,
-//       code: "INVALID_PATH",
-//       message: `Path is not valid`,
-//       fields: path,
-//     };
-//   }
-
-//   const childPath = pathParts.slice(1).join("/");
-//   const childDocID = selectedFile && selectedFile.docID;
-//   if (childDocID) {
-//     return await ServeAppPath(
-//       agent,
-//       recordID,
-//       childDocID,
-//       childPath,
-//       { req, res },
-//       [
-//         {
-//           ...doc.value,
-//           ...selectedFile,
-//           recordID,
-//         },
-//         ...context,
-//       ],
-//     );
-//   }
-
-//   throw {
-//     code: 500,
-//     message: "Cannot handle this file",
-//     fields: { doc },
-//   };
-// }
 
 module.exports = ServerApp;
