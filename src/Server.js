@@ -8,7 +8,7 @@ const fs = require("fs-extra");
 const ExecAgent = require("./ExecAgent");
 const HelperAgent = require("./HelperAgent");
 const joinPath = require("path").join;
-const EXAMPLE_APP_PATH = joinPath(process.cwd(), "app");
+const DEFAULT_MAIN_APP_PATH = joinPath(process.cwd(), "app");
 const FRAMEWORK_PATH = joinPath(__dirname, "../framework");
 const APP_RECORD = "App";
 const FRAMEWORK_RECORD = "Framework";
@@ -44,7 +44,8 @@ module.exports = async options => {
   app.infra = infra;
   const execAgent = await ExecAgent(appAgent, PlatformDeps);
 
-  const appDirectory = options.appDir || EXAMPLE_APP_PATH;
+  const appDirectory =
+    options.appDir || process.env.MAIN_APP_PATH || DEFAULT_MAIN_APP_PATH;
 
   if (isDev) {
     // now developing aven itself. watch for changes in framework and app code

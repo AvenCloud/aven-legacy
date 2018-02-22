@@ -1,14 +1,8 @@
 const pathParse = require("path-parse");
 const pathJoin = require("path").join;
 
-// let debugDummyCount = 0;
-
 const ExecAgent = (agent, platformDeps) => {
   async function exec(docID, recordID, path, optionalParentDocs) {
-    // debugDummyCount++;
-    // if (debugDummyCount > 100) {
-    //   throw "Dude just stop";
-    // }
     let parentDocs = optionalParentDocs || [];
 
     const doc = await agent.dispatch({
@@ -56,12 +50,26 @@ const ExecAgent = (agent, platformDeps) => {
         return null;
       }
       const immediateParent = parentDocs[0];
-      return await exec(
-        immediateParent.docID,
-        immediateParent.recordID,
-        path,
-        parentDocs.slice(1),
-      );
+      if (immediateParent) {
+        return await exec(
+          immediateParent.docID,
+          immediateParent.recordID,
+          path,
+          parentDocs.slice(1),
+        );
+      }
+      if (moduleDoc.inheritRecord) {
+        const inheritRecord = await agent.dispatch({
+          type: "GetRecordAction",
+          recordID: moduleDoc.inheritRecord,
+        });
+        if (!inheritRecord || !inheritRecord.docID) {
+          return null;
+        }
+        return await exec(inheritRecord.docID, inheritRecord.recordID, path);
+      }
+
+      return null;
     }
     if (moduleDoc.type !== "JSModule") {
       // we can only really execute js modules and directories with paths
@@ -112,7 +120,11 @@ const ExecAgent = (agent, platformDeps) => {
     try {
       computedDoc = eval(moduleDoc.code)(deps);
     } catch (e) {
-      computedDoc = null;
+      computedDoc = {
+        error: {
+          message: e.message,
+        },
+      };
     }
 
     return computedDoc;

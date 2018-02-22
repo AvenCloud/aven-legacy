@@ -29,7 +29,9 @@ async function ServerApp(agent, req, res, mainRecord) {
   const path = req.path.slice(1);
 
   const execResult = await agent.exec(docID, mainRecord, path);
-  if (React.Component.isPrototypeOf(execResult)) {
+  if (execResult == null) {
+    res.status(404).send("Not found");
+  } else if (React.Component.isPrototypeOf(execResult)) {
     const App = execResult;
     res.set("content-type", "text/html");
     const { path, query } = req;

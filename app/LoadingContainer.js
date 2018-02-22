@@ -1,4 +1,4 @@
-({ Agent, React, Title, Alert }) => {
+({ Agent, React }) => {
   class LoadingContainer extends React.Component {
     state = { docValue: null };
     async componentDidMount() {

@@ -4,7 +4,7 @@
       const { field, onValue, value } = this.props;
       return (
         <View style={styles.container}>
-          <Text style={styles.label}>{field.label} F0RM</Text>
+          <Text style={styles.label}>{field.label}</Text>
           <TextInput value={value} onChangeText={onValue} />
         </View>
       );
