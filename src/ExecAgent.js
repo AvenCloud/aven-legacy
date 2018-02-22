@@ -1,7 +1,7 @@
 const pathParse = require("path-parse");
 const pathJoin = require("path").join;
 
-let debugDummyCount = 0;
+// let debugDummyCount = 0;
 
 const ExecAgent = (agent, platformDeps) => {
   async function exec(docID, recordID, path, optionalParentDocs) {
@@ -17,7 +17,7 @@ const ExecAgent = (agent, platformDeps) => {
       recordID,
     });
 
-    // console.log("Exec", doc.value.type, path, parentDocs.length);
+    console.log("Exec", path, doc.value.type, parentDocs.length);
     const moduleDoc = doc.value;
     if (moduleDoc.type === "Directory") {
       if (path === "") {
@@ -28,14 +28,11 @@ const ExecAgent = (agent, platformDeps) => {
           return doc;
         }
       }
-      const firstPartOfPath = path.split("/")[0];
-      const restOfPath = path
-        .split("/")
-        .slice(1)
-        .join("/");
+      const pathParts = path.split("/");
+      const restOfPath = pathParts.slice(1).join("/");
       let childDocID = null;
       moduleDoc.files.find(file => {
-        if (file.fileName === firstPartOfPath) {
+        if (file.fileName === pathParts[0]) {
           childDocID = file.docID;
           return true;
         }
@@ -43,7 +40,7 @@ const ExecAgent = (agent, platformDeps) => {
       if (!childDocID) {
         moduleDoc.files.find(file => {
           const baseFileName = pathParse(file.fileName).name;
-          if (baseFileName === firstPartOfPath) {
+          if (baseFileName === pathParts[0]) {
             childDocID = file.docID;
             return true;
           }

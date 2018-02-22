@@ -6,52 +6,85 @@ const ExecAgent = require("./ExecAgent");
 const BrowserNetworkAgent = require("./BrowserNetworkAgent");
 const BrowserPlatformDeps = require("./BrowserPlatformDeps");
 
+const { createBrowserHistory } = require("history");
+
+const history = createBrowserHistory();
+
+// // Listen for changes to the current location.
+// const unlisten = history.listen((location, action) => {
+//   // location is an object like window.location
+//   console.log(action, location.pathname, location.state)
+// })
+
+// // Use push, replace, and go to navigate around.
+// history.push('/home', { some: 'state' })
+
+// // To stop listening, call the function returned from listen().
+// unlisten()
+
+const initialPath = history.location.pathname
+  .split("/")
+  .slice(1)
+  .join("/");
+
 class LoadingContainer extends React.Component {
   async componentDidMount() {
-    const netAgent = await BrowserNetworkAgent();
-    this.agent = ExecAgent(netAgent, BrowserPlatformDeps);
-    this.agent.onStatus(this._setStatus);
-    const result = await this.agent.dispatch({
-      type: "GetRecordAction",
-      recordID: this.props.recordID,
-    });
-    const { docID } = result;
-    if (!result || !docID) {
-      throw {
-        statusCode: 404,
-        code: "INVALID_APP",
-        message: `App Record doc "${this.props.recordID}" not found!`,
-      };
-    }
-    const ExecComponent = await this.agent.exec(docID, this.props.recordID, "");
-    this.setState({ ExecComponent });
-    this.agent.subscribe(this.props.recordID, this._updateApp);
+    this.props.agent.onStatus(this._setStatus);
+    this.props.agent.subscribe(this.props.recordID, this._updateApp);
   }
   componentWillUnmount() {
-    this.agent.offStatus(this._setStatus);
-    this.agent.unsubscribe(this.props.recordID, this._updateApp);
+    this.props.agent.offStatus(this._setStatus);
+    this.props.agent.unsubscribe(this.props.recordID, this._updateApp);
   }
   _setStatus = status => this.setState({ status });
   _setRecord = record => this.setState({ record });
   _updateApp = async record => {
-    const ExecComponent = await this.agent.exec(
+    const ExecComponent = await this.props.agent.exec(
       record.docID,
       this.props.recordID,
-      "",
+      initialPath,
     );
     this.setState({ ExecComponent });
   };
-  state = { status: {}, ExecComponent: null };
+  state = { status: {}, ExecComponent: this.props.initialComponent };
   render() {
     const { status, ExecComponent } = this.state;
     if (ExecComponent) {
-      return <ExecComponent status={status} agent={this.agent} />;
+      return <ExecComponent status={status} agent={this.props.agent} />;
     }
     return null;
   }
 }
 
-ReactDOM.render(
-  <LoadingContainer recordID="App" />,
-  document.getElementById("root"),
-);
+async function setupApp() {
+  const netAgent = await BrowserNetworkAgent();
+  const appAgent = ExecAgent(netAgent, BrowserPlatformDeps);
+
+  const result = await appAgent.dispatch({
+    type: "GetRecordAction",
+    recordID: "App",
+  });
+  const { docID } = result;
+  if (!result || !docID) {
+    throw {
+      statusCode: 404,
+      code: "INVALID_APP",
+      message: `App not found!`,
+    };
+  }
+  const initialComponent = await appAgent.exec(docID, "App", initialPath);
+  ReactDOM.render(
+    <LoadingContainer
+      recordID="App"
+      agent={appAgent}
+      initialComponent={initialComponent}
+    />,
+    document.getElementById("root"),
+  );
+}
+
+setupApp()
+  .then(() => {
+    console.log("App started!");
+  })
+  .catch(console.error);

@@ -33,8 +33,8 @@ async function ServerApp(agent, req, res, mainRecord) {
     const App = execResult;
     res.set("content-type", "text/html");
     const { path, query } = req;
-    // Horrible horrible hacks to support react native web styles:
-    const appKey = `App-${docID}`;
+    // Horrible horrible horrible hacks to support react native web styles:
+    const appKey = `App-${docID}-${path}-${JSON.stringify(query)}`;
     const appKeys = AppRegistry.getAppKeys();
     if (appKeys.indexOf(appKey) === -1) {
       AppRegistry.registerComponent(appKey, () => App);
