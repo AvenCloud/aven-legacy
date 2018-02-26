@@ -18,6 +18,8 @@ const platformDeps = {
   _npm_react_navigation: require("react-navigation"),
   _npm_react_native_elements: require("react-native-elements"),
   _npm_luxon: require("luxon"),
+  _npm_react_native_markdown_renderer: require("react-native-markdown-renderer"),
+  _npm_remarkable: null,
 };
 
 module.exports = platformDeps;

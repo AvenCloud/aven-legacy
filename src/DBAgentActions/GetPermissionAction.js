@@ -41,8 +41,6 @@ const getAbilities = permissionCode => ({
   canExecute: !!canExecute(permissionCode),
 });
 
-const ROOT_USER = process.env.ROOT_USER || "root";
-
 async function GetPermissionAction(action, infra, onRecord, dispatch) {
   const { recordID, authSession, authUser } = action;
 
@@ -53,7 +51,7 @@ async function GetPermissionAction(action, infra, onRecord, dispatch) {
   });
 
   if (recordID === "/") {
-    const isRootUser = session && session.userID === ROOT_USER;
+    const isRootUser = session && session.userID === infra.rootUser;
     const permission = isRootUser ? PERMISSION.ADMIN : PERMISSION.DENY;
     return {
       ...getAbilities(permission),

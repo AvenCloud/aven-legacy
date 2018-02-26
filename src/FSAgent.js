@@ -240,7 +240,7 @@ async function FSAgent(agent) {
     const docID = digest(stringify(value));
     const newRecord = {
       docID,
-      owner: "FSAgent",
+      owner: agent.infra.rootUser,
     };
     if (fsDocs[docID]) {
       return newRecord;

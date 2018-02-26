@@ -49,22 +49,22 @@ const ReactNativeNetworkAgent = async ({ useSSL, host }) => {
   let _ws;
 
   async function detachWebsocket() {
-    // if (_ws) {
-    //   _ws.close();
-    // }
-    // _ws = null;
-    // _isWsConnected = false;
-    // _emitStatusChange();
+    if (_ws) {
+      _ws.close();
+    }
+    _ws = null;
+    _isWsConnected = false;
+    _emitStatusChange();
   }
   async function attachWebsocket() {
-    // await detachWebsocket();
-    // const protocolAndHost = `ws${useSSL ? "s" : ""}://${host}`;
-    // console.log("Connecting to ", protocolAndHost);
-    // _ws = new WebSocket(protocolAndHost);
-    // _ws.onopen = _onWebsocketOpen;
-    // _ws.onclose = _onWebsocketClose;
-    // _ws.onerror = _onWebsocketClose;
-    // _ws.onmessage = _onWebsocketMessage;
+    await detachWebsocket();
+    const protocolAndHost = `ws${useSSL ? "s" : ""}://${host}`;
+    console.log("Connecting to ", protocolAndHost);
+    _ws = new WebSocket(protocolAndHost);
+    _ws.onopen = _onWebsocketOpen;
+    _ws.onclose = _onWebsocketClose;
+    _ws.onerror = _onWebsocketClose;
+    _ws.onmessage = _onWebsocketMessage;
   }
 
   const _onWebsocketOpen = () => {

@@ -3,7 +3,9 @@
     render() {
       if (Platform.web) {
         return (
-          <View style={StyleSheet.absoluteFill}>{this.props.children}</View>
+          <View style={[StyleSheet.absoluteFill, this.props.style]}>
+            {this.props.children}
+          </View>
         );
       } else {
         return this.props.children;

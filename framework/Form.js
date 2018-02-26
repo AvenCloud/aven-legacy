@@ -3,21 +3,34 @@
     render() {
       const { field, onValue, value } = this.props;
       return (
-        <View style={styles.container}>
+        <View style={styles.fieldContainer}>
           <Text style={styles.label}>{field.label}</Text>
-          <TextInput value={value} onChangeText={onValue} />
+          <TextInput
+            value={value}
+            onChangeText={onValue}
+            style={styles.formInput}
+          />
         </View>
       );
     }
   }
   const styles = StyleSheet.create({
-    label: { color: "black" },
+    fieldContainer: { marginBottom: 10 },
+    formContainer: { padding: 30 },
+    label: { color: "#222233", marginVertical: 3 },
+    formInput: {
+      height: 40,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: "#DDDDEE",
+      borderRadius: 5,
+      padding: 8,
+    },
   });
   class Form extends React.Component {
     state = { fields: {} };
     render() {
       return (
-        <View>
+        <View style={styles.formContainer}>
           {this.props.fields.map(field => (
             <FormField
               field={field}

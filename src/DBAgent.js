@@ -70,6 +70,7 @@ const DBAgent = async infra => {
     dispatch,
     subscribe,
     unsubscribe,
+    infra,
   };
 };
 

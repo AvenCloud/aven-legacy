@@ -13,6 +13,8 @@ module.exports = async options => {
   const hostSSL = process.env.NODE_ENV === "production";
   const hostURI = `http${hostSSL ? "s" : ""}://${host}`;
 
+  const rootUser = process.env.ROOT_USER || "root";
+
   const env =
     options.env || (process.env.JEST_TEST ? "testing" : process.env.NODE_ENV);
 
@@ -77,6 +79,7 @@ module.exports = async options => {
     host,
     hostSSL,
     hostURI,
+    rootUser,
     pg,
     sequelize,
     email,
