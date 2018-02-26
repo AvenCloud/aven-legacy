@@ -3,6 +3,8 @@ jobs:
   test:
     machine:
       enable: true
+    environment:
+      PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
     image: circleci/node:8-browsers
 
     working_directory: ~/circleci-aven
@@ -21,7 +23,7 @@ jobs:
 
       - run:
           name: Yarn Install
-          command: /usr/local/bin/yarn install --cache-folder ~/.cache/yarn
+          command: yarn install --cache-folder ~/.cache/yarn
 
       - run:
           name: 'Build'
