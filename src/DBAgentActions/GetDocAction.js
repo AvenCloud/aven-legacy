@@ -1,10 +1,25 @@
 const { Op } = require("sequelize");
 
-async function GetDocAction(action, infra) {
-  // todo, authentication here
+async function GetDocAction(action, infra, onRecord, dispatch) {
+  const { authUser, authSession, recordID, docID } = action;
+
+  const permission = await dispatch({
+    type: "GetPermissionAction",
+    authSession,
+    authUser,
+    recordID,
+  });
+
+  if (!permission.canRead) {
+    throw {
+      message: "Permission denied",
+      statusCode: 403,
+    };
+  }
+
   const doc = await infra.model.doc.findOne({
     where: {
-      id: { [Op.eq]: action.docID },
+      id: { [Op.eq]: docID },
     },
   });
 
@@ -12,9 +27,7 @@ async function GetDocAction(action, infra) {
   const notFoundError = {
     statusCode: 400,
     code: "INVALID_DOC",
-    message: `Document with ID '${action.docID}' and record '${
-      action.recordID
-    }' does not exist.`,
+    message: `Document with ID '${docID}' and record '${recordID}' does not exist.`,
   };
   if (!doc) {
     throw notFoundError;
@@ -22,8 +35,8 @@ async function GetDocAction(action, infra) {
 
   const docRecord = await infra.model.docRecord.findOne({
     where: {
-      docId: { [Op.eq]: action.docID },
-      recordId: { [Op.eq]: action.recordID },
+      docId: { [Op.eq]: docID },
+      recordId: { [Op.eq]: recordID },
     },
   });
 
@@ -32,8 +45,8 @@ async function GetDocAction(action, infra) {
   }
 
   return {
-    docID: action.docID,
-    recordID: action.recordID,
+    docID,
+    recordID,
     value: doc.value,
   };
 }

@@ -11,7 +11,6 @@ const ExecAgent = (agent, platformDeps) => {
       recordID,
     });
 
-    console.log("Exec", path, doc.value.type, parentDocs.length);
     const moduleDoc = doc.value;
     if (moduleDoc.type === "Directory") {
       if (path === "") {

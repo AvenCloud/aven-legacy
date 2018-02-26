@@ -8,6 +8,8 @@ const DBActions = {
   CreateDocAction: require("./DBAgentActions/CreateDocAction"),
   GetDocAction: require("./DBAgentActions/GetDocAction"),
   GetPermissionAction: require("./DBAgentActions/GetPermissionAction"),
+  SetPermissionAction: require("./DBAgentActions/SetPermissionAction"),
+  GetSessionAction: require("./DBAgentActions/GetSessionAction"),
 };
 
 const DBAgent = async infra => {
@@ -28,8 +30,23 @@ const DBAgent = async infra => {
   };
   async function dispatch(action) {
     if (DBActions[action.type]) {
-      const result = await DBActions[action.type](action, infra, onSetRecord);
-      return result;
+      try {
+        const result = await DBActions[action.type](
+          action,
+          infra,
+          onSetRecord,
+          dispatch,
+        );
+        return result;
+      } catch (e) {
+        throw {
+          code: e.code,
+          message: e.message,
+          statusCode: e.statusCode,
+          // action, // Useful for debugging but would leak secrets in prod
+          error: e,
+        };
+      }
     }
     throw {
       statusCode: 400,

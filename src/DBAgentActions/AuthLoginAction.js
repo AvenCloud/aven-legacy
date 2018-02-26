@@ -5,14 +5,14 @@ async function AuthLoginAction(action, infra) {
   const user = await infra.model.user.findOne({
     where: {
       id: {
-        [Op.eq]: action.user,
+        [Op.eq]: action.userID,
       },
     },
   });
   const authMethod = await infra.model.authMethod.findOne({
     where: {
       primaryOwner: {
-        [Op.eq]: action.user,
+        [Op.eq]: action.userID,
       },
     },
   });
@@ -42,14 +42,14 @@ async function AuthLoginAction(action, infra) {
   const logoutToken = await genSessionId();
   await infra.model.userSession.create({
     id: sessionId,
-    user: action.user,
+    user: action.userID,
     secret: await genHash(sessionSecret),
     logoutToken: await genHash(logoutToken),
     ip: "0.0.0.0", // uhhh, actually implement this
     authMethod: authMethod.id,
   });
   return {
-    username: action.user,
+    username: action.userID,
     session: sessionId + "-" + sessionSecret,
     logoutToken: sessionId + "-" + sessionSecret,
   };

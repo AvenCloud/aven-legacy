@@ -87,18 +87,26 @@ const CreateAgentServer = async (agent, infra, routing) => {
     console.error("WSServer Error:", e);
   });
 
-  const httpServer = await new Promise((resolve, reject) => {
-    const s = appServer.listen(infra.appListenPort, err => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(s);
-      }
+  let httpServer = null;
+  if (infra.env !== "testing") {
+    httpServer = await new Promise((resolve, reject) => {
+      const s = appServer.listen(infra.appListenPort, err => {
+        console.log("Started on " + infra.hostURI);
+
+        if (err) {
+          reject(err);
+        } else {
+          resolve(s);
+        }
+      });
     });
-  });
+  }
 
   app.close = async () => {
     await new Promise((resolve, reject) => {
+      if (!httpServer) {
+        resolve();
+      }
       httpServer.close(err => {
         if (err) {
           reject(err);

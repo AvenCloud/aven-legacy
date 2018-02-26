@@ -1,12 +1,8 @@
 const { Op } = require("sequelize");
-const { compareHash } = require("../Utilities");
+const { genHash, genSessionId, compareHash } = require("../Utilities");
 
-async function GetAuth(action, infra, record) {
-  const { authSession, authUser } = action;
-  return "WRITE";
-  if (!authUser) {
-    // throw { message: "Non-authenticated activity is not yet implemented" };
-  }
+async function GetSessionAction(action, infra) {
+  const { authUser, authSession } = action;
   if (!authSession) {
     throw {
       statusCode: 400,
@@ -32,10 +28,7 @@ async function GetAuth(action, infra, record) {
       authUser,
     };
   }
-  if (!record || authUser === record.owner) {
-    return "WRITE";
-  }
-  return record.permission === "PUBLIC" ? "READ" : "NONE";
+  return { authUser, authSession, userID: authUser };
 }
 
-module.exports = GetAuth;
+module.exports = GetSessionAction;

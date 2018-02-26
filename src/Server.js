@@ -95,8 +95,6 @@ module.exports = async options => {
     }
   });
 
-  console.log("Started on " + infra.hostURI);
-
   const closeServer = async () => {
     await app.close();
     await appAgent.close();

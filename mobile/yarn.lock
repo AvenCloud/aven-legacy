@@ -3902,6 +3902,10 @@ lru-memoizer@^1.11.1:
     lru-cache "~4.0.0"
     very-fast-args "^1.1.0"
 
+luxon@^0.5.3:
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/luxon/-/luxon-0.5.3.tgz#d7bfbeddbd76d177a7cc507ba7ef99bdd5247d90"
+
 macos-release@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/macos-release/-/macos-release-1.1.0.tgz#831945e29365b470aa8724b0ab36c8f8959d10fb"

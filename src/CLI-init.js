@@ -7,7 +7,7 @@ const DB_TEMPLATE = path.join(__dirname, "../AvenDBTemplate.sqlite");
 
 async function runInit() {
   const appPath = process.cwd();
-  const defaultAppPath = path.join(__dirname, "../app");
+  const defaultAppPath = path.join(__dirname, "../default-app");
   const gitIgnorePath = path.join(appPath, ".gitignore");
   const pkgJsonPath = path.join(appPath, "package.json");
   const pkgJson = await fs.readFile(pkgJsonPath, { encoding: "utf8" });

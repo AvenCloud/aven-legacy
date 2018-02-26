@@ -1,7 +1,22 @@
 const { Op } = require("sequelize");
 
-async function GetRecordAction(action, infra) {
-  // todo, authentication here
+async function GetRecordAction(action, infra, onRecord, dispatch) {
+  const { authUser, authSession, recordID } = action;
+
+  const permission = await dispatch({
+    type: "GetPermissionAction",
+    authSession,
+    authUser,
+    recordID,
+  });
+
+  if (!permission.canRead) {
+    throw {
+      message: "Permission denied",
+      statusCode: 403,
+    };
+  }
+
   const record = await infra.model.record.findOne({
     where: { id: { [Op.eq]: action.recordID } },
   });
@@ -11,10 +26,10 @@ async function GetRecordAction(action, infra) {
     };
   }
   return {
+    ...permission,
     recordID: action.recordID,
-    // permission: record.permission,
     docID: record.doc,
-    // owner: record.owner,
+    owner: record.owner,
   };
 }
 

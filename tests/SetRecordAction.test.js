@@ -17,7 +17,6 @@ test("Set record works", async () => {
     authUser: app.testAuthUser,
     authSession: app.testAuthSession,
     recordID: "asdf",
-    owner: app.testAuthUser,
     docID: null,
     permission: "PUBLIC",
   });
@@ -29,6 +28,8 @@ test("Set record works", async () => {
     recordID: "asdf",
   });
 
-  expect(resultingRecord.permission).toBe("PUBLIC");
+  expect(resultingRecord.canRead).toBe(true);
+  expect(resultingRecord.canWrite).toBe(true);
+  expect(resultingRecord.canAdmin).toBe(true);
   expect(resultingRecord.owner).toBe(app.testAuthUser);
 });

@@ -27,20 +27,20 @@ test("Logout works with session token", async () => {
   await app.testDispatch({
     type: "AuthVerifyAction",
     code: verificationCode,
-    userID: reg.authID,
-    user: userID,
+    authID: reg.authID,
+    userID,
   });
 
   const loginResult = await app.testDispatch({
     type: "AuthLoginAction",
-    user: userID,
+    userID: userID,
     password: "foobar",
   });
   const sessionToken = loginResult.session;
 
   const logoutResult = await app.testDispatch({
     type: "AuthLogoutAction",
-    session: sessionToken,
+    authSession: sessionToken,
   });
 });
 
@@ -61,19 +61,19 @@ test("Logout works with logout token", async () => {
   await app.testDispatch({
     type: "AuthVerifyAction",
     code: verificationCode,
-    userID: reg.authID,
-    user: userID,
+    authID: reg.authID,
+    userID,
   });
 
   const loginResult = await app.testDispatch({
     type: "AuthLoginAction",
-    user: userID,
+    userID,
     password: "foobar",
   });
   const logoutToken = loginResult.logoutToken;
 
   const logoutResult = await app.testDispatch({
     type: "AuthLogoutAction",
-    session: logoutToken,
+    authSession: logoutToken,
   });
 });

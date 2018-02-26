@@ -3,7 +3,7 @@ const request = require("supertest");
 const Server = require("../src/Server");
 
 async function initTestApp() {
-  const { closeServer, app } = await Server();
+  const { closeServer, app } = await Server({});
 
   app.testDispatch = async action => {
     const result = await request(app)
@@ -33,10 +33,10 @@ async function initTestApp() {
 }
 
 async function setupTestUserSession(app) {
-  app.testAuthUser = "monkey";
+  app.testAuthUser = "root";
   const reg = await app.testDispatch({
     type: "AuthRegisterAction",
-    displayName: "Foo Monkey",
+    displayName: "Root Monkey",
     userID: app.testAuthUser,
     password: "foobar",
     email: "foo1@bar.com",
@@ -52,7 +52,7 @@ async function setupTestUserSession(app) {
   });
   const loginResult = await app.testDispatch({
     type: "AuthLoginAction",
-    user: app.testAuthUser,
+    userID: app.testAuthUser,
     password: "foobar",
   });
   app.testAuthSession = loginResult.session;

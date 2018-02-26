@@ -1,6 +1,6 @@
 {
     "name": "aven-core",
-    "version": "0.1.0-alpha.8",
+    "version": "0.1.0-alpha.10",
     "bin": {
         "aven": "dist/RunCLI.js"
     },
@@ -19,6 +19,10 @@
     "jest": {
         "setupFiles": [
             "jest-canvas-mock"
+        ],
+        "testPathIgnorePatterns": [
+            "mobile",
+            "/node_modules/"
         ]
     },
     "files": [
@@ -26,6 +30,7 @@
         "dist",
         "scripts",
         "default-app",
+        "framework",
         "AvenDBTemplate.sqlite"
     ],
     "devDependencies": {
@@ -64,6 +69,7 @@
         "inquirer": "^5.1.0",
         "isbinaryfile": "^3.0.2",
         "json-stable-stringify": "^1.0.1",
+        "luxon": "^0.5.3",
         "mime-types": "^2.1.17",
         "node-dev": "^3.1.3",
         "node-fetch": "^1.7.3",

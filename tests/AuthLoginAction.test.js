@@ -20,7 +20,7 @@ test("Login doesn't work without verification", async () => {
   });
   const result = await app.testDispatchError({
     type: "AuthLoginAction",
-    user: "foo",
+    userID: "foo",
     password: "foobar",
   });
   expect(result.code).toBe("INVALID_ACCOUNT_VERIFICATION");
@@ -82,7 +82,7 @@ test("Bad secret fails", async () => {
 
   const loginResult = await app.testDispatchError({
     type: "AuthLoginAction",
-    user: "foo",
+    userID: "foo",
     password: "fail",
   });
   expect(loginResult.code).toBe("INVALID_LOGIN");

@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
@@ -22,7 +22,14 @@ module.exports = {
         },
         permission: {
           allowNull: false,
-          type: Sequelize.ENUM("ADMIN", "WRITE", "READ", "DENY"),
+          type: Sequelize.ENUM(
+            "ADMIN",
+            "WRITE",
+            "READ",
+            "EXECUTE",
+            "WRITE_EXECUTE",
+            "DENY",
+          ),
         },
         createdAt: {
           type: Sequelize.DATE,
@@ -60,13 +67,13 @@ module.exports = {
           type: Sequelize.DATE,
         },
       }),
-    ]
+    ];
   },
 
   down: (queryInterface, Sequelize) => {
     return [
       queryInterface.dropTable("RecordPermissions"),
       queryInterface.dropTable("RecordTokens"),
-    ]
+    ];
   },
-}
+};

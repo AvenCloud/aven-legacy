@@ -1,10 +1,24 @@
 const { Op } = require("sequelize");
-const GetAuth = require("./GetAuth");
 const { digest } = require("../Utilities");
 const stringify = require("json-stable-stringify");
 
-async function CreateDocAction(action, infra) {
-  const { recordID } = action;
+async function CreateDocAction(action, infra, onRecord, dispatch) {
+  const { recordID, authSession, authUser } = action;
+
+  const permission = await dispatch({
+    type: "GetPermissionAction",
+    authSession,
+    authUser,
+    recordID,
+  });
+
+  if (!permission.canWrite) {
+    throw {
+      message: "Permission denied",
+      statusCode: 403,
+    };
+  }
+
   const lastRecord =
     recordID &&
     (await infra.model.record.findOne({
@@ -15,14 +29,6 @@ async function CreateDocAction(action, infra) {
       statusCode: 400,
       code: "INVALID_RECORD",
       message: "This record cannot be found or written to",
-    };
-  }
-  const permission = await GetAuth(action, infra, lastRecord);
-  if (permission !== "WRITE") {
-    throw {
-      statusCode: 400,
-      code: "INVALID_PERMISSION",
-      message: "You do not have permission to write to this record",
     };
   }
   const docContent = stringify(action.value);
@@ -57,7 +63,7 @@ async function CreateDocAction(action, infra) {
     docId: docID,
     recordId: recordID,
   });
-  return { docID, recordID, authPermission: permission };
+  return { docID, recordID };
 }
 
 module.exports = CreateDocAction;

@@ -1,44 +1,89 @@
 ## Actions
 
-AuthRegister
+### AuthRegister
 
-* id
+* userID
 * email
 * displayName
 * password
 
-AuthVerify
+### AuthVerify
 
 * code
-* id
-* user
+* authID
+* userID
 
-AuthLogin
+### AuthLogin
 
-* user
+* userID
 * password
 
-AuthLogout
+### AuthLogout
 
-GetDoc
+* authSession
 
+GetPermissionAction
+SetPermissionAction
+GetSessionAction
+
+### GetDoc
+
+* authUser
+* authSession
 * docID
 * recordID
+
+### GetRecord
+
 * authUser
 * authSession
-
-GetRecord
-
 * recordID
+
+### SetRecord
+
 * authUser
 * authSession
+* recordID
+* docID
+* permission
 
-PutRecord
 
-CreateDoc
+### CreateDoc
 
+* authUser
+* authSession
 * value
 * docID
 * recordID
+
+
+### GetPermission
+
 * authUser
 * authSession
+* recordID
+
+returns {
+    userID
+    recordID
+    canRead
+    canWrite
+    canAdmin
+    canExecute
+
+
+### SetPermission
+
+* authUser
+* authSession
+* recordID
+* userID
+* permission
+
+
+### GetSession
+
+* authUser
+* authSession
+
+returns {authUser, authSession}

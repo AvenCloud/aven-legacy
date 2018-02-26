@@ -2,8 +2,8 @@ const { Op } = require("sequelize");
 const { compareHash } = require("../Utilities");
 
 async function AuthLogoutAction(action, infra) {
-  const sessionID = action.session.split("-")[0];
-  const token = action.session.split("-")[1];
+  const sessionID = action.authSession.split("-")[0];
+  const token = action.authSession.split("-")[1];
   const session = await infra.model.userSession.findOne({
     where: {
       id: {

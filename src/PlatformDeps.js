@@ -25,6 +25,7 @@ const platformDeps = {
   _npm_react_native: null,
   _npm_react_native_web: require("react-native-web"),
   _npm_react_navigation: null,
+  _npm_luxon: require("luxon"),
 };
 
 module.exports = platformDeps;

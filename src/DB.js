@@ -214,7 +214,14 @@ function createModel(sequelize) {
     },
     permission: {
       allowNull: false,
-      type: Sequelize.ENUM("ADMIN", "WRITE", "READ", "DENY"),
+      type: Sequelize.ENUM(
+        "ADMIN",
+        "WRITE",
+        "READ",
+        "EXECUTE",
+        "WRITE_EXECUTE",
+        "DENY",
+      ),
     },
   });
 

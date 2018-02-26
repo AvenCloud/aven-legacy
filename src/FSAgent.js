@@ -224,10 +224,10 @@ async function FSAgent(agent) {
       authSession,
       authUser,
     });
-    if (!record || !record.doc) {
+    if (!record || !record.docID) {
       throw "Cannot find record!!:!?"; // todo, consistent error handling on client
     }
-    await getPath(path, recordID, record.doc);
+    await getPath(path, recordID, record.docID);
   }
 
   const _providedDirs = {};
