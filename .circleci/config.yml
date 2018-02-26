@@ -21,7 +21,7 @@ jobs:
 
       - run:
           name: Yarn Install
-          command: yarn install --cache-folder ~/.cache/yarn
+          command: /usr/local/bin/yarn install --cache-folder ~/.cache/yarn
 
       - run:
           name: 'Build'
