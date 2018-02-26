@@ -1,5 +1,5 @@
 const pathParse = require("path-parse");
-const pathJoin = require("path").join;
+const pathJoin = require("path-browserify").join;
 
 const ExecAgent = (agent, platformDeps) => {
   async function exec(docID, recordID, path, optionalParentDocs) {

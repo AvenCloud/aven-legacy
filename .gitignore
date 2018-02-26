@@ -6,6 +6,6 @@ dist
 npm-debug.log
 prettierCheck.debug
 mobile/src
-./.AvenDB.sqlite
+.AvenDB.sqlite
 AvenDBTemplate.sqlite
 sequelizeConfig.json

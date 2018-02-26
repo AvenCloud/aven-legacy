@@ -75,6 +75,8 @@
         "node-fetch": "^1.7.3",
         "npx": "^9.7.1",
         "open": "^0.0.5",
+        "path-browserify": "^0.0.0",
+        "path-parse": "^1.0.5",
         "pg": "^7.4.0",
         "pg-hstore": "^2.3.2",
         "prop-types": "^15.6.0",
