@@ -49,7 +49,7 @@ async function AuthLoginAction(action, infra) {
     authMethod: authMethod.id,
   });
   return {
-    username: action.userID,
+    userID: action.userID,
     session: sessionId + "-" + sessionSecret,
     logoutToken: sessionId + "-" + sessionSecret,
   };

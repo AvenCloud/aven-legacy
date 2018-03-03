@@ -67,11 +67,14 @@ async function AuthRegisterAction(action, infra) {
 
   await infra.email.send(
     action.email,
-    "Welcome",
+    `Welcome, ${action.displayName}!`,
     `
-    Welcome to Aven!
-    http://foo/?code=${authCode}
-  `,
+Welcome to Aven! We're going to build some great apps together.
+
+Your verification code is ${authCode}. See you inside!
+
+http${infra.hostSSL ? "s" : ""}://${infra.host}/verify?code=${authCode}
+`,
     { authCode },
   );
 

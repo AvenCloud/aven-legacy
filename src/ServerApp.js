@@ -1,6 +1,7 @@
 const mime = require("mime-types");
 const pathParse = require("path").parse;
 const React = require("react");
+const ClientAuthAgent = require("./ClientAuthAgent");
 const ReactDOMServer = require("react-dom/server");
 
 // Having troubles with ReactNativeWeb depending on ART depending on document global..
@@ -14,7 +15,9 @@ if (typeof document === "undefined") {
 const { AppRegistry } = require("react-native-web");
 
 async function ServerApp(agent, req, res, mainRecord) {
-  const result = await agent.dispatch({
+  const clientAgent = ClientAuthAgent(agent);
+  // clientAgent.setSession(cookie.authUserID, cookie.authSession)
+  const result = await clientAgent.dispatch({
     type: "GetRecordAction",
     recordID: mainRecord,
   });
@@ -28,7 +31,7 @@ async function ServerApp(agent, req, res, mainRecord) {
   }
   const path = req.path.slice(1);
 
-  const execResult = await agent.exec(docID, mainRecord, path);
+  const execResult = await clientAgent.exec(docID, mainRecord, path);
   if (execResult == null) {
     res.status(404).send("Not found");
   } else if (React.Component.isPrototypeOf(execResult)) {
@@ -58,7 +61,7 @@ async function ServerApp(agent, req, res, mainRecord) {
   <title>${title}</title>
   ${css}
   <script>
-    window.avenEnv = ${JSON.stringify(agent.env)};
+    window.avenEnv = ${JSON.stringify(clientAgent.env)};
   </script>
 </head>
 <body>
@@ -72,7 +75,7 @@ ${appHtml}
   } else if (typeof execResult === "string") {
     res.send(execResult);
   } else if (typeof execResult === "function") {
-    await execResult(agent, req, res);
+    await execResult(clientAgent, req, res);
   } else if (React.isValidElement(execResult)) {
     res.set("content-type", "text/html");
     const html = ReactDOMServer.renderToString(execResult);

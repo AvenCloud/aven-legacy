@@ -1,6 +1,6 @@
 {
     "name": "aven-core",
-    "version": "0.1.0-alpha.10",
+    "version": "0.1.0-alpha.11",
     "bin": {
         "aven": "dist/RunCLI.js"
     },
@@ -68,6 +68,7 @@
         "history": "^4.7.2",
         "inquirer": "^5.1.0",
         "isbinaryfile": "^3.0.2",
+        "js-cookie": "^2.2.0",
         "json-stable-stringify": "^1.0.1",
         "luxon": "^0.5.3",
         "mime-types": "^2.1.17",

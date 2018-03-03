@@ -28,6 +28,8 @@ const platformDeps = {
   _npm_luxon: require("luxon"),
   _npm_react_native_markdown_renderer: null,
   _npm_remarkable: require("remarkable"),
+  BrowserHistory: null,
+  _npm_js_cookie: null,
 };
 
 module.exports = platformDeps;

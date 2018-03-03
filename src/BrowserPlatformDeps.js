@@ -12,7 +12,6 @@ const Platform = {
 
 const platformDeps = {
   Platform,
-
   React,
   _npm_react: React,
   _npm_react_dom: ReactDOM,
@@ -22,6 +21,8 @@ const platformDeps = {
   _npm_luxon: require("luxon"),
   _npm_react_native_markdown_renderer: null,
   _npm_remarkable: require("remarkable"),
+  BrowserHistory: require("./BrowserHistory"),
+  _npm_js_cookie: require("js-cookie"),
 };
 
 module.exports = platformDeps;

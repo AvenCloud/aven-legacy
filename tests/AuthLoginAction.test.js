@@ -51,6 +51,7 @@ test("Login works", async () => {
     userID,
     password: "foobar",
   });
+  expect(loginResult.userID).toBe(userID);
 });
 
 test("Bad secret fails", async () => {

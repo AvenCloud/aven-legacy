@@ -1,9 +1,33 @@
-({ React, Platform, _npm_react_native, _npm_react_native_web }) => {
+({
+  React,
+  Platform,
+  _npm_react_native,
+  _npm_react_native_web,
+  BrowserHistory,
+}) => {
+  let Link = {};
   if (_npm_react_native) {
-    return _npm_react_native.Text;
+    Link = _npm_react_native.Text;
   }
   if (Platform.web) {
-    return ({ children, to }) => <a href={to}>{children}</a>;
+    Link = ({ children, to }) => (
+      <a
+        href={to}
+        onClick={e => {
+          e.preventDefault();
+          Link.goTo(to);
+        }}
+      >
+        {children}
+      </a>
+    );
   }
-  return null;
+  Link.goTo = destPath => {
+    if (Platform.web) {
+      BrowserHistory.push(destPath);
+    } else {
+      // tood
+    }
+  };
+  return Link;
 };
