@@ -2,6 +2,8 @@ const mime = require("mime-types");
 const pathParse = require("path").parse;
 const React = require("react");
 const ClientAuthAgent = require("./ClientAuthAgent");
+const PlatformDeps = require("./PlatformDeps");
+const ExecAgent = require("./ExecAgent");
 const ReactDOMServer = require("react-dom/server");
 
 // Having troubles with ReactNativeWeb depending on ART depending on document global..
@@ -15,7 +17,8 @@ if (typeof document === "undefined") {
 const { AppRegistry } = require("react-native-web");
 
 async function ServerApp(agent, req, res, mainRecord) {
-  const clientAgent = ClientAuthAgent(agent);
+  const authAgent = ClientAuthAgent(agent);
+  const clientAgent = await ExecAgent(authAgent, PlatformDeps);
   // clientAgent.setSession(cookie.authUserID, cookie.authSession)
   const result = await clientAgent.dispatch({
     type: "GetRecordAction",
@@ -69,6 +72,9 @@ async function ServerApp(agent, req, res, mainRecord) {
 ${appHtml}
   </div>
   <script type="text/javascript" src="/_client_app.js"></script>
+  <script type="text/javascript">
+window.avenDocCache = ${JSON.stringify(clientAgent.dumpCache())};
+  </script>
 </body>
 </html>
 `);

@@ -5,7 +5,6 @@ const ServerApp = require("./ServerApp");
 const WatchmanAgent = require("./WatchmanAgent");
 const Infra = require("./Infra");
 const fs = require("fs-extra");
-const ExecAgent = require("./ExecAgent");
 const HelperAgent = require("./HelperAgent");
 const joinPath = require("path").join;
 const DEFAULT_MAIN_APP_PATH = joinPath(process.cwd(), "app");
@@ -42,7 +41,6 @@ module.exports = async options => {
   };
   const app = await CreateAgentServer(appAgent, infra, routing);
   app.infra = infra;
-  const execAgent = await ExecAgent(appAgent, PlatformDeps);
 
   const appDirectory =
     options.appDir || process.env.MAIN_APP_PATH || DEFAULT_MAIN_APP_PATH;
@@ -86,7 +84,7 @@ module.exports = async options => {
 
   app.get("*", async (req, res) => {
     try {
-      await ServerApp(execAgent, req, res, APP_RECORD);
+      await ServerApp(appAgent, req, res, APP_RECORD);
     } catch (e) {
       console.log("Error:", e);
       res

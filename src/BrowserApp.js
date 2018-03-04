@@ -24,8 +24,11 @@ class LoadingContainer extends React.Component {
         .split("/")
         .slice(1)
         .join("/");
-      this._updateApp(this._lastRecord || this.props.initialRecord);
+      this._updateApp();
     });
+  }
+  componentDidCatch(e) {
+    debugger;
   }
   componentWillUnmount() {
     this.props.agent.offStatus(this._setStatus);
@@ -33,8 +36,16 @@ class LoadingContainer extends React.Component {
     this._unlistenHistory();
   }
   _setStatus = status => this.setState({ status });
-  _updateApp = async record => {
-    this._lastRecord = record;
+  _updateApp = async newRecord => {
+    let record = newRecord;
+    if (record) {
+      this._lastRecord = record;
+    } else {
+      record = this._lastRecord || this.props.initialRecord;
+    }
+    if (!record) {
+      throw "Cannot find app record!";
+    }
     const ExecComponent = await this.props.agent.exec(
       record.docID,
       this.props.recordID,
@@ -54,7 +65,7 @@ class LoadingContainer extends React.Component {
 
 async function setupApp() {
   const netAgent = await BrowserNetworkAgent();
-  const authAgent = ClientAuthAgent(netAgent);
+  const authAgent = ClientAuthAgent(netAgent, { cache: window.avenDocCache });
   const authUserID = cookie.get("authUserID");
   const authSession = cookie.get("authSession");
   authAgent.setSession(authUserID, authSession);
@@ -64,7 +75,8 @@ async function setupApp() {
     type: "GetRecordAction",
     recordID: "App",
   });
-  const { docID } = record;
+
+  const docID = record && record.docID;
   if (!record || !docID) {
     throw {
       statusCode: 404,
@@ -84,8 +96,10 @@ async function setupApp() {
   );
 }
 
-setupApp()
-  .then(() => {
-    console.log("App started!");
-  })
-  .catch(console.error);
+window.onload = () => {
+  setupApp()
+    .then(() => {
+      console.log("App started!");
+    })
+    .catch(console.error);
+};

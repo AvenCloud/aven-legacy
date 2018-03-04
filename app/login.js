@@ -1,4 +1,4 @@
-({ React, Form, Alert, Agent, Page, Title }) => {
+({ React, Form, Alert, AuthLoginAction, Page, Title, Link }) => {
   class RegisterPage extends React.Component {
     static title = "Aven";
     render() {
@@ -7,14 +7,17 @@
           <Title>Login</Title>
           <Form
             fields={[
-              { label: "Username", name: "userID" },
-              { label: "Password", name: "password" },
+              { label: "Username", name: "userID", type: "text" },
+              { label: "Password", name: "password", type: "password" },
             ]}
             onSubmit={async data => {
-              const res = await Agent.dispatch({
-                type: "AuthLoginAction",
+              const res = await AuthLoginAction({
                 ...data,
               });
+              if (res.authID === data.authID) {
+                Link.goTo("/");
+                return;
+              }
               Alert(JSON.stringify(res));
             }}
           />

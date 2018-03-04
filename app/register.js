@@ -1,4 +1,18 @@
-({ React, Form, Alert, Agent, Page, Title, Text, Cookie, Link }) => {
+({
+  React,
+  Form,
+  Alert,
+  Agent,
+  Page,
+  Title,
+  Text,
+  AuthLoginAction,
+  AuthVerifyAction,
+  AuthRegisterAction,
+  GetSessionAction,
+  Cookie,
+  Link,
+}) => {
   class RegisterForm extends React.Component {
     state = { pendingRegistration: null };
     render() {
@@ -12,8 +26,7 @@
             <Form
               fields={[{ label: "Verification Code", name: "code" }]}
               onSubmit={async data => {
-                const res = await Agent.dispatch({
-                  type: "AuthVerifyAction",
+                const res = await AuthVerifyAction({
                   userID: pendingRegistration.userID,
                   authID: pendingRegistration.email,
                   ...data,
@@ -22,18 +35,20 @@
                   Alert("Verification Error " + JSON.stringify(res));
                   return;
                 }
-                const loginRes = await Agent.dispatch({
-                  type: "AuthLoginAction",
-                  userID: pendingRegistration.userID,
-                  password: pendingRegistration.password,
+                const sessionRes = await Agent.dispatch({
+                  type: "GetSessionAction",
                 });
+                if (!sessionRes) {
+                  const loginRes = await AuthLoginAction({
+                    userID: pendingRegistration.userID,
+                    password: pendingRegistration.password,
+                  });
+                }
+
                 if (!loginRes.session) {
                   Alert("Login Error " + JSON.stringify(res));
                   return;
                 }
-                await Cookie.set("authUserID", pendingRegistration.userID);
-                await Cookie.set("authSession", loginRes.session);
-                Agent.setSession(pendingRegistration.userID, loginRes.session);
                 Link.goTo("/");
               }}
             />
@@ -43,16 +58,14 @@
       return (
         <Form
           fields={[
-            { label: "Display Name", name: "displayName" },
-            { label: "Username", name: "userID" },
-            { label: "Password", name: "password" },
-            { label: "Email", name: "email" },
+            { label: "Display Name", name: "displayName", type: "name" },
+            { label: "Username", name: "userID", type: "text" },
+            { label: "Password", name: "password", type: "password" },
+            { label: "Email", name: "email", type: "email" },
           ]}
           onSubmit={async data => {
-            const res = await Agent.dispatch({
-              type: "AuthRegisterAction",
-              ...data,
-            });
+            const res = await AuthRegisterAction(data);
+
             if (res.userID && res.authID) {
               this.setState({
                 pendingRegistration: {
@@ -77,6 +90,12 @@
           <RegisterForm />
         </Page>
       );
+    }
+    async componentDidMount() {
+      const session = await GetSessionAction();
+      if (session) {
+        Link.goTo("/");
+      }
     }
   }
   return RegisterPage;
