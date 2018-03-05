@@ -33,7 +33,7 @@ export default class App extends React.Component {
         message: `App Record doc "${App.mainRecord}" not found!`,
       };
     }
-    const ExecComponent = await this.agent.exec(docID, App.mainRecord, "");
+    const ExecComponent = await this.agent.execDoc(docID, App.mainRecord, "");
     this.agent.subscribe(App.mainRecord, this._updateApp);
     this.setState({ ExecComponent });
   };
@@ -49,7 +49,7 @@ export default class App extends React.Component {
       docID: record.docID,
       recordID: App.mainRecord,
     });
-    const ExecComponent = await this.agent.exec(
+    const ExecComponent = await this.agent.execDoc(
       record.docID,
       App.mainRecord,
       "",

@@ -62,7 +62,7 @@ async function FSAgent(agent) {
     return moduleData;
   }
 
-  async function readFileValue(path) {
+  async function readPathValue(path) {
     const stat = await fs.lstat(path);
     let fileValue = null;
     if (basename(path).match(/.js$/)) {
@@ -112,13 +112,13 @@ async function FSAgent(agent) {
   }
 
   async function checksumPath(path) {
-    const fileValue = await readFileValue(path);
+    const fileValue = await readPathValue(path);
     const id = digest(stringify(fileValue));
     return id;
   }
 
   async function putPath(path, recordID) {
-    const fileValue = await readFileValue(path);
+    const fileValue = await readPathValue(path);
 
     if (fileValue.type === "Directory") {
       await Promise.all(
@@ -236,7 +236,7 @@ async function FSAgent(agent) {
   const fsRecords = {};
 
   const _providePathDocs = async (path, recordID) => {
-    const value = await readFileValue(path);
+    const value = await readPathValue(path);
     const docID = digest(stringify(value));
     const newRecord = {
       docID,

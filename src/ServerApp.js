@@ -16,7 +16,78 @@ if (typeof document === "undefined") {
 }
 const { AppRegistry } = require("react-native-web");
 
-async function ServerApp(agent, req, res, mainRecord) {
+async function respondWithApp(App, props, res, path, docID, clientAgent) {
+  res.set("content-type", "text/html");
+  // Horrible horrible horrible hacks to support react native web styles:
+  const appKey = `App-${docID}-${path}`;
+  const appKeys = AppRegistry.getAppKeys();
+  if (appKeys.indexOf(appKey) === -1) {
+    AppRegistry.registerComponent(appKey, () => App);
+  }
+  const { element, getStyleElement } = AppRegistry.getApplication(appKey, {
+    initialProps: props,
+  });
+  const appHtml = ReactDOMServer.renderToString(element);
+  const css = ReactDOMServer.renderToStaticMarkup(getStyleElement());
+
+  const title = App.title;
+  const html = `
+<!doctype html>
+<html>
+<head>
+<link rel="stylesheet" href="/assets/normalize.css" />
+<link rel="stylesheet" href="/assets/app.css" />
+<title>${title}</title>
+${css}
+<script>
+  window.avenEnv = ${JSON.stringify(clientAgent.env)};
+</script>
+</head>
+<body>
+<div id="root">
+${appHtml}
+</div>
+<script type="text/javascript" src="/_client_app.js"></script>
+<script type="text/javascript">
+window.avenDocCache = ${JSON.stringify(clientAgent.dumpCache())};
+</script>
+</body>
+</html>
+`;
+  res.send(html);
+}
+
+async function RunErrorApp(agent, req, res, mainRecord, error) {
+  const errorPagePath = "ErrorPage";
+  const authAgent = ClientAuthAgent(agent);
+  const clientAgent = await ExecAgent(authAgent, PlatformDeps);
+
+  const record = await clientAgent.dispatch({
+    type: "GetRecordAction",
+    recordID: mainRecord,
+  });
+  const { docID } = record;
+  if (!record || !docID) {
+    throw {
+      statusCode: 404,
+      code: "INVALID_APP",
+      message: `App Record doc "${mainRecord}" not found!`,
+    };
+  }
+
+  const ErrorApp = await clientAgent.execDoc(docID, mainRecord, errorPagePath);
+  const { path, query } = req;
+  await respondWithApp(
+    ErrorApp,
+    { path, query, error },
+    res,
+    errorPagePath,
+    docID,
+    clientAgent,
+  );
+}
+
+async function RunServerApp(agent, req, res, mainRecord) {
   const authAgent = ClientAuthAgent(agent);
   const clientAgent = await ExecAgent(authAgent, PlatformDeps);
   // clientAgent.setSession(cookie.authUserID, cookie.authSession)
@@ -34,50 +105,29 @@ async function ServerApp(agent, req, res, mainRecord) {
   }
   const path = req.path.slice(1);
 
-  const execResult = await clientAgent.exec(docID, mainRecord, path);
+  const execResult = await clientAgent.execDoc(docID, mainRecord, path);
   if (execResult == null) {
+    throw {
+      statusCode: 404,
+      code: "PATH_NOT_FOUND",
+      message: `Cannot find "${path}"`,
+      path,
+      record: mainRecord,
+    };
     res.status(404).send("Not found");
   } else if (React.Component.isPrototypeOf(execResult)) {
-    const App = execResult;
-    res.set("content-type", "text/html");
     const { path, query } = req;
-    // Horrible horrible horrible hacks to support react native web styles:
-    const appKey = `App-${docID}-${path}-${JSON.stringify(query)}`;
-    const appKeys = AppRegistry.getAppKeys();
-    if (appKeys.indexOf(appKey) === -1) {
-      AppRegistry.registerComponent(appKey, () => App);
-    }
-    const { element, getStyleElement } = AppRegistry.getApplication(appKey, {
+    await respondWithApp(
+      execResult,
+      {
+        path,
+        query,
+      },
+      res,
       path,
-      query,
-    });
-    const appHtml = ReactDOMServer.renderToString(element);
-    const css = ReactDOMServer.renderToStaticMarkup(getStyleElement());
-
-    const title = App.title;
-    res.send(`
-<!doctype html>
-<html>
-<head>
-  <link rel="stylesheet" href="/assets/normalize.css" />
-  <link rel="stylesheet" href="/assets/app.css" />
-  <title>${title}</title>
-  ${css}
-  <script>
-    window.avenEnv = ${JSON.stringify(clientAgent.env)};
-  </script>
-</head>
-<body>
-  <div id="root">
-${appHtml}
-  </div>
-  <script type="text/javascript" src="/_client_app.js"></script>
-  <script type="text/javascript">
-window.avenDocCache = ${JSON.stringify(clientAgent.dumpCache())};
-  </script>
-</body>
-</html>
-`);
+      docID,
+      clientAgent,
+    );
   } else if (typeof execResult === "string") {
     res.send(execResult);
   } else if (typeof execResult === "function") {
@@ -107,6 +157,14 @@ window.avenDocCache = ${JSON.stringify(clientAgent.dumpCache())};
     res.json(execResult);
   }
   return;
+}
+
+async function ServerApp(agent, req, res, mainRecord) {
+  try {
+    await RunServerApp(agent, req, res, mainRecord);
+  } catch (e) {
+    await RunErrorApp(agent, req, res, mainRecord, e);
+  }
 }
 
 module.exports = ServerApp;

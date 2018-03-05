@@ -2,7 +2,23 @@ const pathParse = require("path-parse");
 const pathJoin = require("path-browserify").join;
 
 const ExecAgent = (agent, platformDeps) => {
-  async function exec(docID, recordID, path, optionalParentDocs) {
+  async function exec(recordID, path) {
+    const record = await agent.dispatch({
+      type: "GetRecordAction",
+      recordID,
+    });
+
+    if (!record || !record.docID) {
+      throw {
+        statusCode: 404,
+        message: `Record "${recordID}" not found for execution`,
+        recordID,
+      };
+    }
+
+    return await execDoc(record.docID, recordID, path);
+  }
+  async function execDoc(docID, recordID, path, optionalParentDocs) {
     let parentDocs = optionalParentDocs || [];
 
     const doc = await agent.dispatch({
@@ -16,7 +32,7 @@ const ExecAgent = (agent, platformDeps) => {
       if (path === "") {
         const indexFile = moduleDoc.files.find(f => f.fileName === "index.js");
         if (indexFile) {
-          return await exec(docID, recordID, "index.js", parentDocs);
+          return await execDoc(docID, recordID, "index.js", parentDocs);
         } else {
           return doc;
         }
@@ -40,7 +56,7 @@ const ExecAgent = (agent, platformDeps) => {
         });
       }
       if (childDocID) {
-        return await exec(childDocID, recordID, restOfPath, [
+        return await execDoc(childDocID, recordID, restOfPath, [
           doc,
           ...parentDocs,
         ]);
@@ -50,7 +66,7 @@ const ExecAgent = (agent, platformDeps) => {
       }
       const immediateParent = parentDocs[0];
       if (immediateParent) {
-        return await exec(
+        return await execDoc(
           immediateParent.docID,
           immediateParent.recordID,
           path,
@@ -65,7 +81,7 @@ const ExecAgent = (agent, platformDeps) => {
         if (!inheritRecord || !inheritRecord.docID) {
           return null;
         }
-        return await exec(inheritRecord.docID, inheritRecord.recordID, path);
+        return await execDoc(inheritRecord.docID, inheritRecord.recordID, path);
       }
 
       return null;
@@ -75,7 +91,7 @@ const ExecAgent = (agent, platformDeps) => {
       return moduleDoc;
     }
     if (moduleDoc.error) {
-      return moduleDoc.error;
+      throw moduleDoc.error;
     }
 
     const basicDeps = { ...platformDeps, Agent: agent };
@@ -95,7 +111,7 @@ const ExecAgent = (agent, platformDeps) => {
         if (!directParent) {
           throw "Every JS module is expected to run within a folder";
         }
-        const executedDep = await exec(
+        const executedDep = await execDoc(
           directParent.docID,
           directParent.recordID,
           depPath,
@@ -131,6 +147,7 @@ const ExecAgent = (agent, platformDeps) => {
 
   return {
     ...agent,
+    execDoc,
     exec,
   };
 };

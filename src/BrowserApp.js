@@ -28,13 +28,15 @@ class LoadingContainer extends React.Component {
     });
   }
   componentDidCatch(e) {
-    debugger;
+    console.error("waaack");
+    this.setState({ error: e });
   }
   componentWillUnmount() {
     this.props.agent.offStatus(this._setStatus);
     this.props.agent.unsubscribe(this.props.recordID, this._updateApp);
     this._unlistenHistory();
   }
+  _clearError = () => this.setState({ error: null });
   _setStatus = status => this.setState({ status });
   _updateApp = async newRecord => {
     let record = newRecord;
@@ -46,16 +48,24 @@ class LoadingContainer extends React.Component {
     if (!record) {
       throw "Cannot find app record!";
     }
-    const ExecComponent = await this.props.agent.exec(
+    const ExecComponent = await this.props.agent.execDoc(
       record.docID,
       this.props.recordID,
       appPath,
     );
-    this.setState({ ExecComponent });
+    this.setState({ ExecComponent, error: null });
   };
-  state = { status: {}, ExecComponent: this.props.initialComponent };
+  state = {
+    status: {},
+    ExecComponent: this.props.initialComponent,
+    error: this.props.initialError,
+  };
   render() {
-    const { status, ExecComponent } = this.state;
+    const { status, ExecComponent, error } = this.state;
+    const ErrorComponent = this.props.errorComponent;
+    if (error) {
+      return <ErrorComponent onRetry={this._clearError} error={error} />;
+    }
     if (ExecComponent) {
       return <ExecComponent status={status} agent={this.props.agent} />;
     }
@@ -64,6 +74,7 @@ class LoadingContainer extends React.Component {
 }
 
 async function setupApp() {
+  const mainRecord = "App";
   const netAgent = await BrowserNetworkAgent();
   const authAgent = ClientAuthAgent(netAgent, { cache: window.avenDocCache });
   const authUserID = cookie.get("authUserID");
@@ -73,7 +84,7 @@ async function setupApp() {
 
   const record = await appAgent.dispatch({
     type: "GetRecordAction",
-    recordID: "App",
+    recordID: mainRecord,
   });
 
   const docID = record && record.docID;
@@ -84,13 +95,22 @@ async function setupApp() {
       message: `App not found!`,
     };
   }
-  const initialComponent = await appAgent.exec(docID, "App", appPath);
+  const errorComponent = await appAgent.execDoc(docID, mainRecord, "ErrorPage");
+  let initialError = null;
+  let initialComponent = null;
+  try {
+    initialComponent = await appAgent.execDoc(docID, mainRecord, appPath);
+  } catch (e) {
+    initialError = e;
+  }
   ReactDOM.render(
     <LoadingContainer
-      recordID="App"
+      recordID={mainRecord}
       agent={appAgent}
       initialRecord={record}
       initialComponent={initialComponent}
+      initialError={initialError}
+      errorComponent={errorComponent}
     />,
     document.getElementById("root"),
   );

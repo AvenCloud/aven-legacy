@@ -86,7 +86,8 @@ module.exports = async options => {
     try {
       await ServerApp(appAgent, req, res, APP_RECORD);
     } catch (e) {
-      console.log("Error:", e);
+      // Most error pages should be handled by ServerApp itself. This is a fallback:
+      console.log("Unhandled Error:", e);
       res
         .status(e.statusCode || 500)
         .json({ message: e.message, type: e.type });

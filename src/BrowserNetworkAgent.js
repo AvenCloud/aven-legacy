@@ -97,7 +97,6 @@ const BroserNetworkAgent = async () => {
 
   const _onWebsocketMessage = async e => {
     const payload = JSON.parse(e.data);
-    console.log("dd", payload);
     if (payload.recordID && payload.docID) {
       _deliverRecord(payload);
     }
