@@ -41,16 +41,21 @@ const getAbilities = permissionCode => ({
   canExecute: !!canExecute(permissionCode),
 });
 
+const isRootRecord = recordID => recordID === "/" || recordID === "";
+
 async function GetPermissionAction(action, infra, onRecord, dispatch) {
   const { recordID, authSession, authUser } = action;
 
-  const session = await dispatch({
-    type: "GetSessionAction",
-    authSession,
-    authUser,
-  });
+  let session = null;
+  if (authUser && authSession) {
+    session = await dispatch({
+      type: "GetSessionAction",
+      authSession,
+      authUser,
+    });
+  }
 
-  if (recordID === "/") {
+  if (isRootRecord(recordID)) {
     const isRootUser = session && session.userID === infra.rootUser;
     const permission = isRootUser ? PERMISSION.ADMIN : PERMISSION.DENY;
     return {
@@ -70,13 +75,16 @@ async function GetPermissionAction(action, infra, onRecord, dispatch) {
         "Does not support nested record IDs yet. Permissions will eventually inherit..",
     };
   }
-
   const record = await infra.model.record.findOne({
     where: { id: { [Op.eq]: recordIDs[0] } },
   });
+
   const parentRecordPath = pathJoin(recordID, "..");
   const parentRecord = parentRecordPath === "." ? "/" : parentRecordPath;
   if (!record) {
+    if (session && `@${session.userID}` === recordID) {
+      return { ...getAbilities(PERMISSION.ADMIN), recordID };
+    }
     const parentPermission = await dispatch({
       ...action,
       type: "GetPermissionAction",
@@ -87,17 +95,25 @@ async function GetPermissionAction(action, infra, onRecord, dispatch) {
       recordID,
     };
   }
-  const doesOwnRecord = record.owner === session.userID;
+  const doesOwnRecord = session && record.owner === session.userID;
   let ourPermissionCode = PERMISSION.DENY;
+  if (record.permission === "PUBLIC") {
+    ourPermissionCode = addPermissions(ourPermissionCode, PERMISSION.READ);
+  }
   if (doesOwnRecord) {
-    ourPermissionCode = PERMISSION.ADMIN;
-  } else {
-    const permission = await infra.model.recordPermission.findOne({
-      where: {
-        user: { [Op.eq]: session.userID },
-        record: { [Op.eq]: recordID },
-      },
-    });
+    ourPermissionCode = addPermissions(ourPermissionCode, PERMISSION.ADMIN);
+  } else if (session) {
+    let permission = null;
+    try {
+      permission = await infra.model.recordPermission.findOne({
+        where: {
+          user: { [Op.eq]: session.userID },
+          record: { [Op.eq]: recordID },
+        },
+      });
+    } catch (e) {
+      // this e makes no sense..
+    }
     if (permission) {
       ourPermissionCode = addPermissions(
         ourPermissionCode,
@@ -108,7 +124,7 @@ async function GetPermissionAction(action, infra, onRecord, dispatch) {
   return {
     ...getAbilities(ourPermissionCode),
     recordID,
-    userID: session.userID,
+    userID: session && session.userID,
   };
 }
 

@@ -8,7 +8,7 @@ async function SetPermissionAction(action, infra, onRecord, dispatch) {
     recordID,
   });
 
-  if (!permission.canWrite) {
+  if (!permission.canAdmin) {
     throw {
       message: "Permission denied",
       statusCode: 403,
