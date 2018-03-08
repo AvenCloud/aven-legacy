@@ -28,7 +28,6 @@ class LoadingContainer extends React.Component {
     });
   }
   componentDidCatch(e) {
-    console.error("waaack");
     this.setState({ error: e });
   }
   componentWillUnmount() {

@@ -32,6 +32,7 @@ const platformDeps = {
   BrowserHistory: null,
   _npm_js_cookie: null,
   _npm_tinycolor2: require("tinycolor2"),
+  _npm_monaco_editor: null,
 };
 
 module.exports = platformDeps;

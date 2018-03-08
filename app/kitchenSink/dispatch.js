@@ -6,10 +6,11 @@
         <Page>
           <Text>Dispatch Action</Text>
           <Form
-            fields={[{ name: "action", label: "Action JSON" }]}
+            fields={[{ name: "action", label: "Action JSON", type: "json" }]}
             onSubmit={async data => {
-              const result = await Agent.dispatch(JSON.parse(data.action));
-              Alert(`Result is ${JSON.stringify(result)}`);
+              Alert(data.action);
+              // const result = await Agent.dispatch(JSON.parse(data.action));
+              // Alert(`Result is ${JSON.stringify(result)}`);
             }}
           />
         </Page>

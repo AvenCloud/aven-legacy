@@ -5,7 +5,7 @@ const inquirer = require("inquirer");
 const Sequelize = require("sequelize");
 const DB = require("./DB");
 const { genHash, genSessionId } = require("./Utilities");
-
+const fetch = require("node-fetch");
 const DB_TEMPLATE = path.join(__dirname, "../AvenDBTemplate.sqlite");
 
 async function runInitConnect(pkg) {
@@ -28,12 +28,52 @@ async function runInitConnect(pkg) {
   } else {
     throw "Invalid host, must start with http:// or https://";
   }
+  async function dispatch(action) {
+    const protocolAndHost = `http${useSSL ? "s" : ""}://${host}`;
+    const res = await fetch(`${protocolAndHost}/api/dispatch`, {
+      method: "post",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(action),
+    });
+    const textBody = await res.text();
+    let body = textBody;
+    try {
+      body = textBody && JSON.parse(textBody);
+    } catch (e) {}
+    return body;
+  }
+
   const avenContext = {
     host,
     useSSL,
     // authUserID: "root",
     // authUserSession,
   };
+  console.log(
+    "Please create an account via your web browser at " + hostAnswer.host,
+  );
+  const loginAnswer = await inquirer.prompt([
+    {
+      name: "username",
+      type: "input",
+      message: "Username",
+    },
+    {
+      name: "password",
+      type: "password",
+      message: "Password",
+    },
+  ]);
+
+  const loginRes = await dispatch({
+    type: "AuthLoginAction",
+    userID: loginAnswer.username,
+    password: loginAnswer.password,
+  });
+
   pkg.scripts = {
     start: "aven start",
   };
@@ -41,7 +81,7 @@ async function runInitConnect(pkg) {
   await fs.writeFile(pkgJsonPath, JSON.stringify(pkg, null, 2));
   await fs.writeFile(avenContextPath, JSON.stringify(avenContext, null, 2));
 
-  console.log("done!", avenContext);
+  console.log("done!", avenContext, loginRes);
 }
 
 const appPath = process.cwd();

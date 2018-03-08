@@ -25,6 +25,7 @@ const platformDeps = {
   BrowserHistory: require("./BrowserHistory"),
   _npm_js_cookie: require("js-cookie"),
   _npm_tinycolor2: require("tinycolor2"),
+  _npm_monaco_editor: require("@timkendrick/monaco-editor"),
 };
 
 module.exports = platformDeps;

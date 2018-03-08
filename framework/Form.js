@@ -1,4 +1,49 @@
-({ React, Platform, Alert, View, Button, Text, TextInput, StyleSheet }) => {
+({
+  React,
+  Platform,
+  Alert,
+  View,
+  Button,
+  Text,
+  TextInput,
+  StyleSheet,
+  _npm_monaco_editor,
+}) => {
+  const MonacoEditor = _npm_monaco_editor;
+  class JSONEditor extends React.Component {
+    editorDidMount(editor, monaco) {
+      editor.focus();
+    }
+    render() {
+      const { onValue, value } = this.props;
+      return (
+        <div
+          style={{ width: 400, height: 400, borderWidth: 1 }}
+          ref={div => {
+            if (!div) {
+              this.editor = null;
+              return;
+            }
+            this.editor = _npm_monaco_editor.editor.create(
+              div,
+              {
+                value,
+              },
+              {},
+            );
+
+            this.editor.onDidChangeModelContent(() => {
+              const model = this.editor.getModel();
+              const content = model.getLinesContent();
+              const foobar = content.join("\n");
+              console.log(foobar);
+              onValue(foobar);
+            });
+          }}
+        />
+      );
+    }
+  }
   class FormField extends React.Component {
     render() {
       const {
@@ -16,6 +61,10 @@
       // - email
       // - password
       // - number
+      // - json
+      if (type === "json") {
+        return <JSONEditor value={value} onValue={onValue} />;
+      }
       const keyboardType =
         type === "email"
           ? "email-address"
