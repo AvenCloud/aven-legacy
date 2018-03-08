@@ -8,12 +8,49 @@ const { genHash, genSessionId } = require("./Utilities");
 
 const DB_TEMPLATE = path.join(__dirname, "../AvenDBTemplate.sqlite");
 
+async function runInitConnect(pkg) {
+  const hostAnswer = await inquirer.prompt([
+    {
+      name: "host",
+      type: "input",
+      message: "What server?",
+      default: "https://aven.io",
+    },
+  ]);
+  let host = null;
+  let useSSL = false;
+  if (hostAnswer.host.substr(0, 8) === "https://") {
+    useSSL = true;
+    host = hostAnswer.host.substr(8);
+  } else if (hostAnswer.host.substr(0, 7) === "http://") {
+    useSSL = false;
+    host = hostAnswer.host.substr(7);
+  } else {
+    throw "Invalid host, must start with http:// or https://";
+  }
+  const avenContext = {
+    host,
+    useSSL,
+    // authUserID: "root",
+    // authUserSession,
+  };
+  pkg.scripts = {
+    start: "aven start",
+  };
+
+  await fs.writeFile(pkgJsonPath, JSON.stringify(pkg, null, 2));
+  await fs.writeFile(avenContextPath, JSON.stringify(avenContext, null, 2));
+
+  console.log("done!", avenContext);
+}
+
+const appPath = process.cwd();
+const defaultAppPath = path.join(__dirname, "../default-app");
+const gitIgnorePath = path.join(appPath, ".gitignore");
+const pkgJsonPath = path.join(appPath, "package.json");
+const avenContextPath = path.join(appPath, "AvenContext.json");
+
 async function runInit() {
-  const appPath = process.cwd();
-  const defaultAppPath = path.join(__dirname, "../default-app");
-  const gitIgnorePath = path.join(appPath, ".gitignore");
-  const pkgJsonPath = path.join(appPath, "package.json");
-  const avenContextPath = path.join(appPath, "AvenContext.json");
   const pkgJson = await fs.readFile(pkgJsonPath, { encoding: "utf8" });
   const pkg = { ...JSON.parse(pkgJson) };
 
@@ -28,8 +65,8 @@ async function runInit() {
       ],
     },
   ]);
-  if (answers.mode !== "local") {
-    throw "This mode is not yet supported";
+  if (answers.mode === "connect") {
+    return await runInitConnect(pkg);
   }
 
   await fs.copy(DB_TEMPLATE, "./.AvenDB.sqlite");

@@ -111,7 +111,7 @@
       Unsplash.wingGrey,
     ];
     const photoCreditLinks = photoCredits.map((p, index) => (
-      <React.Fragment>
+      <React.Fragment key={index}>
         <Link
           to={`https://unsplash.com/photos/${p.unsplashID}`}
           style={{ color: FooterLinkColor, textDecorationLine: "underline" }}

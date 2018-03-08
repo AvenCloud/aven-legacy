@@ -11,9 +11,10 @@ const DEFAULT_MAIN_APP_PATH = joinPath(process.cwd(), "app");
 const FRAMEWORK_PATH = joinPath(__dirname, "../framework");
 const APP_RECORD = "App";
 const FRAMEWORK_RECORD = "Framework";
+const { digest } = require("./Utilities");
 const { promisify } = require("bluebird");
 const execFile = promisify(require("child_process").execFile);
-let prodClientAppCache = null;
+let prodClientAppBundle = null;
 const CLIENT_APP_SRC = joinPath(__dirname, "BrowserApp.js");
 const CLIENT_APP = joinPath(__dirname, "../dist/BrowserApp.bundle.js");
 const PlatformDeps = require("./PlatformDeps");
@@ -59,7 +60,15 @@ module.exports = async options => {
     await fsAgent.provideDirectory(appDirectory, APP_RECORD);
   }
 
-  app.get("/_client_app.js", async (req, res) => {
+  let clientScriptID = "dev";
+  if (!isDev) {
+    prodClientAppBundle = await fs.readFile(CLIENT_APP, {
+      encoding: "utf8",
+    });
+    clientScriptID = digest(prodClientAppBundle);
+  }
+
+  app.get(`/client-${clientScriptID}.js`, async (req, res) => {
     const { host, useSSL } = appAgent.env;
     res.set({
       "Access-Control-Allow-Origin": `http${useSSL ? "s" : ""}://${host}`,
@@ -73,19 +82,13 @@ module.exports = async options => {
       });
       res.send(built);
     } else {
-      if (!prodClientAppCache) {
-        prodClientAppCache = await fs.readFile(CLIENT_APP, {
-          encoding: "utf8",
-        });
-      }
-      res.set("Cache-Control", "no-cache");
-      res.send(prodClientAppCache);
+      res.send(prodClientAppBundle);
     }
   });
 
   app.get("*", async (req, res) => {
     try {
-      await ServerApp(appAgent, req, res, APP_RECORD);
+      await ServerApp(appAgent, req, res, APP_RECORD, clientScriptID);
     } catch (e) {
       // Most error pages should be handled by ServerApp itself. This is a fallback:
       console.log("Unhandled Error:", e);

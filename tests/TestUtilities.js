@@ -61,5 +61,4 @@ async function setupTestUserSession(app) {
 module.exports = {
   initTestApp,
   setupTestUserSession,
-  registerAndLoginTestUser: async () => {},
 };

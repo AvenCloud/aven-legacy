@@ -37,7 +37,7 @@ afterEach(async () => {
   await app.closeTest();
 });
 
-test("Permissions are granted for root user", async () => {
+test.skip("Permissions are granted for root user", async () => {
   const rootPermission = await app.testDispatch({
     type: "GetPermissionAction",
     authUser: app.testAuthUser,
@@ -63,7 +63,7 @@ test("Permissions are granted for root user", async () => {
   expect(permission.canWrite).toEqual(true);
 });
 
-test("Permissions are not granted for non-root user", async () => {
+test.skip("Permissions are not granted for non-root user", async () => {
   const rootPermission = await app.testDispatch({
     type: "GetPermissionAction",
     authUser: testAuthUser,
@@ -89,7 +89,7 @@ test("Permissions are not granted for non-root user", async () => {
   expect(permission.canWrite).toEqual(false);
 });
 
-test("user namespace permissions are granted by default unless real record exists", async () => {
+test.skip("user namespace permissions are granted by default unless real record exists", async () => {
   const userNamespaceRecord = `@${testAuthUser}`;
   const defaultPermission = await app.testDispatch({
     type: "GetPermissionAction",
@@ -125,7 +125,7 @@ test("user namespace permissions are granted by default unless real record exist
   expect(permission.canWrite).toEqual(false);
 });
 
-test("records can be set to public", async () => {
+test.skip("records can be set to public", async () => {
   await app.testDispatch({
     type: "SetRecordAction",
     authUser: app.testAuthUser, // this is root

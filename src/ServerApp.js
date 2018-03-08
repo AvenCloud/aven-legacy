@@ -16,7 +16,15 @@ if (typeof document === "undefined") {
 }
 const { AppRegistry } = require("react-native-web");
 
-async function respondWithApp(App, props, res, path, docID, clientAgent) {
+async function respondWithApp(
+  App,
+  props,
+  res,
+  path,
+  docID,
+  clientAgent,
+  clientScriptID,
+) {
   res.set("content-type", "text/html");
   // Horrible horrible horrible hacks to support react native web styles:
   const appKey = `App-${docID}-${path}`;
@@ -47,7 +55,7 @@ ${css}
 <div id="root">
 ${appHtml}
 </div>
-<script type="text/javascript" src="/_client_app.js"></script>
+<script type="text/javascript" src="/client-${clientScriptID}.js"></script>
 <script type="text/javascript">
 window.avenDocCache = ${JSON.stringify(clientAgent.dumpCache())};
 </script>
@@ -57,7 +65,7 @@ window.avenDocCache = ${JSON.stringify(clientAgent.dumpCache())};
   res.send(html);
 }
 
-async function RunErrorApp(agent, req, res, mainRecord, error) {
+async function RunErrorApp(agent, req, res, mainRecord, clientScriptID, error) {
   const errorPagePath = "ErrorPage";
   const authAgent = ClientAuthAgent(agent);
   const clientAgent = await ExecAgent(authAgent, PlatformDeps);
@@ -84,10 +92,11 @@ async function RunErrorApp(agent, req, res, mainRecord, error) {
     errorPagePath,
     docID,
     clientAgent,
+    clientScriptID,
   );
 }
 
-async function RunServerApp(agent, req, res, mainRecord) {
+async function RunServerApp(agent, req, res, mainRecord, clientScriptID) {
   const authAgent = ClientAuthAgent(agent);
   const clientAgent = await ExecAgent(authAgent, PlatformDeps);
   // clientAgent.setSession(cookie.authUserID, cookie.authSession)
@@ -127,6 +136,7 @@ async function RunServerApp(agent, req, res, mainRecord) {
       path,
       docID,
       clientAgent,
+      clientScriptID,
     );
   } else if (typeof execResult === "string") {
     res.send(execResult);
@@ -159,11 +169,11 @@ async function RunServerApp(agent, req, res, mainRecord) {
   return;
 }
 
-async function ServerApp(agent, req, res, mainRecord) {
+async function ServerApp(agent, req, res, mainRecord, clientScriptID) {
   try {
-    await RunServerApp(agent, req, res, mainRecord);
+    await RunServerApp(agent, req, res, mainRecord, clientScriptID);
   } catch (e) {
-    await RunErrorApp(agent, req, res, mainRecord, e);
+    await RunErrorApp(agent, req, res, mainRecord, clientScriptID, e);
   }
 }
 

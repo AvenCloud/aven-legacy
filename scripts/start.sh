@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-echo "STARTING SERVER WITH ENV $NODE_ENV"
+echo "STARTING SERVER WITH ENV '$NODE_ENV' "
 
 if [ NODE_ENV == "production" ] 
 then
@@ -18,7 +18,10 @@ then
 else
 
     run_app_dev() {
-        echo "Running app.."
+
+    echo "STARTING DEVELOPMENT AVEN SERVER"
+    echo "--------------------------------"
+
         node dist/RunServer.js
     }
 

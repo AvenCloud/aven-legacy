@@ -71,7 +71,7 @@ const CreateAgentServer = async (agent, infra, routing) => {
         infra.env !== "testing" ||
         req.headers["x-aven-test"] !== "expect-error"
       ) {
-        console.error(e);
+        console.error(JSON.stringify(e));
       }
       res.status(e.statusCode || 500).json(e);
     }
