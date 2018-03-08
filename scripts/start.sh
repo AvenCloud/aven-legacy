@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+echo "STARTING SERVER WITH ENV $NODE_ENV"
 
 if [ NODE_ENV == "production" ] 
 then
