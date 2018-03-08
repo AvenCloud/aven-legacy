@@ -78,6 +78,7 @@ module.exports = async options => {
           encoding: "utf8",
         });
       }
+      res.set("Cache-Control", "no-cache");
       res.send(prodClientAppCache);
     }
   });
