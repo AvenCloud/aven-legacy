@@ -20,7 +20,7 @@ const PlatformDeps = require("./PlatformDeps");
 
 module.exports = async options => {
   const infra = await Infra({
-    dbPath: options.dbPath || ".AvenDB.sqlite",
+    localStorage: options.localStorage,
   });
   const dbAgent = await DBAgent(infra);
 

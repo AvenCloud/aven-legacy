@@ -3,39 +3,39 @@ jobs:
   test:
     machine:
       enable: true
-    environment:
-      PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
-    image: circleci/node:8-browsers
+    image: circleci/classic:latest
 
-    working_directory: ~/circleci-aven
+    working_directory: ~/repo
 
     steps:
       - checkout
       - restore_cache:
           keys:
-          - aven-yarn-{{ checksum "yarn.lock" }}
-          - aven-yarn-
+          - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
 
       - save_cache:
-          key: aven-yarn-{{ checksum "yarn.lock" }}
           paths:
-            - ~/.cache/yarn
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
 
       - run:
-          name: Yarn Install
-          command: yarn install --cache-folder ~/.cache/yarn
-
-      - run:
-          name: 'Build'
-          command: yarn build
-      
-      - run:
-          name: 'Test'
-          command: yarn test'
-
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y apt-utils
+            sudo apt-get install -y libssl-dev build-essential curl
+            sudo curl -sL https://deb.nodesource.com/setup_8.x | sudo bash -
+            sudo curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo  apt-key add -
+            echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo  tee /etc/apt/sources.list.d/yarn.list
+            sudo apt-get update
+            sudo apt-get install -y nodejs yarn build-essential apt-transport-https   ca-certificates    curl   gnupg2 software-properties-common
+            sudo git checkout $CIRCLE_BRANCH
+            sudo yarn install
+            sudo yarn test
 
 workflows:
   version: 2
-  build_and_test:
+  test:
     jobs:
       - test

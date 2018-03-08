@@ -15,8 +15,7 @@
       email,
       displayName,
     });
-    await Cookie.set("authUserID", pendingRegistration.userID);
-    await Cookie.set("authSession", loginRes.session);
+    return res;
   }
   return Register;
 };

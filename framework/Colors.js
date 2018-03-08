@@ -1,6 +1,6 @@
 ({}) => {
   return {
-    primary: "#3F3E64",
+    primary: "#082B49",
     white: "#FFFFFF",
     bgWash: "#EEEEF7",
   };

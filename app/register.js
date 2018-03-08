@@ -43,12 +43,12 @@
                     userID: pendingRegistration.userID,
                     password: pendingRegistration.password,
                   });
+                  if (!loginRes.session) {
+                    Alert("Login Error " + JSON.stringify(res));
+                    return;
+                  }
                 }
 
-                if (!loginRes.session) {
-                  Alert("Login Error " + JSON.stringify(res));
-                  return;
-                }
                 Link.goTo("/");
               }}
             />

@@ -20,7 +20,17 @@ module.exports = async options => {
 
   let pg = null;
   let sequelize = null;
-  if (process.env.DATABASE_URL) {
+  if (options.localStorage) {
+    // Used for "local" runtime
+    sequelize = new Sequelize({
+      dialect: "sqlite",
+      storage: options.localStorage,
+
+      logging: false,
+      operatorsAliases: false,
+    });
+  } else if (process.env.DATABASE_URL) {
+    // Used in prod
     pg = new Client({
       connectionString: process.env.DATABASE_URL,
       ssl: process.env.PG_NO_SSL ? false : true,
@@ -31,9 +41,10 @@ module.exports = async options => {
       operatorsAliases: false,
     });
   } else {
+    // Used for core Aven development (`yarn dev`)
     sequelize = new Sequelize({
       dialect: "sqlite",
-      storage: options.dbPath,
+      storage: ".AvenDB.sqlite",
 
       logging: false,
       operatorsAliases: false,

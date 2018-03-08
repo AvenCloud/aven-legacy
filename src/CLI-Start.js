@@ -7,12 +7,16 @@ const spawnAsync = require("@expo/spawn-async");
 
 async function runStart() {
   process.env.NODE_ENV = "local";
-  const dbPath = path.join(process.cwd(), ".AvenDB.sqlite");
+  const avenContextPath = path.join(process.cwd(), "AvenContext.json");
+  const avenContextJSON = await fs.readFile(avenContextPath, {
+    encoding: "utf8",
+  });
+  const avenContext = JSON.parse(avenContextJSON);
 
   const options = {
     env: "local",
     appDir: process.cwd(),
-    dbPath,
+    ...avenContext,
   };
 
   const reportError = type => e => {

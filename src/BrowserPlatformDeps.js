@@ -13,6 +13,7 @@ const Platform = {
 const platformDeps = {
   Platform,
   React,
+  ProcessEnv: {},
   _npm_react: React,
   _npm_react_dom: ReactDOM,
   _npm_react_native: null,
@@ -23,6 +24,7 @@ const platformDeps = {
   _npm_remarkable: require("remarkable"),
   BrowserHistory: require("./BrowserHistory"),
   _npm_js_cookie: require("js-cookie"),
+  _npm_tinycolor2: require("tinycolor2"),
 };
 
 module.exports = platformDeps;

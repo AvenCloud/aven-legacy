@@ -1,6 +1,6 @@
 # Aven Framework (Soft Launch)
 
-![Aven Cloud](./graphics/AvenLogo.png)
+![Aven Cloud](./graphics/Splash.png)
 
 An opinionated attempt to make applications dramatically easier to develop and deploy. Use JS and React to target all platforms, update code and application data using the same real-time database.
 
