@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 echo "STARTING SERVER WITH ENV '$NODE_ENV' "
 
-if [ NODE_ENV == 'production' ] 
+if [ "$NODE_ENV" == 'production' ] 
 then
     echo "STARTING PRODUCTION AVEN SERVER"
     echo "-------------------------------"
