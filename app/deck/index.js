@@ -176,7 +176,7 @@
               resizeMode="contain"
             />
             <Subtitle>
-              Market growth of IT Enterprise software 2009-2019. Projected $289B
+              Market growth of IT Enterprise software 2009-2019. Projected $389B
               in 2018
             </Subtitle>
             <a
