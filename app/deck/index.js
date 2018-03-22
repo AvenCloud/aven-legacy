@@ -50,33 +50,43 @@
     </View>
   );
 
-  const LogoList = ({ logos }) =>
-    logos.map((logo, i) => (
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          marginVertical: 20,
-        }}
-        key={i}
-      >
-        <Image
-          style={{ width: 200, height: 80 }}
-          source={logo.image}
-          resizeMode="contain"
-        />
-        <Text
+  const LogoList = ({ logos }) => (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+      }}
+    >
+      {logos.map((logo, i) => (
+        <View
           style={{
-            textAlign: "center",
-            paddingTop: 10,
-            color: "#666",
-            fontSize: 20,
+            justifyContent: "center",
+            alignItems: "center",
+            marginVertical: 20,
+            margin: 20,
+            maxWidth: 200,
           }}
+          key={i}
         >
-          {logo.caption}
-        </Text>
-      </View>
-    ));
+          <Image
+            style={{ width: 200, height: 80 }}
+            source={logo.image}
+            resizeMode="contain"
+          />
+          <Text
+            style={{
+              textAlign: "center",
+              paddingTop: 10,
+              color: "#666",
+              fontSize: 20,
+            }}
+          >
+            {logo.caption}
+          </Text>
+        </View>
+      ))}
+    </View>
+  );
 
   const BulletPage = ({ items, title, color }) => (
     <Page>
@@ -140,7 +150,7 @@
           </Page>
 
           <Page>
-            <Title color="#4444cc">What does Aven do?</Title>
+            <Title color="#555588">What does Aven do?</Title>
             <Subtitle>
               We build mobile apps and websites with our on-demand development
               team
@@ -149,7 +159,7 @@
 
           <BulletPage
             title="Why is Eric the best founder for Aven?"
-            color="#cc5555"
+            color="#4444cc"
             items={[
               {
                 icon: "facebook-square",
@@ -225,8 +235,8 @@
             />
           </Page>
           <BulletPage
-            color="#999955"
-            title="What problems are Aven solving?"
+            color="#cc4444"
+            title="What does Aven fix?"
             items={[
               {
                 icon: "fire",
@@ -236,7 +246,7 @@
               {
                 icon: "question-circle",
                 text:
-                  "Contract expectations often unclear, and both parties leave dissatisfied",
+                  "Contract expectations are often unclear, and both parties leave dissatisfied",
               },
               {
                 icon: "star-half-empty",
