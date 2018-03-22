@@ -1,0 +1,3 @@
+    - death to terminal, should all be in browser/app
+    - death to git
+    - don't adopt a type system until we incrementally transition to another stable language

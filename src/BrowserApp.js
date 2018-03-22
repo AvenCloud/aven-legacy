@@ -62,7 +62,7 @@ class LoadingContainer extends React.Component {
   render() {
     const { status, ExecComponent, error } = this.state;
     const ErrorComponent = this.props.errorComponent;
-    if (error) {
+    if (error || !ExecComponent) {
       return <ErrorComponent onRetry={this._clearError} error={error} />;
     }
     if (ExecComponent) {

@@ -1,12 +1,13 @@
-({ React, Page, Markdown }) => {
+({ React, Page, Markdown, Text, docs }) => {
   class MarkdownExample extends React.Component {
     static title = "Markdown";
     render() {
       return (
         <Page title="Markdown">
+          <Text>uhh {JSON.stringify(docs)}</Text>
           <Markdown
             content={`
-# Aven Framework
+# Aven Frameworkk
 ## [Open source on GitHub](https://github.com/AvenDevelopment/aven)
 
 ![Aven Cloud](https://github.com/AvenCloud/aven/raw/master/graphics/AvenLogo.png)

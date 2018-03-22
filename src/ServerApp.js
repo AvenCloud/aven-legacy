@@ -45,6 +45,7 @@ async function respondWithApp(
 <head>
 <link rel="stylesheet" href="/assets/normalize.css" />
 <link rel="stylesheet" href="/assets/app.css" />
+<link rel="stylesheet" href="/assets/css/font-awesome.css" />
 <title>${title}</title>
 ${css}
 <script>

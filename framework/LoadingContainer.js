@@ -14,9 +14,9 @@
         });
         this.setState({ docValue: doc.value });
       }
-      Agent.subscribe(this.props.record, this._changeShit);
+      Agent.subscribe(this.props.record, this._goChange);
     }
-    _changeShit = async () => {
+    _goChange = async () => {
       const record = await Agent.dispatch({
         type: "GetRecordAction",
         recordID: this.props.record,
@@ -29,7 +29,7 @@
       this.setState({ docValue: doc.value });
     };
     componentWillUnmount() {
-      Agent.unsubscribe(this.props.record, this._changeShit);
+      Agent.unsubscribe(this.props.record, this._goChange);
     }
     render() {
       return this.props.render(this.state.docValue, this._setRecord);

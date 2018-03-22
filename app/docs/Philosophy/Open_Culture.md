@@ -1,0 +1,4 @@
+    - framework is open source forever
+    - welcoming to all contributors, customers, and learners
+    - most communication is
+    - we attempt to be resilient to time zones

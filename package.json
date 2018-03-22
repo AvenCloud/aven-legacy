@@ -1,6 +1,6 @@
 {
     "name": "aven-core",
-    "version": "0.1.0-alpha.11",
+    "version": "0.1.0-alpha.13",
     "bin": {
         "aven": "dist/RunCLI.js"
     },
@@ -63,6 +63,7 @@
         "express": "^4.16.2",
         "fb-watchman": "^2.0.0",
         "file-type": "^7.4.0",
+        "font-awesome": "^4.7.0",
         "fqdn": "0.0.3",
         "fs-extra": "^5.0.0",
         "global": "^4.3.2",
@@ -84,6 +85,8 @@
         "prop-types": "^15.6.0",
         "react": "^16.2.0",
         "react-dom": "^16.2.0",
+        "react-fontawesome": "^1.6.1",
+        "react-native-vector-icons": "^4.5.0",
         "react-native-web": "^0.4.0",
         "remarkable": "^1.7.1",
         "sequelize": "^4.27.0",

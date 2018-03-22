@@ -1,0 +1,1 @@
+Uses SQLite in dev, PostgreSQL in production

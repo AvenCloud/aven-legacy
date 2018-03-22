@@ -31,6 +31,7 @@ const platformDeps = {
   _npm_remarkable: require("remarkable"),
   BrowserHistory: null,
   _npm_js_cookie: null,
+  _npm_react_fontawesome: require("react-fontawesome"),
   _npm_tinycolor2: require("tinycolor2"),
   _npm_monaco_editor: null,
 };

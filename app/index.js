@@ -98,10 +98,10 @@
     );
 
     if (session) {
-      let sessionLinks = (
+      sessionLinks = (
         <React.Fragment>
-          <FooterLink to="register">My Account</FooterLink>
-          <FooterLink to="login">Logout</FooterLink>
+          <FooterLink to={`@${session.authUser}`}>My Account</FooterLink>
+          <FooterLink to="logout">Logout</FooterLink>
         </React.Fragment>
       );
     }
@@ -154,7 +154,9 @@
         );
       }
       async componentDidMount() {
+        console.log("component did mount");
         const session = await GetSessionAction();
+        console.log("got session", session);
         this.setState({ session });
       }
     }
@@ -220,7 +222,7 @@
                     marginVertical: 20,
                   }}
                 >
-                  Aven Framework Beta
+                  Aven Framework Preview
                 </Text>
                 <Text
                   style={{
