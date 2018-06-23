@@ -1,4 +1,4 @@
-# Aven Framework (Soft Launch)
+# Aven Cloud (Soft Launch)
 
 ![Aven Cloud](./graphics/Splash.png)
 
